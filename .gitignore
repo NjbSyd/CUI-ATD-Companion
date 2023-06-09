@@ -1,6 +1,7 @@
 node_modules/
 .expo/
 dist/
+.idea/
 npm-debug.*
 *.jks
 *.p8
@@ -18,3 +19,6 @@ web-build/
 package-lock.json
 Storage.csv
 Config/FirebaseConfig.js
+.idea/CUI-ATD-Unofficial-Timetable.iml
+.idea/modules.xml
+.idea/vcs.xml
