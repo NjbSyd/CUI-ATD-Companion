@@ -6,7 +6,6 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import {StatusBar} from "expo-status-bar";
 import {Teachers} from "./UI/Screens/Teachers";
 import {Classroom} from "./UI/Screens/Classroom";
-import {fetchAndSaveDataFromFB} from "./BackEnd/SqliteFX";
 
 const Tabs = createBottomTabNavigator();
 export default function App() {
