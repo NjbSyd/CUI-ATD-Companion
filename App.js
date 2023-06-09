@@ -1,4 +1,4 @@
-import {LogBox} from 'react-native';
+import {Image, LogBox, Text} from 'react-native';
 import {useEffect} from "react";
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -17,6 +17,7 @@ export default function App() {
         <Tabs.Navigator
             initialRouteName="Teachers"
             screenOptions={({route}) => ({
+              headerLeft: ()=><Image source={require("./assets/logo.png")} style={{width:37,height:44,marginLeft:"35%",marginRight:"-35%" }} />,
               tabBarIcon: ({color, size}) => {
                 let rn = route.name;
                 let iconName = rn === 'Classrooms' ? 'google-classroom'

@@ -1,11 +1,11 @@
-import {ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
 import {useEffect, useState} from "react";
 import {getAllTeachersData, refetchAllDataFromFB} from "../../BackEnd/FBFunctions";
 import {Dropdown} from "react-native-element-dropdown";
 import {List} from "../Components/List";
 import {checkInKeys, getData} from "../../BackEnd/AsyncStorageFX";
 import Loading from "../Components/Loading";
-import {LocalReloadButton, CloudReloadButton} from "../Components/ReloadButton";
+import {FloatingButton} from "../Components/ReloadButton";
 
 export function Teachers() {
   const [reload, setReload] = useState(true);
@@ -74,18 +74,30 @@ export function Teachers() {
                   search={true}
                   searchPlaceholder="Teacher name"
                   autoScroll={false}
+                  inputSearchStyle={{backgroundColor:"#d1fff6"}}
         />
         <Text style={styles.label}>Teacher's Schedule</Text>
         <ScrollView style={styles.scrollView}>
           {
             selectedTeacherData.length === 0 ?
-            <Text style={{fontSize: 100, alignSelf: 'center'}}>🤦‍♂🤷‍♂</Text> :
+            <Image source={require('../../assets/noresults.png')} style={{
+                width: "100%",
+                height: 400,
+                alignSelf: 'center',
+                resizeMode: 'contain',
+            }}/> :
             <List data={selectedTeacherData} type={"Teacher"}/>
           }
         </ScrollView>
         <Loading visible={loading}/>
-        <LocalReloadButton onPress={() => setReload(true)}/>
-        <CloudReloadButton onPress={async () => {
+        {/*<LocalReloadButton onPress={() => setReload(true)}/>*/}
+        {/*<CloudReloadButton onPress={async () => {*/}
+        {/*  ToastAndroid.show("Fetching data from server...", ToastAndroid.SHORT);*/}
+        {/*  setLoading(true)*/}
+        {/*  await refetchAllDataFromFB();*/}
+        {/*  setReload(true)*/}
+        {/*}}/>*/}
+        <FloatingButton onPressLocal={() => setReload(true)} onPressCloud={async () => {
           ToastAndroid.show("Fetching data from server...", ToastAndroid.SHORT);
           setLoading(true)
           await refetchAllDataFromFB();

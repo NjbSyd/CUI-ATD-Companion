@@ -1,4 +1,4 @@
-import {ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
+import {Image, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
 import {Dropdown} from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
 import {useEffect, useState} from "react";
@@ -6,12 +6,15 @@ import {getClassRooms, getTimeslots, refetchAllDataFromFB} from "../../BackEnd/F
 import Loading from "../Components/Loading";
 import {checkInKeys, getData} from "../../BackEnd/AsyncStorageFX";
 import {List} from "../Components/List";
-import {LocalReloadButton, CloudReloadButton} from "../Components/ReloadButton";
+import {FloatingButton} from "../Components/ReloadButton";
 
 export function Classroom() {
   const [reload, setReload] = useState(false);
   useEffect(() => {
-    FetchTimeSlotsAndClassRooms().then(() => {});
+    FetchTimeSlotsAndClassRooms().then(() => {
+      setSelectedRoom(null)
+      setSelectedTimeSlot(null)
+    });
     setReload(false)
   }, [reload]);
 
@@ -82,6 +85,18 @@ export function Classroom() {
         });
       });
     });
+    const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"];
+    resultingData = resultingData.sort((a, b) => {
+      const dayA = a.day.toUpperCase();
+      const dayB = b.day.toUpperCase();
+      if (days.indexOf(dayA) > days.indexOf(dayB)) {
+        return 1;
+      } else if (days.indexOf(dayA) < days.indexOf(dayB)) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
     setResultingData(resultingData)
     setIsSearching(false);
   }
@@ -91,7 +106,7 @@ export function Classroom() {
   const [isLoading, setIsLoading] = useState(false);
   const [timeslots, setTimeslots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [rooms, setRooms] = useState(dummyRooms);
+  const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [timeTable, setTimeTable] = useState();
   return (
@@ -106,6 +121,7 @@ export function Classroom() {
                     mode={"modal"}
                     autoScroll={false}
                     placeholder={"Timeslot..."}
+                    inputSearchStyle={{backgroundColor:"#d1fff6"}}
           />
           <Dropdown style={styles.selectorView} containerStyle={styles.selectorList} data={rooms} labelField="label"
                     valueField="value"
@@ -117,18 +133,23 @@ export function Classroom() {
                     mode={"modal"}
                     autoScroll={false}
                     placeholder={"Room#..."}
+                    inputSearchStyle={{backgroundColor:"#d1fff6"}}
           />
           <MagnifierButton onPress={() => search()}/>
         </View>
         <Text style={styles.label}>Classes</Text>
         <ScrollView style={styles.scrollView}>
-          {resultingData.length === 0 ? <Text style={{fontSize: 100, alignSelf: 'center'}}>🤦‍♂🤷‍♂</Text> :
+          {resultingData.length === 0 ? <Image source={require('../../assets/noresults.png')} style={{
+                                        width: "100%",
+                                        height: 400,
+                                        alignSelf: 'center',
+                                        resizeMode: 'contain',
+                                      }}/> :
            <List data={resultingData} type={"Classroom"}/>}
         </ScrollView>
         <Loading visible={isSearching}/>
         <Loading visible={isLoading}/>
-        <LocalReloadButton onPress={() => setReload(true)}/>
-        <CloudReloadButton onPress={async () => {
+        <FloatingButton onPressLocal={() => setReload(true)} onPressCloud={async () => {
           ToastAndroid.show("Fetching data from server...", ToastAndroid.SHORT);
           setIsLoading(true)
           await refetchAllDataFromFB();
@@ -170,8 +191,3 @@ const styles = StyleSheet.create({
     width: "100%",
   }
 });
-
-const dummyRooms = [
-  {label: "Loading...1", value: "Loading...1"}, {label: "Loading...2", value: "Loading...2"},
-  {label: "Loading...3", value: "Loading...3"}, {label: "Loading...4", value: "Loading...4"}
-];
