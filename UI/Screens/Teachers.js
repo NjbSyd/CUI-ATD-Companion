@@ -1,126 +1,95 @@
-import {Image, ScrollView, StyleSheet, Text, ToastAndroid, View} from "react-native";
-import {useEffect, useState} from "react";
-import {getAllTeachersData, refetchAllDataFromFB} from "../../BackEnd/FBFunctions";
-import {Dropdown} from "react-native-element-dropdown";
-import {List} from "../Components/List";
-import {checkInKeys, getData} from "../../BackEnd/AsyncStorageFX";
-import Loading from "../Components/Loading";
-import {FloatingButton} from "../Components/ReloadButton";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  View,
+} from "react-native";
+import { useEffect, useState } from "react";
+import { Dropdown } from "react-native-element-dropdown";
+import { List } from "../Components/List";
+import { FloatingButton } from "../Components/ReloadButton";
+import { Header } from "../Components/Header";
+import { useSelector } from "react-redux";
+import {
+  GetTeacherNames,
+  GetTeachersSchedule,
+} from "../../Functions/functions";
 
-export function Teachers() {
-  const [reload, setReload] = useState(true);
-  useEffect(() => {
-    setSelectedTeacher(null)
-    setSelectedTeacherData([]);
-    setLoading(true)
-    extractedMethodFromUseEffect().then(() => {
-      setLoading(false)
-    }).catch(() => {
-      setLoading(false)
-      ToastAndroid.show("Error Loading Teachers Data", ToastAndroid.SHORT)
-    });
-    setReload(false);
-  }, [reload]);
-
-
-  async function extractedMethodFromUseEffect() {
-    await checkInKeys("teacherNames").then((res) => {
-      if (!res) {
-        let promise = getDataNotFoundInAsyncStorage();
-      } else {
-        let promise = getDataFoundInAsyncStorage();
-      }
-    }).catch(() => {
-      let promise = getDataNotFoundInAsyncStorage();
-    });
-  }
-
-
-  async function getDataNotFoundInAsyncStorage() {
-    try {
-      const teacherNs = await getAllTeachersData()
-      setTeachersNames(teacherNs);
-    } catch (e) {
-      setTeachersNames([{label: e, value: e}])
-    }
-  }
-
-  async function getDataFoundInAsyncStorage() {
-    try {
-      const teacherNs = await getData("teacherNames");
-      setTeachersNames(teacherNs);
-    } catch (e) {
-      setTeachersNames([{label: e, value: e}])
-    }
-  }
-
-  const [teachersNames, setTeachersNames] = useState([]);
-  const [loading, setLoading] = useState(true);
+export function Teachers({ navigation }) {
+  const teachersNames = useSelector((state) => state.teacherNames).teacherNames;
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedTeacherData, setSelectedTeacherData] = useState([]);
   return (
-      <View style={styles.container}>
-        <Dropdown style={styles.slotSelector} data={teachersNames} labelField="label" valueField="value"
-                  onChange={(item) => {
-                    setSelectedTeacher(item);
-                    getData(item.label).then((data) => {
-                      setSelectedTeacherData(data);
-                    }).catch((e) => {
-                      console.log(e);
-                    });
-                  }}
-                  placeholder={"Select a teacher"}
-                  value={selectedTeacher}
-                  search={true}
-                  searchPlaceholder="Teacher name"
-                  autoScroll={false}
-                  inputSearchStyle={{backgroundColor:"#d1fff6"}}
-        />
-        <Text style={styles.label}>Teacher's Schedule</Text>
-        <ScrollView style={styles.scrollView}>
-          {
-            selectedTeacherData.length === 0 ?
-            <Image source={require('../../assets/noresults.png')} style={{
-                width: "100%",
-                height: 400,
-                alignSelf: 'center',
-                resizeMode: 'contain',
-            }}/> :
-            <List data={selectedTeacherData} type={"Teacher"}/>
-          }
-        </ScrollView>
-        <Loading visible={loading}/>
-        {/*<LocalReloadButton onPress={() => setReload(true)}/>*/}
-        {/*<CloudReloadButton onPress={async () => {*/}
-        {/*  ToastAndroid.show("Fetching data from server...", ToastAndroid.SHORT);*/}
-        {/*  setLoading(true)*/}
-        {/*  await refetchAllDataFromFB();*/}
-        {/*  setReload(true)*/}
-        {/*}}/>*/}
-        <FloatingButton onPressLocal={() => setReload(true)} onPressCloud={async () => {
-          ToastAndroid.show("Fetching data from server...", ToastAndroid.SHORT);
-          setLoading(true)
-          await refetchAllDataFromFB();
-          setReload(true)
-        }}/>
-      </View>
-  )
+    <View style={styles.container}>
+      <Header title={"Teachers"} />
+      <Dropdown
+        style={styles.slotSelector}
+        data={teachersNames}
+        labelField="label"
+        valueField="value"
+        onChange={(item) => {
+          console.log(item);
+          setSelectedTeacher(item);
+          GetTeachersSchedule(item.value).then((res) => {
+            setSelectedTeacherData(res);
+          });
+        }}
+        placeholder={"Select a teacher"}
+        value={selectedTeacher}
+        search={true}
+        searchPlaceholder="Teacher name"
+        autoScroll={false}
+        inputSearchStyle={{ backgroundColor: "#d1fff6" }}
+      />
+      {selectedTeacherData.length !== 0 && (
+        <Text style={styles.label}> {selectedTeacher.label}'s Schedule</Text>
+      )}
+      <ScrollView style={styles.scrollView}>
+        {selectedTeacherData.length === 0 ? (
+          <Image
+            source={require("../../assets/noresults.png")}
+            style={{
+              width: "100%",
+              height: 400,
+              alignSelf: "center",
+              resizeMode: "contain",
+            }}
+          />
+        ) : (
+          <List data={selectedTeacherData} type={"Teacher"} />
+        )}
+      </ScrollView>
+      <FloatingButton />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, backgroundColor: '#fff', alignItems: 'center', width: '100%',
-  }, scrollView: {
-    width: '80%', margin: 20,
-  }, label: {
-    fontSize: 18, fontWeight: 'bold', marginTop: 10, alignSelf: 'flex-start', marginLeft: '6%',
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    width: "100%",
+  },
+  scrollView: {
+    width: "80%",
+    margin: 20,
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 10,
+    alignSelf: "flex-start",
+    marginLeft: "6%",
   },
   slotSelector: {
-    width: '90%',
+    width: "90%",
     padding: 10,
     marginTop: 10,
     borderWidth: 0.3,
-    borderColor: '#000',
+    borderColor: "#000",
     borderRadius: 5,
   },
 });

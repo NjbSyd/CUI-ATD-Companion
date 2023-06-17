@@ -1,108 +1,135 @@
-function FindClassRoomDetails(fullSchedule,roomNo,slot) {
-  let data = [];
-  fullSchedule=fullSchedule[0];
-  console.log(JSON.stringify(fullSchedule))
-  if(roomNo === undefined || roomNo === null || roomNo === ""){
-    return data;
-  }
-  for (const className in fullSchedule) {
-    for (const classObj of fullSchedule[className]) {
-      if (classObj[slot] &&
-          classObj[slot]["classRoom"].includes(roomNo)) {
-        data.push({className, day: classObj["Day"], time: slot, subject: classObj[slot]["subject"], teacher: classObj[slot]["teacher"], classRoom: classObj[slot]["classRoom"]})
-      }
-    }
-  }
-  data = [...new Set(data)]
-  const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  data.sort((a, b) => {
-    return weekdays.indexOf(a.day) - weekdays.indexOf(b.day);
-  });
-  console.log(fullSchedule["BSE 6A"][2]["08:00 to 09:30"]["day"])
-  return data;
-}
+import * as SQLite from "expo-sqlite";
 
-function extractAllSubjects(data) {
-  let subjects = [];
-  Object.values(data).forEach((week) => {
-    week.forEach((day) => {
-      Object.values(day).forEach((slot) => {
-        if (slot !== null && typeof slot === "object" && "subject" in slot) {
-          subjects.push(slot.subject);
-        }
-      });
-    });
-  });
-  subjects = [...new Set(subjects)]
-  return subjects;
-}
-
-function extractAllTeachers(data) {
-  let teachers = [];
-  Object.values(data).forEach((week) => {
-    week.forEach((day) => {
-      Object.values(day).forEach((slot) => {
-        if (slot !== null && typeof slot === "object" && "teacher" in slot) {
-          teachers.push(slot.teacher);
-        }
-      });
-    });
-  });
-  teachers = [...new Set(teachers)]
-  return teachers;
-}
-
-function noOfClasses(JsonData, reqDay) {
-  let no = 0;
-  Object.keys(JsonData).map((key, index) => {
-    JsonData[key].forEach((day) => {
-      if (day.Day === reqDay) {
-        Object.values(day).forEach((slot) => {
-          if (slot !== null && typeof slot === "object" && "teacher" in slot)
-            no++;
-        });
-      }
-    })
-  })
-  console.log(no)
-}
-
-function extractAllClassRooms(data) {
-  data=data[0];
-  let classRooms = [];
-  Object.keys(data).map((ClassNameSemesterSection) => {
-    for (const daySchedule of data[ClassNameSemesterSection]) {
-        for (const timeSlot in daySchedule) {
-        if (daySchedule[timeSlot] !== null && typeof daySchedule[timeSlot] === 'object') {
-          const room = daySchedule[timeSlot].classRoom;
-          if (room && !classRooms.includes(room)) {
-            classRooms.push(room);
+function GetTeacherNames() {
+  return new Promise((resolve, reject) => {
+    const db = SQLite.openDatabase("TimeTable.db");
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT DISTINCT teacher FROM timetables",
+        [],
+        (_, rows) => {
+          let teachers = [];
+          for (let i = 0; i < rows.rows.length; i++) {
+            teachers.push(rows.rows.item(i).teacher);
           }
-        }
-      }
-    }
+          teachers.sort((a, b) => {
+            if (a > b) {
+              return 1;
+            } else if (a < b) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          teachers = teachers.map((teacher) => {
+            return { label: teacher, value: teacher };
+          });
+          resolve(teachers);
+        },
+        (_, error) => reject(error)
+      );
+    });
   });
-  classRooms.sort((a, b) => {
-    if (a > b) {
-      return 1;
-    } else if (a < b) {
-      return -1;
-    } else {
-      return 0;
-    }
-  });
-
-  classRooms= classRooms.map((classRoom) => {
-    return {label: classRoom, value: classRoom};
-  });
-    return classRooms;
 }
 
-export {
-  FindClassRoomDetails,
-  extractAllSubjects,
-  extractAllTeachers,
-  noOfClasses,
-  extractAllClassRooms,
-};
+function GetTeachersSchedule(teacher) {
+  return new Promise((resolve, reject) => {
+    const db = SQLite.openDatabase("TimeTable.db");
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM timetables WHERE teacher = ?",
+        [teacher],
+        (_, rows) => {
+          let schedule = [];
+          for (let i = 0; i < rows.rows.length; i++) {
+            schedule.push(rows.rows.item(i));
+          }
+          let weekDays = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ];
+          schedule.sort((a, b) => {
+            if (weekDays.indexOf(a.day) > weekDays.indexOf(b.day)) {
+              return 1;
+            } else if (weekDays.indexOf(a.day) < weekDays.indexOf(b.day)) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          resolve(schedule);
+        },
+        (_, error) => reject(error)
+      );
+    });
+  });
+}
 
+function GetTimeSlots() {
+  return new Promise((resolve, reject) => {
+    const db = SQLite.openDatabase("TimeTable.db");
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT DISTINCT time_slot FROM timetables",
+        [],
+        (_, rows) => {
+          let timeSlots = [];
+          for (let i = 0; i < rows.rows.length; i++) {
+            timeSlots.push(rows.rows.item(i).time);
+          }
+          timeSlots.sort((a, b) => {
+            if (a > b) {
+              return 1;
+            } else if (a < b) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          timeSlots = timeSlots.map((time) => {
+            return { label: time, value: time };
+          });
+          resolve(timeSlots);
+        },
+        (_, error) => reject(error)
+      );
+    });
+  });
+}
+function GetClassRooms() {
+  return new Promise((resolve, reject) => {
+    const db = SQLite.openDatabase("TimeTable.db");
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT DISTINCT class_room FROM timetables",
+        [],
+        (_, rows) => {
+          let class_rooms = [];
+          for (let i = 0; i < rows.rows.length; i++) {
+            class_rooms.push(rows.rows.item(i).class_room);
+          }
+          class_rooms.sort((a, b) => {
+            if (a > b) {
+              return 1;
+            } else if (a < b) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          class_rooms = class_rooms.map((class_room) => {
+            return { label: class_room, value: class_room };
+          });
+          resolve(class_rooms);
+        },
+        (_, error) => reject(error)
+      );
+    });
+  });
+}
+export { GetTeacherNames, GetTeachersSchedule, GetTimeSlots, GetClassRooms };

@@ -1,39 +1,33 @@
-import {Image, LogBox, Text} from 'react-native';
-import {useEffect} from "react";
-import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import {StatusBar} from "expo-status-bar";
-import {Teachers} from "./UI/Screens/Teachers";
-import {Classroom} from "./UI/Screens/Classroom";
+import "react-native-gesture-handler";
+import { LogBox } from "react-native";
+import { useEffect } from "react";
+import { ApplicationEntry } from "./UI/Screens/ApplicationEntry";
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { SplashScreen } from "./UI/Screens/SplashScreen";
+import { StatusBar } from "expo-status-bar";
+import { Provider } from "react-redux";
+import store from "./Redux/Store";
 
-const Tabs = createBottomTabNavigator();
+const Stack = createStackNavigator();
 export default function App() {
   useEffect(() => {
     LogBox.ignoreAllLogs(true);
   });
+
   return (
+    <Provider store={store}>
       <NavigationContainer>
-        <Tabs.Navigator
-            initialRouteName="Teachers"
-            screenOptions={({route}) => ({
-              headerLeft: ()=><Image source={require("./assets/logo.png")} style={{width:37,height:44,marginLeft:"35%",marginRight:"-35%" }} />,
-              tabBarIcon: ({color, size}) => {
-                let rn = route.name;
-                let iconName = rn === 'Classrooms' ? 'google-classroom'
-                                                   : rn === 'Timetable' ? 'timetable'
-                                                                        : rn === 'Teachers' ? 'account-tie' : 'question';
-                return <MaterialCommunityIcons name={iconName} size={size} color={color}/>;
-              },
-              headerStyle: {
-                backgroundColor: 'rgb(2, 201, 208)',
-                height: 80,
-              }
-            })}>
-          <Tabs.Screen name="Teachers" component={Teachers} />
-          <Tabs.Screen name="Classrooms" component={Classroom}/>
-        </Tabs.Navigator>
-        <StatusBar style="auto"/>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name={"Splash"} component={SplashScreen} />
+          <Stack.Screen name={"Main"} component={ApplicationEntry} />
+        </Stack.Navigator>
+        <StatusBar style="auto" />
       </NavigationContainer>
+    </Provider>
   );
 }

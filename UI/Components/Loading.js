@@ -1,5 +1,7 @@
 import React from 'react';
 import {View, Modal, StyleSheet, Image, Text} from 'react-native';
+import AnimatedLottieView from "lottie-react-native";
+import {transparent} from "react-native-paper/src/styles/themes/v2/colors";
 
 const LoadingPopup = ({visible}) => {
   return (
@@ -10,8 +12,10 @@ const LoadingPopup = ({visible}) => {
       >
         <View style={styles.container}>
           <View style={styles.popup}>
-            <Text style={styles.txt}>Loading</Text>
-            <Image source={require('../../assets/Loading.gif')} style={styles.image}/>
+            <AnimatedLottieView style={{
+              flex:1,
+              alignSelf: 'center',
+            }} source={require('../../assets/Loading.json')} autoPlay  autoSize={true}/>
           </View>
         </View>
       </Modal>
@@ -21,12 +25,13 @@ const LoadingPopup = ({visible}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   popup: {
-    backgroundColor: '#fff',
+    width: '50%',
+    height: '15%',
+    backgroundColor: 'rgba(55,159,234,0.51)',
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
