@@ -3,6 +3,7 @@
     "name": "Unofficial_Timetable_CUI",
     "slug": "Unofficial_Timetable_CUI",
     "version": "1.0.0",
+    "owner": "njbsyd",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -21,10 +22,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.njbsyd.unofficial.tt.cui"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "48feebfc-5bf2-4f3f-ad24-8b42fc196750"
+      }
     }
   }
 }
