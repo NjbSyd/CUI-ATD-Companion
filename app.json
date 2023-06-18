@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Timetable",
+    "name": "Unofficial-Timetable",
     "slug": "timetable",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -27,9 +27,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "owner": "njbsyd",
     "extra": {
       "eas": {
-        "projectId": "68047d71-6c99-4683-90d5-0947696e8764"
+        "projectId": "ef2b46dd-0e2f-4832-a5e5-4330ec4085e0"
       }
     }
   }
