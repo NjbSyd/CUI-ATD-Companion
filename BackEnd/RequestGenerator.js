@@ -13,6 +13,7 @@ async function getDataFromDB() {
     const res = await axios.get(API_URL);
     return res.data;
   } catch (e) {
+    console.log(e);
     throw e;
   }
 }

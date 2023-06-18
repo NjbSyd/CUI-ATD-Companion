@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
 import { useEffect, useState } from "react";
@@ -25,6 +25,11 @@ export function Classroom() {
 
   function searchButtonOnPress() {
     setIsSearching(true);
+    if (selectedTimeSlot === null || selectedRoom === null) {
+      setIsSearching(false);
+      Alert.alert("Please select a timeslot and a room");
+      return;
+    }
     GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
       .then((res) => {
         setResultingData(res);

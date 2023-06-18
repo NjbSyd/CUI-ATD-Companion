@@ -16,6 +16,7 @@ import {
   GetTeacherNames,
   GetTeachersSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
+import Loading from "../Components/Loading";
 
 export function Teachers({ navigation }) {
   const teachersNames = useSelector((state) => state.teacherNames).teacherNames;
