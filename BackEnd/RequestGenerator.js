@@ -4,7 +4,7 @@ import { checkInKeys, getData, setData } from "./AsyncStorageFunctions";
 
 async function getDataFromDB() {
   try {
-    const { API_URL } = require("./my.secrets.json");
+    const API_URL = "http://35.202.88.20:3000/timetable";
     const res = await axios.get(API_URL);
     return res.data;
   } catch (e) {
