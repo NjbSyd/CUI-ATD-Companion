@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import {
   GetTeacherNames,
   GetTeachersSchedule,
-} from "../../Functions/functions";
+} from "../../BackEnd/SQLiteSearchFunctions";
 
 export function Teachers({ navigation }) {
   const teachersNames = useSelector((state) => state.teacherNames).teacherNames;

@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import { LogBox } from "react-native";
+import { Alert, BackHandler, LogBox } from "react-native";
 import { useEffect } from "react";
 import { ApplicationEntry } from "./UI/Screens/ApplicationEntry";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -14,7 +14,6 @@ export default function App() {
   useEffect(() => {
     LogBox.ignoreAllLogs(true);
   });
-
   return (
     <Provider store={store}>
       <NavigationContainer>

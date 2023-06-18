@@ -1,20 +1,42 @@
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { List } from "../Components/List";
 import { Header } from "../Components/Header";
 import { useSelector } from "react-redux";
+import Loading from "../Components/Loading";
+import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 
 export function Classroom() {
-  const timeslots = useSelector((state) => state.timeslots).timeslots;
-  const rooms = useSelector((state) => state.classRooms).classRooms;
+  useEffect(() => {
+    setSelectedTimeSlot(null);
+    setSelectedRoom(null);
+    setResultingData([]);
+    setIsSearching(false);
+  }, []);
+
+  const timeslots = useSelector((state) => state.timeslots).timeSlots;
+  const rooms = useSelector((state) => state.classRooms).classRoomNames;
   const [resultingData, setResultingData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [timeTable, setTimeTable] = useState();
+
+  function searchButtonOnPress() {
+    setIsSearching(true);
+    GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
+      .then((res) => {
+        setResultingData(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsSearching(false);
+      });
+  }
+
   return (
     <View style={styles.container}>
       <Header title={"Classroom"} />
@@ -26,7 +48,7 @@ export function Classroom() {
           labelField="label"
           valueField="value"
           onChange={(item) => {
-            setSelectedTimeSlot(item?.value);
+            setSelectedTimeSlot(item.value);
           }}
           value={selectedTimeSlot}
           mode={"modal"}
@@ -50,7 +72,7 @@ export function Classroom() {
           placeholder={"Room#..."}
           inputSearchStyle={{ backgroundColor: "#d1fff6" }}
         />
-        <MagnifierButton onPress={() => search()} />
+        <MagnifierButton onPress={searchButtonOnPress} />
       </View>
       {resultingData.length !== 0 && <Text style={styles.label}>Classes</Text>}
       <ScrollView style={styles.scrollView}>
@@ -68,6 +90,7 @@ export function Classroom() {
           <List data={resultingData} type={"Classroom"} />
         )}
       </ScrollView>
+      {isSearching && <Loading />}
     </View>
   );
 }

@@ -30,6 +30,7 @@ const initializeDatabase = () => {
 // Function to insert or update data into the table
 const insertOrUpdateData = (inputData) => {
   try {
+    console.log(inputData);
     const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(

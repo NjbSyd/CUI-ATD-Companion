@@ -80,7 +80,7 @@ function GetTimeSlots() {
         (_, rows) => {
           let timeSlots = [];
           for (let i = 0; i < rows.rows.length; i++) {
-            timeSlots.push(rows.rows.item(i).time);
+            timeSlots.push(rows.rows.item(i).time_slot);
           }
           timeSlots.sort((a, b) => {
             if (a > b) {
@@ -91,6 +91,7 @@ function GetTimeSlots() {
               return 0;
             }
           });
+
           timeSlots = timeSlots.map((time) => {
             return { label: time, value: time };
           });
@@ -101,6 +102,7 @@ function GetTimeSlots() {
     });
   });
 }
+
 function GetClassRooms() {
   return new Promise((resolve, reject) => {
     const db = SQLite.openDatabase("TimeTable.db");
@@ -132,4 +134,49 @@ function GetClassRooms() {
     });
   });
 }
-export { GetTeacherNames, GetTeachersSchedule, GetTimeSlots, GetClassRooms };
+
+function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
+  return new Promise((resolve, reject) => {
+    const db = SQLite.openDatabase("TimeTable.db");
+    db.transaction((tx) => {
+      tx.executeSql(
+        "SELECT * FROM timetables WHERE class_room = ? AND time_slot = ?",
+        [class_room, time_slot],
+        (_, rows) => {
+          let schedule = [];
+          for (let i = 0; i < rows.rows.length; i++) {
+            schedule.push(rows.rows.item(i));
+          }
+          let weekDays = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ];
+          schedule.sort((a, b) => {
+            if (weekDays.indexOf(a.day) > weekDays.indexOf(b.day)) {
+              return 1;
+            } else if (weekDays.indexOf(a.day) < weekDays.indexOf(b.day)) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
+          resolve(schedule);
+        },
+        (_, error) => reject(error)
+      );
+    });
+  });
+}
+
+export {
+  GetTeacherNames,
+  GetTeachersSchedule,
+  GetTimeSlots,
+  GetClassRooms,
+  GetTimeslotBasedClassRoomTimetable,
+};

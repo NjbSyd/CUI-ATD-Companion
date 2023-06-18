@@ -8,56 +8,55 @@ import { setClassRoomNames } from "../../Redux/Reducers/ClassRoomsReducer";
 import { setTimeSlots } from "../../Redux/Reducers/TimeSlotsReducer";
 
 export function SplashScreen({ navigation }) {
-  const [InitialAnimationDone, setInitialAnimationDone] = useState(false);
-  useEffect(() => {
-    getOnAnimationFinish(setInitialAnimationDone, navigation)
-      .then(() => {
-        navigation.navigate("Main");
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-  }, [InitialAnimationDone]);
+  const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const dispatch = useDispatch();
 
-  async function getOnAnimationFinish(setInitialAnimationDone, navigation) {
-    setInitialAnimationDone(true);
-    try {
-      const { teachers, classRooms, timeSlots } = await fetchDataAndStore();
-      console.log(teachers, classRooms, timeSlots);
-      dispatch(setTeacherNames(teachers));
-      dispatch(setClassRoomNames(classRooms));
-      dispatch(setTimeSlots(timeSlots));
-      ToastAndroid.show("Data Updated", ToastAndroid.SHORT);
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { teachers, classRooms, timeSlots } = await fetchDataAndStore();
+        dispatch(setTeacherNames(teachers));
+        dispatch(setClassRoomNames(classRooms));
+        dispatch(setTimeSlots(timeSlots));
+        ToastAndroid.show("Data Updated", ToastAndroid.SHORT);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const onAnimationFinish = async () => {
+      setInitialAnimationDone(true);
+      await fetchData();
+      navigation.navigate("Main");
+    };
+
+    const animationTimeout = setTimeout(onAnimationFinish, 3000);
+
+    return () => {
+      clearTimeout(animationTimeout);
+    };
+  }, [dispatch, navigation]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <AnimatedLottieView
         style={styles.splashContainer}
         source={require("../../assets/SplashScreen.json")}
-        resizeMode={"center"}
+        resizeMode="center"
         autoPlay
         speed={0.7}
         loop={false}
         onAnimationFinish={() => {
           setInitialAnimationDone(true);
         }}
-        autoSize={true}
+        autoSize
       />
-      {InitialAnimationDone && (
+      {initialAnimationDone && (
         <>
           <AnimatedLottieView
             style={styles.progressContainer}
             source={require("../../assets/Progress.json")}
-            resizeMode={"center"}
+            resizeMode="center"
             autoPlay
             loop
             autoSize

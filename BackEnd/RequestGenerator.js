@@ -4,10 +4,8 @@ import {
   GetClassRooms,
   GetTeacherNames,
   GetTimeSlots,
-} from "../Functions/functions";
-import { setTeacherNames } from "../Redux/Reducers/TeachersReducer";
-import { setClassRoomNames } from "../Redux/Reducers/ClassRoomsReducer";
-import { setTimeSlots } from "../Redux/Reducers/TimeSlotsReducer";
+} from "./SQLiteSearchFunctions";
+import { checkInKeys, getData, setData } from "./AsyncStorageFunctions";
 
 async function getDataFromDB() {
   try {
@@ -22,16 +20,35 @@ async function getDataFromDB() {
 async function fetchDataAndStore() {
   try {
     await initializeDatabase();
-    const res = await getDataFromDB();
-    res.forEach((element) => {
-      insertOrUpdateData(element);
-    });
-    const teachers = await GetTeacherNames();
-    const classRooms = await GetClassRooms();
-    const timeSlots = await GetTimeSlots();
-    console.log("Data fetched and stored successfully");
+    const DateExists = await checkInKeys("Date");
+    if (!DateExists) {
+      console.log("Fetching fresh data from API");
+      const res = await getDataFromDB();
+      res.forEach((element) => {
+        insertOrUpdateData(element);
+      });
+      await setData("Date", JSON.stringify(Date.now()));
+    } else {
+      let DateToday = new Date(Date.now());
+      let DateStored = await getData("Date");
+      DateStored = new Date(DateStored);
+      if (DateToday.getDate() > DateStored.getDate()) {
+        console.log("Refreshing data from API");
+        const res = await getDataFromDB();
+        res.forEach((element) => {
+          insertOrUpdateData(element);
+        });
+        await setData("Date", JSON.stringify(Date.now()));
+      } else {
+        console.log("Data is up to date");
+      }
+    }
+    const teachers = await GetTeacherNames().catch((e) => console.log(e));
+    const classRooms = await GetClassRooms().catch((e) => console.log(e));
+    const timeSlots = await GetTimeSlots().catch((e) => console.log(e));
     return { teachers, classRooms, timeSlots };
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }
