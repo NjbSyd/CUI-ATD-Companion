@@ -49,15 +49,11 @@ export function Teachers({ navigation }) {
       )}
       <ScrollView style={styles.scrollView}>
         {selectedTeacherData.length === 0 ? (
-          <Image
-            source={require("../../assets/noresults.png")}
-            style={{
-              width: "100%",
-              height: 400,
+            <Text style={{
+              fontSize: 38,
+              fontWeight: "bold",
               alignSelf: "center",
-              resizeMode: "contain",
-            }}
-          />
+            }}>Nothing Here⛔</Text>
         ) : (
           <List data={selectedTeacherData} type={"Teacher"} />
         )}

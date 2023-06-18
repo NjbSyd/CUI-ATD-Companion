@@ -82,15 +82,11 @@ export function Classroom() {
       {resultingData.length !== 0 && <Text style={styles.label}>Classes</Text>}
       <ScrollView style={styles.scrollView}>
         {resultingData.length === 0 ? (
-          <Image
-            source={require("../../assets/noresults.png")}
-            style={{
-              width: "100%",
-              height: 400,
-              alignSelf: "center",
-              resizeMode: "contain",
-            }}
-          />
+          <Text style={{
+            fontSize: 38,
+            fontWeight: "bold",
+            alignSelf: "center",
+          }}>Nothing Here⛔</Text>
         ) : (
           <List data={resultingData} type={"Classroom"} />
         )}
