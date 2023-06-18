@@ -2,9 +2,9 @@ import React from "react";
 import { View, Modal, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 
-const LoadingPopup = () => {
+const LoadingPopup = ({visible}) => {
   return (
-    <Modal animationType="fade" transparent={true}>
+    <Modal animationType="fade" transparent={true} visible={visible}>
       <View style={styles.container}>
         <View style={styles.popup}>
           <AnimatedLottieView

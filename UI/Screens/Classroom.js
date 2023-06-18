@@ -1,23 +1,23 @@
-import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
 import { useEffect, useState } from "react";
 import { List } from "../Components/List";
 import { Header } from "../Components/Header";
-import { useSelector } from "react-redux";
 import Loading from "../Components/Loading";
-import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
+import {
+  GetClassRooms,
+  GetTimeslotBasedClassRoomTimetable,
+  GetTimeSlots,
+} from "../../BackEnd/SQLiteSearchFunctions";
 
 export function Classroom() {
   useEffect(() => {
-    setSelectedTimeSlot(null);
-    setSelectedRoom(null);
-    setResultingData([]);
-    setIsSearching(false);
+    GetDropDownPlaceholders().then(() => {});
   }, []);
 
-  const timeslots = useSelector((state) => state.timeslots).timeSlots;
-  const rooms = useSelector((state) => state.classRooms).classRoomNames;
+  const [timeslots, setTimeSlots] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [resultingData, setResultingData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -35,13 +35,26 @@ export function Classroom() {
         setResultingData(res);
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       })
       .finally(() => {
         setIsSearching(false);
       });
   }
 
+  const GetDropDownPlaceholders = async () => {
+    setIsSearching(true);
+    try {
+      const receivedRooms = await GetClassRooms();
+      setRooms(receivedRooms);
+      const receivedTimeslots = await GetTimeSlots();
+      setTimeSlots(receivedTimeslots);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSearching(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <Header title={"Classroom"} />
@@ -82,11 +95,15 @@ export function Classroom() {
       {resultingData.length !== 0 && <Text style={styles.label}>Classes</Text>}
       <ScrollView style={styles.scrollView}>
         {resultingData.length === 0 ? (
-          <Text style={{
-            fontSize: 38,
-            fontWeight: "bold",
-            alignSelf: "center",
-          }}>Nothing Here⛔</Text>
+          <Text
+            style={{
+              fontSize: 38,
+              fontWeight: "bold",
+              alignSelf: "center",
+            }}
+          >
+            Nothing Here⛔
+          </Text>
         ) : (
           <List data={resultingData} type={"Classroom"} />
         )}

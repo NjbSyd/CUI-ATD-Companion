@@ -1,26 +1,32 @@
-import { View, StyleSheet, Image, ToastAndroid } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  Alert,
+  BackHandler,
+} from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { fetchDataAndStore } from "../../BackEnd/RequestGenerator";
-import { useDispatch } from "react-redux";
-import { setTeacherNames } from "../../Redux/Reducers/TeachersReducer";
-import { setClassRoomNames } from "../../Redux/Reducers/ClassRoomsReducer";
-import { setTimeSlots } from "../../Redux/Reducers/TimeSlotsReducer";
 
 export function SplashScreen({ navigation }) {
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
-  const dispatch = useDispatch();
-
+  const [loadingText, setLoadingText] = useState("Loading...");
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { teachers, classRooms, timeSlots } = await fetchDataAndStore();
-        dispatch(setTeacherNames(teachers));
-        dispatch(setClassRoomNames(classRooms));
-        dispatch(setTimeSlots(timeSlots));
-        ToastAndroid.show("Data Updated", ToastAndroid.SHORT);
+        await fetchDataAndStore(setLoadingText);
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        Alert.alert("Error Occured", "Please Try Again Later", [
+          {
+            text: "OK",
+            onPress: () => {
+              BackHandler.exitApp();
+            },
+          },
+        ]);
       }
     };
 
@@ -35,7 +41,7 @@ export function SplashScreen({ navigation }) {
     return () => {
       clearTimeout(animationTimeout);
     };
-  }, [dispatch, navigation]);
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -65,6 +71,37 @@ export function SplashScreen({ navigation }) {
             style={styles.image}
             source={require("../../assets/icon.png")}
           />
+          <View
+            style={{ position: "absolute", bottom: "27%", alignSelf: "center" }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: "rgb(255,255,255)",
+                marginVertical: 40,
+                alignSelf: "center",
+                fontWeight: "100",
+                letterSpacing: 1,
+              }}
+            >
+              {loadingText}
+            </Text>
+          </View>
+          <View
+            style={{ position: "absolute", bottom: "5%", alignSelf: "center" }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: "rgba(255,255,255,0.2)",
+                fontStyle: "italic",
+                includeFontPadding: true,
+                letterSpacing: 3,
+              }}
+            >
+              Made with ❤ by NS & MNK
+            </Text>
+          </View>
         </>
       )}
     </View>

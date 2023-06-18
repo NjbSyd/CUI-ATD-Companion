@@ -1,25 +1,32 @@
 import {
-  Image,
   ScrollView,
   StyleSheet,
   Text,
-  ToastAndroid,
   View,
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
-import { FloatingButton } from "../Components/ReloadButton";
 import { Header } from "../Components/Header";
-import { useSelector } from "react-redux";
 import {
   GetTeacherNames,
   GetTeachersSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
-import Loading from "../Components/Loading";
+import LoadingPopup from "../Components/Loading";
 
-export function Teachers({ navigation }) {
-  const teachersNames = useSelector((state) => state.teacherNames).teacherNames;
+export function Teachers() {
+  useEffect(()=>{
+    setLoading(true);
+    GetTeacherNames().then((res)=>{
+      setTeachersNames(res);
+    }).catch((e)=>{
+      console.error(e)
+    }).finally(()=>{
+      setLoading(false);
+    })
+  },[])
+  const [loading,setLoading]=useState(false);
+  const [teachersNames,setTeachersNames]=useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedTeacherData, setSelectedTeacherData] = useState([]);
   return (
@@ -31,7 +38,6 @@ export function Teachers({ navigation }) {
         labelField="label"
         valueField="value"
         onChange={(item) => {
-          console.log(item);
           setSelectedTeacher(item);
           GetTeachersSchedule(item.value).then((res) => {
             setSelectedTeacherData(res);
@@ -58,7 +64,7 @@ export function Teachers({ navigation }) {
           <List data={selectedTeacherData} type={"Teacher"} />
         )}
       </ScrollView>
-      <FloatingButton />
+      <LoadingPopup visible={loading}/>
     </View>
   );
 }

@@ -4,7 +4,7 @@ function setData(key, value) {
   AsyncStorage.setItem(`@${key}`, value)
   .then(() => {
   })
-  .catch(e => console.log(e));
+  .catch(e => console.error(e));
 }
 
 async function getData(key) {
@@ -12,7 +12,7 @@ async function getData(key) {
     const data = await AsyncStorage.getItem(`@${key}`);
     return JSON.parse(data);
   } catch (e) {
-    console.log(e)
+    console.error(e)
     return [];
   }
 }
@@ -22,7 +22,7 @@ async function checkInKeys(key) {
     const keys = await AsyncStorage.getAllKeys()
     return keys.includes(`@${key}`);
   } catch (e) {
-    console.log(e);
+      console.error(e);
     return false;
   }
 }

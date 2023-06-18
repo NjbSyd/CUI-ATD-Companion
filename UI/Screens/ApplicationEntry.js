@@ -12,9 +12,9 @@ export function ApplicationEntry() {
       backBehavior="firstRoute"
       shifting={true}
       tabBarBadge={false}
-      initialRouteName={"Classrooms"}
+      initialRouteName={"Teachers"}
       barStyle={{
-        backgroundColor: "rgba(2,201,208,0.1)",
+        backgroundColor: "rgb(15, 44, 76)",
         height: "8%",
       }}
     >
@@ -22,8 +22,12 @@ export function ApplicationEntry() {
         name="Teachers"
         component={Teachers}
         options={{
-          tabBarIcon: ({ color }) => (
-            <FontAwesome5 name="chalkboard-teacher" color={color} size={26} />
+          tabBarIcon: ({ focused, color }) => (
+            <FontAwesome5
+              name="chalkboard-teacher"
+              color={focused ? color : "white"}
+              size={26}
+            />
           ),
         }}
       />
@@ -31,10 +35,10 @@ export function ApplicationEntry() {
         name="Classrooms"
         component={Classroom}
         options={{
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: ({ focused, color }) => (
             <MaterialCommunityIcons
               name="google-classroom"
-              color={color}
+              color={focused ? color : "white"}
               size={26}
             />
           ),
