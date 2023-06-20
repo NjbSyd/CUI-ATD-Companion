@@ -99,7 +99,7 @@ export function SplashScreen({ navigation }) {
                 letterSpacing: 3,
               }}
             >
-              Made with ❤ by NS & MNK
+              Made with ❤ by NS
             </Text>
           </View>
         </>

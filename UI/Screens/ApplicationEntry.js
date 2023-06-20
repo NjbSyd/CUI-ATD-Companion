@@ -3,6 +3,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { Classroom } from "./Classroom";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { Subjects } from "./Subjects";
 
 const Tabs = createMaterialBottomTabNavigator();
 
@@ -34,6 +35,19 @@ export function ApplicationEntry() {
       <Tabs.Screen
         name="Classrooms"
         component={Classroom}
+        options={{
+          tabBarIcon: ({ focused, color }) => (
+            <MaterialCommunityIcons
+              name="google-classroom"
+              color={focused ? color : "white"}
+              size={26}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="Subjects"
+        component={Subjects}
         options={{
           tabBarIcon: ({ focused, color }) => (
             <MaterialCommunityIcons

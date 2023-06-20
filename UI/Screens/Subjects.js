@@ -4,24 +4,25 @@ import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { Header } from "../Components/Header";
 import {
-  GetTeacherNames,
-  GetTeachersSchedule,
+  GetSubjectNames,
+  GetSubjectsSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
 import LoadingPopup from "../Components/Loading";
 
-export function Teachers() {
+export function Subjects() {
   useEffect(() => {
     GetDropDownPlaceholders().then(() => {});
   }, []);
   const [loading, setLoading] = useState(false);
-  const [teachersNames, setTeachersNames] = useState([]);
-  const [selectedTeacher, setSelectedTeacher] = useState(null);
-  const [selectedTeacherData, setSelectedTeacherData] = useState([]);
+  const [subjectNames, setSubjectNames] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [selectedSubjectData, setSelectedSubjectData] = useState([]);
+
   const GetDropDownPlaceholders = async () => {
     setLoading(true);
     try {
-      const receivedTeacher = await GetTeacherNames();
-      setTeachersNames(receivedTeacher);
+      const receivedSubjects = await GetSubjectNames();
+      setSubjectNames(receivedSubjects);
     } catch (e) {
       console.error(e);
     } finally {
@@ -30,30 +31,31 @@ export function Teachers() {
   };
   return (
     <View style={styles.container}>
-      <Header title={"Teachers"} />
+      <Header title={"Subjects"} />
       <Dropdown
         style={styles.slotSelector}
-        data={teachersNames}
+        data={subjectNames}
         labelField="label"
         valueField="value"
         onChange={(item) => {
-          setSelectedTeacher(item);
-          GetTeachersSchedule(item.value).then((res) => {
-            setSelectedTeacherData(res);
+          setSelectedSubject(item);
+          GetSubjectsSchedule(item.value).then((res) => {
+            console.log(res);
+            setSelectedSubjectData(res);
           });
         }}
-        placeholder={"Select a teacher"}
-        value={selectedTeacher}
+        placeholder={"Select a Subject"}
+        value={selectedSubject}
         search={true}
-        searchPlaceholder="Teacher name"
+        searchPlaceholder="Subject name"
         autoScroll={false}
         inputSearchStyle={{ backgroundColor: "#d1fff6" }}
       />
-      {selectedTeacherData.length !== 0 && (
-        <Text style={styles.label}> {selectedTeacher.label}'s Schedule</Text>
+      {selectedSubjectData.length !== 0 && (
+        <Text style={styles.label}> {selectedSubject.label}'s Schedule</Text>
       )}
       <ScrollView style={styles.scrollView}>
-        {selectedTeacherData.length === 0 ? (
+        {selectedSubjectData.length === 0 ? (
           <Text
             style={{
               fontSize: 38,
@@ -64,7 +66,7 @@ export function Teachers() {
             Nothing Here⛔
           </Text>
         ) : (
-          <List data={selectedTeacherData} type={"Teacher"} />
+          <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
       <LoadingPopup visible={loading} />
