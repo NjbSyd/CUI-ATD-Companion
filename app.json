@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Unofficial_Timetable_CUI",
+    "name": "Unofficial CUI",
     "slug": "Unofficial_Timetable_CUI",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "owner": "njbsyd",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,11 +27,6 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "0afca4c6-a316-418e-85bf-d19d9a3fc59b"
-      }
     }
   }
 }
