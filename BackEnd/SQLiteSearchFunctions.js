@@ -1,140 +1,107 @@
 import * as SQLite from "expo-sqlite";
 
-function GetTeacherNames() {
-  const db = SQLite.openDatabase("TimeTable.db");
+const db = SQLite.openDatabase("TimeTable.db");
 
+function executeSqlAsync(sqlStatement, params = []) {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT DISTINCT teacher FROM timetables ORDER BY teacher",
-        [],
-        (_, rows) => {
-          const teachers = rows._array.map((row) => ({
-            label: row.teacher,
-            value: row.teacher,
-          }));
-          resolve(teachers);
-        },
+        sqlStatement,
+        params,
+        (_, resultSet) => resolve(resultSet),
         (_, error) => reject(error)
       );
     });
   });
 }
 
-function GetSubjectNames() {
-  const db = SQLite.openDatabase("TimeTable.db");
+async function GetDistinctValues(columnName, tableName, orderBy = "") {
+  try {
+    const orderByClause = orderBy ? `ORDER BY ${orderBy}` : "";
+    const resultSet = await executeSqlAsync(
+      `SELECT DISTINCT ${columnName} FROM ${tableName} ${orderByClause}`
+    );
 
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT DISTINCT subject FROM timetables ORDER BY subject ASC",
-        [],
-        (_, { rows }) => {
-          const subjects = rows._array.map((item) => ({
-            label: item.subject,
-            value: item.subject,
-          }));
-          resolve(subjects);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+    const distinctValues = resultSet.rows._array.map((item) => ({
+      label: item[columnName],
+      value: item[columnName],
+    }));
+
+    return distinctValues;
+  } catch (error) {
+    console.error(
+      `Error occurred during GetDistinctValues for ${columnName}:`,
+      error
+    );
+    throw error;
+  }
 }
 
-function GetTimeSlots() {
-  const db = SQLite.openDatabase("TimeTable.db");
-
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT DISTINCT time_slot FROM timetables ORDER BY time_slot ASC",
-        [],
-        (_, { rows }) => {
-          const timeSlots = rows._array.map((item) => ({
-            label: item.time_slot,
-            value: item.time_slot,
-          }));
-          resolve(timeSlots);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+async function GetTeacherNames() {
+  return GetDistinctValues("teacher", "timetables", "teacher");
 }
 
-function GetClassRooms() {
-  const db = SQLite.openDatabase("TimeTable.db");
-
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT DISTINCT class_room FROM timetables ORDER BY class_room ASC",
-        [],
-        (_, { rows }) => {
-          const classRooms = rows._array.map((item) => ({
-            label: item.class_room,
-            value: item.class_room,
-          }));
-          resolve(classRooms);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+async function GetSubjectNames() {
+  return GetDistinctValues("subject", "timetables", "subject ASC");
 }
 
-function GetTeachersSchedule(teacher) {
-  const db = SQLite.openDatabase("TimeTable.db");
-
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM timetables WHERE teacher = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END",
-        [teacher],
-        (_, { rows }) => {
-          const schedule = rows._array;
-          resolve(schedule);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+async function GetTimeSlots() {
+  return GetDistinctValues("time_slot", "timetables", "time_slot ASC");
 }
 
-function GetSubjectsSchedule(subject) {
-  const db = SQLite.openDatabase("TimeTable.db");
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT _id, subject, teacher, class_name FROM timetables WHERE subject = ? GROUP BY class_name, teacher ORDER BY teacher",
-        [subject],
-        (_, { rows }) => {
-          const schedule = rows._array;
-          resolve(schedule);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+async function GetClassRooms() {
+  return GetDistinctValues("class_room", "timetables", "class_room ASC");
 }
 
-function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
-  const db = SQLite.openDatabase("TimeTable.db");
+async function GetTeachersSchedule(teacher) {
+  try {
+    const resultSet = await executeSqlAsync(
+      `SELECT * FROM timetables WHERE teacher = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END`,
+      [teacher]
+    );
 
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "SELECT * FROM timetables WHERE class_room = ? AND time_slot = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END",
-        [class_room, time_slot],
-        (_, { rows }) => {
-          const schedule = rows._array;
-          resolve(schedule);
-        },
-        (_, error) => reject(error)
-      );
-    });
-  });
+    const schedule = resultSet.rows._array;
+
+    return schedule;
+  } catch (error) {
+    console.error("Error occurred during GetTeachersSchedule:", error);
+    throw error;
+  }
+}
+
+async function GetSubjectsSchedule(subject) {
+  try {
+    const resultSet = await executeSqlAsync(
+      `SELECT _id, subject, teacher, class_name FROM timetables WHERE subject = ? GROUP BY class_name, teacher ORDER BY teacher`,
+      [subject]
+    );
+
+    const schedule = resultSet.rows._array;
+
+    return schedule;
+  } catch (error) {
+    console.error("Error occurred during GetSubjectsSchedule:", error);
+    throw error;
+  }
+}
+
+async function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
+  try {
+    const resultSet = await executeSqlAsync(
+      `SELECT * FROM timetables WHERE class_room = ? AND time_slot = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END`,
+      [class_room, time_slot]
+    );
+
+    const schedule = resultSet.rows._array;
+
+    return schedule;
+  } catch (error) {
+    console.error(
+      "Error occurred during GetTimeslotBasedClassRoomTimetable:",
+      error
+    );
+    throw error;
+  }
 }
 
 export {

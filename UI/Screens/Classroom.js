@@ -1,24 +1,16 @@
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { List } from "../Components/List";
-import { Header } from "../Components/Header";
 import Loading from "../Components/Loading";
-import {
-  GetClassRooms,
-  GetTimeslotBasedClassRoomTimetable,
-  GetTimeSlots,
-} from "../../BackEnd/SQLiteSearchFunctions";
+import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
+import { useSelector } from "react-redux";
 
 export function Classroom() {
-  useEffect(() => {
-    GetDropDownPlaceholders().then(() => {});
-  }, []);
-
-  const [timeslots, setTimeSlots] = useState([]);
-  const [rooms, setRooms] = useState([]);
+  const rooms = useSelector((state) => state.ClassRoomSlice.classRoom);
+  const timeslots = useSelector((state) => state.TimeslotSlice.timeSlot);
   const [resultingData, setResultingData] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -42,23 +34,8 @@ export function Classroom() {
         setIsSearching(false);
       });
   }
-
-  const GetDropDownPlaceholders = async () => {
-    setIsSearching(true);
-    try {
-      const receivedRooms = await GetClassRooms();
-      setRooms(receivedRooms);
-      const receivedTimeslots = await GetTimeSlots();
-      setTimeSlots(receivedTimeslots);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsSearching(false);
-    }
-  };
   return (
     <View style={styles.container}>
-      <Header title={"Classroom"} />
       <View style={styles.selectorContainer}>
         <Dropdown
           style={styles.selectorView}

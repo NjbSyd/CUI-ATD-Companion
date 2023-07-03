@@ -1,38 +1,18 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
-import { Header } from "../Components/Header";
-import {
-  GetSubjectNames,
-  GetSubjectsSchedule,
-} from "../../BackEnd/SQLiteSearchFunctions";
-import LoadingPopup from "../Components/Loading";
+import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
+import { useSelector } from "react-redux";
 
 export function Subjects() {
-  useEffect(() => {
-    GetDropDownPlaceholders().then(() => {});
-  }, []);
-  const [loading, setLoading] = useState(false);
-  const [subjectNames, setSubjectNames] = useState([]);
+  const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
 
-  const GetDropDownPlaceholders = async () => {
-    setLoading(true);
-    try {
-      const receivedSubjects = await GetSubjectNames();
-      setSubjectNames(receivedSubjects);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
   return (
     <View style={styles.container}>
-      <Header title={"Subjects"} />
       <Dropdown
         style={styles.slotSelector}
         data={subjectNames}
@@ -52,7 +32,10 @@ export function Subjects() {
         inputSearchStyle={{ backgroundColor: "#d1fff6" }}
       />
       {selectedSubjectData.length !== 0 && (
-        <Text style={styles.label}> {selectedSubject.label}'s Schedule</Text>
+        <Text style={styles.label}>
+          {" "}
+          Teachers for "{selectedSubject.label}"
+        </Text>
       )}
       <ScrollView style={styles.scrollView}>
         {selectedSubjectData.length === 0 ? (
@@ -61,7 +44,6 @@ export function Subjects() {
           <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
-      <LoadingPopup visible={loading} />
     </View>
   );
 }
