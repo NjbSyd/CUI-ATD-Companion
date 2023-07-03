@@ -18,7 +18,7 @@ export default function SplashScreen({ navigation }) {
       await fetchDataAndStore(setLoadingText, StateDispatcher);
       navigation.navigate("ApplicationEntry");
     } catch (error) {
-      setLoadingText(error.message);
+      setLoadingText(error);
     }
   };
   return (

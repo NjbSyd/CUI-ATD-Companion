@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [{ label: "No data", value: "No Data" }];
+const initialState = {
+  subject: [{ label: "No data", value: "No Data" }],
+};
 
 const SubjectSlice = createSlice({
   name: "subject",
   initialState,
   reducers: {
     setSubjectNames: (state, action) => {
-      state = action.payload;
+      state.subject = [...action.payload];
     },
   },
 });

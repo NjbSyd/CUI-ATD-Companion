@@ -1,22 +1,31 @@
-import React, { Component } from "react";
+import React from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
 
 export function Header({ title }) {
   return (
-    <View style={styles.container}>
+    <View style={headerStyles.container}>
       <Image
         source={require("../../assets/logo.png")}
         resizeMode="contain"
-        style={styles.image}
+        style={headerStyles.image}
       />
-      <Text numberOfLines={1} style={styles.title}>
+      <Text numberOfLines={1} style={headerStyles.title}>
         {title}
       </Text>
     </View>
   );
 }
+export const HeaderImage = () => {
+  return (
+    <Image
+      source={require("../../assets/logo.png")}
+      resizeMode="contain"
+      style={headerStyles.image}
+    />
+  );
+};
 
-const styles = StyleSheet.create({
+export const headerStyles = StyleSheet.create({
   container: {
     width: "100%",
     backgroundColor: "rgb(15, 44, 76)",
@@ -35,12 +44,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: "#FFFFFF",
+    color: "rgb(15, 44, 76)",
     backgroundColor: "transparent",
   },
   image: {
-    width: 58,
-    height: 46,
+    width: 50,
+    height: 50,
     alignSelf: "center",
   },
 });

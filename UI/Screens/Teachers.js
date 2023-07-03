@@ -2,44 +2,21 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useEffect, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
-import { Header } from "../Components/Header";
 import {
   GetTeacherNames,
   GetTeachersSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
 import LoadingPopup from "../Components/Loading";
 import NoResults from "../Components/NoResults";
+import { useSelector } from "react-redux";
 
 export function Teachers() {
-  useEffect(() => {
-    setLoading(true);
-    GetTeacherNames()
-      .then((res) => {
-        setTeachersNames(res);
-      })
-      .catch((e) => {
-        console.error(e);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-  const [loading, setLoading] = useState(false);
-  const [teachersNames, setTeachersNames] = useState([]);
+  const teachersNames = useSelector((state) => state.TeacherSlice.teacher);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedTeacherData, setSelectedTeacherData] = useState([]);
-  const GetDropDownPlaceholders = async () => {
-    setLoading(true);
-    try {
-      const receivedTeacher = await GetTeacherNames();
-      setTeachersNames(receivedTeacher);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+
   return (
     <View style={styles.container}>
-      <Header title={"Teachers"} />
       <Dropdown
         style={styles.slotSelector}
         data={teachersNames}
@@ -68,7 +45,6 @@ export function Teachers() {
           <List data={selectedTeacherData} type={"Teacher"} />
         )}
       </ScrollView>
-      <LoadingPopup visible={loading} />
     </View>
   );
 }

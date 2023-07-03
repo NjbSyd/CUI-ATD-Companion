@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = [{ label: "No data", value: "No Data" }];
+const initialState = {
+  classRoom: [{ label: "No data", value: "No Data" }],
+};
 
 const ClassRoomSlice = createSlice({
   name: "classroom",
   initialState,
   reducers: {
     setClassRoom: (state, action) => {
-      state = action.payload;
+      state.classRoom = [...action.payload];
     },
   },
 });

@@ -7,7 +7,7 @@ import SplashScreen from "./UI/Screens/SplashScreen";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { MyStore } from "./Redux/Store";
-import { createNativeStackNavigator } from "react-native-screens/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -28,6 +28,10 @@ export default function App() {
           <Stack.Screen
             name={"ApplicationEntry"}
             component={ApplicationEntry}
+            options={{
+              gestureEnabled: false,
+            }}
+            getId={() => "ApplicationEntry"}
           />
         </Stack.Navigator>
         <StatusBar style="auto" />
