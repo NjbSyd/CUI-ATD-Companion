@@ -8,6 +8,7 @@ import {
   GetSubjectsSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
 import LoadingPopup from "../Components/Loading";
+import NoResults from "../Components/NoResults";
 
 export function Subjects() {
   useEffect(() => {
@@ -40,7 +41,6 @@ export function Subjects() {
         onChange={(item) => {
           setSelectedSubject(item);
           GetSubjectsSchedule(item.value).then((res) => {
-            console.log(res);
             setSelectedSubjectData(res);
           });
         }}
@@ -56,15 +56,7 @@ export function Subjects() {
       )}
       <ScrollView style={styles.scrollView}>
         {selectedSubjectData.length === 0 ? (
-          <Text
-            style={{
-              fontSize: 38,
-              fontWeight: "bold",
-              alignSelf: "center",
-            }}
-          >
-            Nothing Here⛔
-          </Text>
+          <NoResults />
         ) : (
           <List data={selectedSubjectData} type={"Subject"} />
         )}

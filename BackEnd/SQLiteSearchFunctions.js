@@ -1,62 +1,40 @@
 import * as SQLite from "expo-sqlite";
 
-function GetSubjectNames() {
+function GetTeacherNames() {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT DISTINCT subject FROM timetables",
+        "SELECT DISTINCT teacher FROM timetables ORDER BY teacher",
         [],
         (_, rows) => {
-          let subjects = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            subjects.push(rows.rows.item(i).subject);
-          }
-          subjects.sort((a, b) => {
-            if (a > b) {
-              return 1;
-            } else if (a < b) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-          subjects = subjects.map((oneSubject) => {
-            return { label: oneSubject, value: oneSubject };
-          });
-          resolve(subjects);
+          const teachers = rows._array.map((row) => ({
+            label: row.teacher,
+            value: row.teacher,
+          }));
+          resolve(teachers);
         },
         (_, error) => reject(error)
       );
     });
   });
 }
-function GetSubjectsSchedule(subject) {
+
+function GetSubjectNames() {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM timetables WHERE subject = ? GROUP BY class_name, teacher",
-        [subject],
-        (_, rows) => {
-          let schedule = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            schedule.push(rows.rows.item(i));
-          }
-          schedule.sort((a, b) => {
-            if (a.teacher > b.teacher) {
-              return 1;
-            } else if (a.teacher < b.teacher) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-          schedule = schedule.map((one) => {
-            const { _id, subject, teacher, class_name } = one;
-            return { _id, subject, teacher, class_name };
-          });
-          resolve(schedule);
+        "SELECT DISTINCT subject FROM timetables ORDER BY subject ASC",
+        [],
+        (_, { rows }) => {
+          const subjects = rows._array.map((item) => ({
+            label: item.subject,
+            value: item.subject,
+          }));
+          resolve(subjects);
         },
         (_, error) => reject(error)
       );
@@ -65,30 +43,18 @@ function GetSubjectsSchedule(subject) {
 }
 
 function GetTimeSlots() {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT DISTINCT time_slot FROM timetables",
+        "SELECT DISTINCT time_slot FROM timetables ORDER BY time_slot ASC",
         [],
-        (_, rows) => {
-          let timeSlots = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            timeSlots.push(rows.rows.item(i).time_slot);
-          }
-          timeSlots.sort((a, b) => {
-            if (a > b) {
-              return 1;
-            } else if (a < b) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-
-          timeSlots = timeSlots.map((time) => {
-            return { label: time, value: time };
-          });
+        (_, { rows }) => {
+          const timeSlots = rows._array.map((item) => ({
+            label: item.time_slot,
+            value: item.time_slot,
+          }));
           resolve(timeSlots);
         },
         (_, error) => reject(error)
@@ -96,67 +62,38 @@ function GetTimeSlots() {
     });
   });
 }
+
 function GetClassRooms() {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT DISTINCT class_room FROM timetables",
+        "SELECT DISTINCT class_room FROM timetables ORDER BY class_room ASC",
         [],
-        (_, rows) => {
-          let class_rooms = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            class_rooms.push(rows.rows.item(i).class_room);
-          }
-          class_rooms.sort((a, b) => {
-            if (a > b) {
-              return 1;
-            } else if (a < b) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-          class_rooms = class_rooms.map((class_room) => {
-            return { label: class_room, value: class_room };
-          });
-          resolve(class_rooms);
+        (_, { rows }) => {
+          const classRooms = rows._array.map((item) => ({
+            label: item.class_room,
+            value: item.class_room,
+          }));
+          resolve(classRooms);
         },
         (_, error) => reject(error)
       );
     });
   });
 }
-function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
+
+function GetTeachersSchedule(teacher) {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM timetables WHERE class_room = ? AND time_slot = ?",
-        [class_room, time_slot],
-        (_, rows) => {
-          let schedule = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            schedule.push(rows.rows.item(i));
-          }
-          let weekDays = [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday",
-          ];
-          schedule.sort((a, b) => {
-            if (weekDays.indexOf(a.day) > weekDays.indexOf(b.day)) {
-              return 1;
-            } else if (weekDays.indexOf(a.day) < weekDays.indexOf(b.day)) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
+        "SELECT * FROM timetables WHERE teacher = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END",
+        [teacher],
+        (_, { rows }) => {
+          const schedule = rows._array;
           resolve(schedule);
         },
         (_, error) => reject(error)
@@ -165,67 +102,33 @@ function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
   });
 }
 
-function GetTeacherNames() {
+function GetSubjectsSchedule(subject) {
+  const db = SQLite.openDatabase("TimeTable.db");
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT DISTINCT teacher FROM timetables",
-        [],
-        (_, rows) => {
-          let teachers = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            teachers.push(rows.rows.item(i).teacher);
-          }
-          teachers.sort((a, b) => {
-            if (a > b) {
-              return 1;
-            } else if (a < b) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
-          teachers = teachers.map((teacher) => {
-            return { label: teacher, value: teacher };
-          });
-          resolve(teachers);
+        "SELECT _id, subject, teacher, class_name FROM timetables WHERE subject = ? GROUP BY class_name, teacher ORDER BY teacher",
+        [subject],
+        (_, { rows }) => {
+          const schedule = rows._array;
+          resolve(schedule);
         },
         (_, error) => reject(error)
       );
     });
   });
 }
-function GetTeachersSchedule(teacher) {
+
+function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
+  const db = SQLite.openDatabase("TimeTable.db");
+
   return new Promise((resolve, reject) => {
-    const db = SQLite.openDatabase("TimeTable.db");
     db.transaction((tx) => {
       tx.executeSql(
-        "SELECT * FROM timetables WHERE teacher = ?",
-        [teacher],
-        (_, rows) => {
-          let schedule = [];
-          for (let i = 0; i < rows.rows.length; i++) {
-            schedule.push(rows.rows.item(i));
-          }
-          let weekDays = [
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday",
-          ];
-          schedule.sort((a, b) => {
-            if (weekDays.indexOf(a.day) > weekDays.indexOf(b.day)) {
-              return 1;
-            } else if (weekDays.indexOf(a.day) < weekDays.indexOf(b.day)) {
-              return -1;
-            } else {
-              return 0;
-            }
-          });
+        "SELECT * FROM timetables WHERE class_room = ? AND time_slot = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END",
+        [class_room, time_slot],
+        (_, { rows }) => {
+          const schedule = rows._array;
           resolve(schedule);
         },
         (_, error) => reject(error)
@@ -236,10 +139,10 @@ function GetTeachersSchedule(teacher) {
 
 export {
   GetTeacherNames,
-  GetTeachersSchedule,
   GetTimeSlots,
   GetClassRooms,
-  GetTimeslotBasedClassRoomTimetable,
   GetSubjectNames,
+  GetTeachersSchedule,
+  GetTimeslotBasedClassRoomTimetable,
   GetSubjectsSchedule,
 };

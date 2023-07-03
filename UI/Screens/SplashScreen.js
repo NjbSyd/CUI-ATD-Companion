@@ -1,48 +1,26 @@
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  Alert,
-  BackHandler,
-} from "react-native";
+import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
 import { fetchDataAndStore } from "../../BackEnd/RequestGenerator";
+import { useDispatch } from "react-redux";
 
-export function SplashScreen({ navigation }) {
+export default function SplashScreen({ navigation }) {
+  const StateDispatcher = useDispatch();
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await fetchDataAndStore(setLoadingText);
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error Occured", "Please Try Again Later", [
-          {
-            text: "OK",
-            onPress: () => {
-              BackHandler.exitApp();
-            },
-          },
-        ]);
-      }
-    };
-
-    const onAnimationFinish = async () => {
-      setInitialAnimationDone(true);
-      await fetchData();
-      navigation.navigate("Main");
-    };
-
-    const animationTimeout = setTimeout(onAnimationFinish, 3000);
-
-    return () => {
-      clearTimeout(animationTimeout);
-    };
+    setLoadingText("Checking Internet Connection...");
   }, []);
 
+  const onAnimationFinish = async () => {
+    setInitialAnimationDone(true);
+    try {
+      await fetchDataAndStore(setLoadingText, StateDispatcher);
+      navigation.navigate("ApplicationEntry");
+    } catch (error) {
+      setLoadingText(error.message);
+    }
+  };
   return (
     <View style={{ flex: 1 }}>
       <AnimatedLottieView
@@ -52,9 +30,7 @@ export function SplashScreen({ navigation }) {
         autoPlay
         speed={0.7}
         loop={false}
-        onAnimationFinish={() => {
-          setInitialAnimationDone(true);
-        }}
+        onAnimationFinish={onAnimationFinish}
         autoSize
       />
       {initialAnimationDone && (

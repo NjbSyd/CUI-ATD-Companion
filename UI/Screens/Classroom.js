@@ -10,6 +10,7 @@ import {
   GetTimeslotBasedClassRoomTimetable,
   GetTimeSlots,
 } from "../../BackEnd/SQLiteSearchFunctions";
+import NoResults from "../Components/NoResults";
 
 export function Classroom() {
   useEffect(() => {
@@ -27,7 +28,7 @@ export function Classroom() {
     setIsSearching(true);
     if (selectedTimeSlot === null || selectedRoom === null) {
       setIsSearching(false);
-      Alert.alert("Please select a timeslot and a room");
+      Alert.alert("Invalid Input", "Please select a room and a time slot");
       return;
     }
     GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
@@ -95,15 +96,7 @@ export function Classroom() {
       {resultingData.length !== 0 && <Text style={styles.label}>Classes</Text>}
       <ScrollView style={styles.scrollView}>
         {resultingData.length === 0 ? (
-          <Text
-            style={{
-              fontSize: 38,
-              fontWeight: "bold",
-              alignSelf: "center",
-            }}
-          >
-            Nothing Here⛔
-          </Text>
+          <NoResults />
         ) : (
           <List data={resultingData} type={"Classroom"} />
         )}

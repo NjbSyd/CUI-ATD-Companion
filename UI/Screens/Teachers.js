@@ -8,10 +8,21 @@ import {
   GetTeachersSchedule,
 } from "../../BackEnd/SQLiteSearchFunctions";
 import LoadingPopup from "../Components/Loading";
+import NoResults from "../Components/NoResults";
 
 export function Teachers() {
   useEffect(() => {
-    GetDropDownPlaceholders().then(() => {});
+    setLoading(true);
+    GetTeacherNames()
+      .then((res) => {
+        setTeachersNames(res);
+      })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
   const [loading, setLoading] = useState(false);
   const [teachersNames, setTeachersNames] = useState([]);
@@ -24,8 +35,6 @@ export function Teachers() {
       setTeachersNames(receivedTeacher);
     } catch (e) {
       console.error(e);
-    } finally {
-      setLoading(false);
     }
   };
   return (
@@ -54,15 +63,7 @@ export function Teachers() {
       )}
       <ScrollView style={styles.scrollView}>
         {selectedTeacherData.length === 0 ? (
-          <Text
-            style={{
-              fontSize: 38,
-              fontWeight: "bold",
-              alignSelf: "center",
-            }}
-          >
-            Nothing Here⛔
-          </Text>
+          <NoResults />
         ) : (
           <List data={selectedTeacherData} type={"Teacher"} />
         )}
