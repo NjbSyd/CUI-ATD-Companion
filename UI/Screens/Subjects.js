@@ -8,7 +8,6 @@ import { useSelector } from "react-redux";
 
 export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
-  console.log(subjectNames);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
 
