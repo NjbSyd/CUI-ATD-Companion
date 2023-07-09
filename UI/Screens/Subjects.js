@@ -26,6 +26,7 @@ export function Subjects() {
         }}
         placeholder={"Select a Subject"}
         value={selectedSubject}
+        mode={"modal"}
         search={true}
         searchPlaceholder="Subject name"
         autoScroll={false}

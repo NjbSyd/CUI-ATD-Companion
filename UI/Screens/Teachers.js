@@ -1,12 +1,8 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
-import {
-  GetTeacherNames,
-  GetTeachersSchedule,
-} from "../../BackEnd/SQLiteSearchFunctions";
-import LoadingPopup from "../Components/Loading";
+import { GetTeachersSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
 import { useSelector } from "react-redux";
 
@@ -28,6 +24,7 @@ export function Teachers() {
             setSelectedTeacherData(res);
           });
         }}
+        mode={"modal"}
         placeholder={"Select a teacher"}
         value={selectedTeacher}
         search={true}
