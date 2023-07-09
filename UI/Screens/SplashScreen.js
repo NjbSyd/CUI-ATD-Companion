@@ -16,7 +16,9 @@ export default function SplashScreen({ navigation }) {
     setInitialAnimationDone(true);
     try {
       await fetchDataAndStore(setLoadingText, StateDispatcher);
-      navigation.navigate("ApplicationEntry");
+      setTimeout(() => {
+        navigation.navigate("ApplicationEntry");
+      }, 3000);
     } catch (error) {
       setLoadingText(error);
     }
@@ -28,7 +30,7 @@ export default function SplashScreen({ navigation }) {
         source={require("../../assets/SplashScreen.json")}
         resizeMode="center"
         autoPlay
-        speed={0.7}
+        speed={1}
         loop={false}
         onAnimationFinish={onAnimationFinish}
         autoSize

@@ -80,4 +80,66 @@ const insertOrUpdateData = (inputData) => {
   }
 };
 
-export { insertOrUpdateData, initializeDatabase };
+const createDataSyncDateTable = () => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      `CREATE TABLE IF NOT EXISTS SyncDate (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        Date TEXT
+      );`,
+      [],
+      () => {},
+      (error) => {
+        console.error("Error creating SyncDate table:", error);
+      }
+    );
+  });
+};
+
+const insertOrUpdateDataSyncDate = (inputDate) => {
+  try {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM SyncDate WHERE id = 1 LIMIT 1`,
+        [],
+        (_, resultSet) => {
+          const rows = resultSet.rows._array;
+          if (rows.length === 0) {
+            tx.executeSql(
+              `INSERT INTO SyncDate (id, Date) VALUES (1, ?)`,
+              [inputDate],
+              () => null,
+              (error) => {
+                console.error("Error occurred during date insert:", error);
+                throw error;
+              }
+            );
+          } else {
+            tx.executeSql(
+              `UPDATE SyncDate SET Date = ? WHERE id = 1`,
+              [inputDate],
+              () => null,
+              (error) => {
+                console.error("Error occurred during date update:", error);
+                throw error;
+              }
+            );
+          }
+        },
+        (error) => {
+          console.error("Error occurred during SELECT:", error);
+          throw error;
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error occurred:", error);
+  }
+};
+
+export {
+  insertOrUpdateData,
+  initializeDatabase,
+  createDataSyncDateTable,
+  insertOrUpdateDataSyncDate,
+};

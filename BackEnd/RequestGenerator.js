@@ -2,6 +2,7 @@ import axios from "axios";
 import NetInfo from "@react-native-community/netinfo";
 import {
   GetClassRooms,
+  GetDataSyncDate,
   GetSubjectNames,
   GetTeacherNames,
   GetTimeSlots,
@@ -10,7 +11,13 @@ import { setTeacherNames } from "../Redux/TeacherSlice";
 import { setClassRoom } from "../Redux/ClassRoomSlice";
 import { setSubjectNames } from "../Redux/SubjectSlice";
 import { setTimeslot } from "../Redux/TimeslotSlice";
-import { insertOrUpdateData, initializeDatabase } from "./SQLiteFunctions";
+import {
+  insertOrUpdateData,
+  initializeDatabase,
+  insertOrUpdateDataSyncDate,
+  createDataSyncDateTable,
+} from "./SQLiteFunctions";
+import { shouldReloadData } from "./Helpers";
 
 const API_URL = "http://35.202.88.20:3000/timetable";
 
@@ -26,17 +33,23 @@ async function getDataFromDB() {
 
 async function fetchDataAndStore(setLoadingText, StateDispatcher) {
   try {
+    createDataSyncDateTable();
+    const DataSyncDate = await GetDataSyncDate();
+    const shouldReload = shouldReloadData(DataSyncDate);
+    if (!shouldReload) {
+      insertOrUpdateDataSyncDate(new Date().toLocaleString());
+      await fetchLocalData(setLoadingText, StateDispatcher);
+      return;
+    }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
-    console.log(isConnected);
     if (!isConnected) {
-      setLoadingText("No Internet Connection");
+      setLoadingText("No Internet Connection😢");
       return;
     }
 
     setLoadingText("Initializing Database ...");
     initializeDatabase();
     setLoadingText("Database Initialized");
-
     setLoadingText("Fetching Data ...");
     const data = await getDataFromDB();
 
@@ -64,9 +77,38 @@ async function fetchDataAndStore(setLoadingText, StateDispatcher) {
     setLoadingText("Getting some things Ready...Subjects✅");
 
     setLoadingText("Data Updated");
+    insertOrUpdateDataSyncDate(new Date().toJSON());
   } catch (error) {
     console.log(error);
     setLoadingText("Error Occurred");
+    throw error;
+  }
+}
+
+async function fetchLocalData(setLoadingText, StateDispatcher) {
+  try {
+    setLoadingText("Getting some things Ready...");
+
+    const classRooms = await GetClassRooms();
+    StateDispatcher(setClassRoom(classRooms));
+    setLoadingText("Getting some things Ready...Classrooms✅");
+
+    const timeSlots = await GetTimeSlots();
+    StateDispatcher(setTimeslot(timeSlots));
+    setLoadingText("Getting some things Ready...Timeslots✅");
+
+    const teacherNames = await GetTeacherNames();
+    StateDispatcher(setTeacherNames(teacherNames));
+    setLoadingText("Getting some things Ready...Teachers✅");
+
+    const subjectNames = await GetSubjectNames();
+    StateDispatcher(setSubjectNames(subjectNames));
+    setLoadingText("Getting some things Ready...Subjects✅");
+
+    setLoadingText("Data Updated from Local Storage");
+    insertOrUpdateDataSyncDate(new Date().toJSON());
+  } catch (error) {
+    console.error("Error occurred:", error);
     throw error;
   }
 }

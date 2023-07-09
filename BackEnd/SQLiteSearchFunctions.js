@@ -22,12 +22,10 @@ async function GetDistinctValues(columnName, tableName, orderBy = "") {
       `SELECT DISTINCT ${columnName} FROM ${tableName} ${orderByClause}`
     );
 
-    const distinctValues = resultSet.rows._array.map((item) => ({
+    return resultSet.rows._array.map((item) => ({
       label: item[columnName],
       value: item[columnName],
     }));
-
-    return distinctValues;
   } catch (error) {
     console.error(
       `Error occurred during GetDistinctValues for ${columnName}:`,
@@ -76,9 +74,7 @@ async function GetSubjectsSchedule(subject) {
       [subject]
     );
 
-    const schedule = resultSet.rows._array;
-
-    return schedule;
+    return resultSet.rows._array;
   } catch (error) {
     console.error("Error occurred during GetSubjectsSchedule:", error);
     throw error;
@@ -104,6 +100,23 @@ async function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
   }
 }
 
+async function GetDataSyncDate(orderBy = "") {
+  const columnName = "Date";
+  const tableName = "SyncDate";
+
+  try {
+    const DataSyncDate = await GetDistinctValues(
+      columnName,
+      tableName,
+      orderBy
+    );
+    return DataSyncDate.length > 0 ? DataSyncDate[0].value : null;
+  } catch (error) {
+    console.error("Error occurred:", error);
+    throw error;
+  }
+}
+
 export {
   GetTeacherNames,
   GetTimeSlots,
@@ -112,4 +125,5 @@ export {
   GetTeachersSchedule,
   GetTimeslotBasedClassRoomTimetable,
   GetSubjectsSchedule,
+  GetDataSyncDate,
 };
