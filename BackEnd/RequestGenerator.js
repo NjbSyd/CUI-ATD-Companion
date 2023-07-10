@@ -33,6 +33,7 @@ async function getDataFromDB() {
 
 async function fetchDataAndStore(setLoadingText, StateDispatcher) {
   try {
+    setLoadingText("Checking for Updates ...");
     createDataSyncDateTable();
     const DataSyncDate = await GetDataSyncDate();
     const shouldReload = shouldReloadData(DataSyncDate);
@@ -46,7 +47,6 @@ async function fetchDataAndStore(setLoadingText, StateDispatcher) {
       setLoadingText("No Internet Connection😢");
       return;
     }
-
     setLoadingText("Initializing Database ...");
     initializeDatabase();
     setLoadingText("Database Initialized");

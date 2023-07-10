@@ -14,9 +14,6 @@
       "developmentClient": true
     },
     "production": {
-      "android": {
-        "buildType": "apk"
-      }
     }
   }
 }
