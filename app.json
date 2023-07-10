@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.njbsyd.unofficial.tt.cui"
+      "package": "com.njbsyd.cui.unofficial"
     },
     "web": {
       "favicon": "./assets/favicon.png"
