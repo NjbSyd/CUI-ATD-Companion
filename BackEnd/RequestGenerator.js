@@ -19,7 +19,7 @@ import {
 } from "./SQLiteFunctions";
 import { shouldReloadData } from "./Helpers";
 
-const API_URL = "http://35.202.88.20:3000/timetable";
+const API_URL = "https://timetable-scrapper.onrender.com/timetable";
 
 async function getDataFromDB() {
   try {
