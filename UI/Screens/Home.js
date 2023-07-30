@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import {
   View,
-  Image,
   StyleSheet,
   TouchableOpacity,
   Text,
@@ -79,6 +78,7 @@ const Main = ({ navigation }) => {
           "Subjects",
           "Check assigned Teachers for a Subject"
         )}
+        {renderButton("calendar-alt", "Timetable", "Check a Class schedule")}
       </View>
     </View>
   );

@@ -1,7 +1,7 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import { useEffect, useState } from "react";
-import { fetchDataAndStore } from "../../BackEnd/RequestGenerator";
+import { PopulateGlobalState } from "../../BackEnd/RequestGenerator";
 import { useDispatch } from "react-redux";
 
 export default function SplashScreen({ navigation }) {
@@ -15,10 +15,10 @@ export default function SplashScreen({ navigation }) {
   const onAnimationFinish = async () => {
     setInitialAnimationDone(true);
     try {
-      await fetchDataAndStore(setLoadingText, StateDispatcher);
+      await PopulateGlobalState(setLoadingText, StateDispatcher);
       setTimeout(() => {
         navigation.navigate("ApplicationEntry");
-      }, 3000);
+      }, 1500);
     } catch (error) {
       setLoadingText(error);
     }

@@ -1,17 +1,54 @@
-import {MaterialCommunityIcons} from "@expo/vector-icons";
-import ActionButton from "react-native-action-button";
+import React, { useRef } from "react";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { TouchableOpacity, Animated, ToastAndroid } from "react-native";
+import { FetchDataFromSQLite } from "../../BackEnd/RequestGenerator";
 
+function ReloadButton({ StateDispatcher }) {
+  const rotateValue = useRef(new Animated.Value(0)).current;
 
-const FloatingButton = ({onPressCloud,onPressLocal,cloudButtonActive}) => {
-return (
-    <ActionButton buttonColor="rgb(2, 201, 208)" offsetX={15} offsetY={10} size={50} degrees={135} >
-      <ActionButton.Item buttonColor='#a3a8dc' title="Reload From Disk"  onPress={() => onPressLocal()}>
-        <MaterialCommunityIcons name="file-refresh-outline" size={28}/>
-      </ActionButton.Item>
-        <ActionButton.Item buttonColor='#fffb93' active={!cloudButtonActive} title="Reload From Cloud" onPress={() => onPressCloud()}>
-            <MaterialCommunityIcons name="cloud-sync-outline" size={28} />
-        </ActionButton.Item>
-    </ActionButton>
-)};
+  const startRotation = () => {
+    Animated.loop(
+      Animated.timing(rotateValue, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      })
+    ).start();
+  };
 
-export {FloatingButton};
+  const stopRotation = () => {
+    rotateValue.stopAnimation();
+  };
+
+  const rotation = rotateValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
+
+  const iconStyle = {
+    transform: [{ rotate: rotation }],
+  };
+
+  return (
+    <>
+      <TouchableOpacity
+        style={{
+          alignSelf: "center",
+          columnGap: 20,
+        }}
+        onPress={async () => {
+          startRotation();
+          await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
+          stopRotation();
+          ToastAndroid.show("Reloaded Successfully✅", ToastAndroid.SHORT);
+        }}
+      >
+        <Animated.View style={iconStyle}>
+          <MaterialCommunityIcons name={"reload"} size={30} color="black" />
+        </Animated.View>
+      </TouchableOpacity>
+    </>
+  );
+}
+
+export { ReloadButton };

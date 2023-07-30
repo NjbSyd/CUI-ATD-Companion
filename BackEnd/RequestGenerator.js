@@ -1,6 +1,7 @@
 import axios from "axios";
 import NetInfo from "@react-native-community/netinfo";
 import {
+  GetClassNames,
   GetClassRooms,
   GetDataSyncDate,
   GetSubjectNames,
@@ -12,34 +13,35 @@ import { setClassRoom } from "../Redux/ClassRoomSlice";
 import { setSubjectNames } from "../Redux/SubjectSlice";
 import { setTimeslot } from "../Redux/TimeslotSlice";
 import {
-  insertOrUpdateData,
-  initializeDatabase,
-  insertOrUpdateDataSyncDate,
   createDataSyncDateTable,
+  initializeDatabase,
+  insertOrUpdateData,
+  insertOrUpdateDataSyncDate,
 } from "./SQLiteFunctions";
 import { shouldReloadData } from "./Helpers";
+import { ToastAndroid } from "react-native";
+import { setClassNames } from "../Redux/SectionSlice";
 
 const API_URL = "https://timetable-scrapper.onrender.com/timetable";
 
-async function getDataFromDB() {
+async function FetchDataFromMongoDB() {
   try {
     const res = await axios.get(API_URL);
     return res.data;
   } catch (e) {
-    console.error(e);
+    ToastAndroid.show(e.message, ToastAndroid.SHORT);
     throw e;
   }
 }
 
-async function fetchDataAndStore(setLoadingText, StateDispatcher) {
+async function PopulateGlobalState(setLoadingText, StateDispatcher) {
   try {
-    setLoadingText("Checking for Updates ...");
-    createDataSyncDateTable();
+    await createDataSyncDateTable();
+    await initializeDatabase();
     const DataSyncDate = await GetDataSyncDate();
     const shouldReload = shouldReloadData(DataSyncDate);
     if (!shouldReload) {
-      insertOrUpdateDataSyncDate(new Date().toLocaleString());
-      await fetchLocalData(setLoadingText, StateDispatcher);
+      await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
@@ -47,45 +49,21 @@ async function fetchDataAndStore(setLoadingText, StateDispatcher) {
       setLoadingText("No Internet Connection😢");
       return;
     }
-    setLoadingText("Initializing Database ...");
-    initializeDatabase();
-    setLoadingText("Database Initialized");
     setLoadingText("Fetching Data ...");
-    const data = await getDataFromDB();
-
+    const data = await FetchDataFromMongoDB();
     for (const element of data) {
-      insertOrUpdateData(element);
+      await insertOrUpdateData(element);
     }
 
-    console.log("Data Fetched");
-    setLoadingText("Getting some things Ready...");
-
-    const classRooms = await GetClassRooms();
-    StateDispatcher(setClassRoom(classRooms));
-    setLoadingText("Getting some things Ready...Classrooms✅");
-
-    const timeSlots = await GetTimeSlots();
-    StateDispatcher(setTimeslot(timeSlots));
-    setLoadingText("Getting some things Ready...Timeslots✅");
-
-    const teacherNames = await GetTeacherNames();
-    StateDispatcher(setTeacherNames(teacherNames));
-    setLoadingText("Getting some things Ready...Teachers✅");
-
-    const subjectNames = await GetSubjectNames();
-    StateDispatcher(setSubjectNames(subjectNames));
-    setLoadingText("Getting some things Ready...Subjects✅");
-
-    setLoadingText("Data Updated");
-    insertOrUpdateDataSyncDate(new Date().toJSON());
+    await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
   } catch (error) {
     console.log(error);
-    setLoadingText("Error Occurred");
+    setLoadingText("Error Occurred⛔");
     throw error;
   }
 }
 
-async function fetchLocalData(setLoadingText, StateDispatcher) {
+async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
   try {
     setLoadingText("Getting some things Ready...");
 
@@ -105,12 +83,16 @@ async function fetchLocalData(setLoadingText, StateDispatcher) {
     StateDispatcher(setSubjectNames(subjectNames));
     setLoadingText("Getting some things Ready...Subjects✅");
 
-    setLoadingText("Data Updated from Local Storage");
-    insertOrUpdateDataSyncDate(new Date().toJSON());
+    const sectionNames = await GetClassNames();
+    StateDispatcher(setClassNames(sectionNames));
+    setLoadingText("Getting some things Ready...Sections✅");
+
+    setLoadingText(`Data Updated from ${Mode}`);
+    await insertOrUpdateDataSyncDate(new Date().toJSON());
   } catch (error) {
     console.error("Error occurred:", error);
     throw error;
   }
 }
 
-export { fetchDataAndStore };
+export { PopulateGlobalState, FetchDataFromSQLite };

@@ -2,7 +2,7 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("TimeTable.db");
 
-const initializeDatabase = () => {
+const initializeDatabase = async () => {
   db.transaction((tx) => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS timetables (
@@ -23,7 +23,7 @@ const initializeDatabase = () => {
   });
 };
 
-const insertOrUpdateData = (inputData) => {
+const insertOrUpdateData = async (inputData) => {
   try {
     db.transaction((tx) => {
       tx.executeSql(
@@ -80,7 +80,7 @@ const insertOrUpdateData = (inputData) => {
   }
 };
 
-const createDataSyncDateTable = () => {
+const createDataSyncDateTable = async () => {
   db.transaction((tx) => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS SyncDate (
@@ -96,7 +96,8 @@ const createDataSyncDateTable = () => {
   });
 };
 
-const insertOrUpdateDataSyncDate = (inputDate) => {
+const insertOrUpdateDataSyncDate = async (inputDate) => {
+  await createDataSyncDateTable();
   try {
     db.transaction((tx) => {
       tx.executeSql(

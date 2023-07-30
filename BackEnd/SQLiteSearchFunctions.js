@@ -2,7 +2,7 @@ import * as SQLite from "expo-sqlite";
 
 const db = SQLite.openDatabase("TimeTable.db");
 
-function executeSqlAsync(sqlStatement, params = []) {
+async function executeSqlAsync(sqlStatement, params = []) {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -36,19 +36,23 @@ async function GetDistinctValues(columnName, tableName, orderBy = "") {
 }
 
 async function GetTeacherNames() {
-  return GetDistinctValues("teacher", "timetables", "teacher");
+  return await GetDistinctValues("teacher", "timetables", "teacher");
 }
 
 async function GetSubjectNames() {
-  return GetDistinctValues("subject", "timetables", "subject ASC");
+  return await GetDistinctValues("subject", "timetables", "subject ASC");
 }
 
 async function GetTimeSlots() {
-  return GetDistinctValues("time_slot", "timetables", "time_slot ASC");
+  return await GetDistinctValues("time_slot", "timetables", "time_slot ASC");
 }
 
 async function GetClassRooms() {
-  return GetDistinctValues("class_room", "timetables", "class_room ASC");
+  return await GetDistinctValues("class_room", "timetables", "class_room ASC");
+}
+
+async function GetClassNames() {
+  return await GetDistinctValues("class_name", "timetables", "class_name ASC");
 }
 
 async function GetTeachersSchedule(teacher) {
@@ -57,10 +61,7 @@ async function GetTeachersSchedule(teacher) {
       `SELECT * FROM timetables WHERE teacher = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END`,
       [teacher]
     );
-
-    const schedule = resultSet.rows._array;
-
-    return schedule;
+    return resultSet.rows._array;
   } catch (error) {
     console.error("Error occurred during GetTeachersSchedule:", error);
     throw error;
@@ -88,9 +89,7 @@ async function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
       [class_room, time_slot]
     );
 
-    const schedule = resultSet.rows._array;
-
-    return schedule;
+    return resultSet.rows._array;
   } catch (error) {
     console.error(
       "Error occurred during GetTimeslotBasedClassRoomTimetable:",
@@ -117,6 +116,31 @@ async function GetDataSyncDate(orderBy = "") {
   }
 }
 
+async function GetTimetableByClassName(class_name) {
+  try {
+    const resultSet = await executeSqlAsync(
+      `SELECT _id, class_name, class_room, day, subject, teacher, time_slot FROM timetables WHERE class_name = ? ORDER BY
+        CASE day
+          WHEN 'Monday' THEN 1
+          WHEN 'Tuesday' THEN 2
+          WHEN 'Wednesday' THEN 3
+          WHEN 'Thursday' THEN 4
+          WHEN 'Friday' THEN 5
+          WHEN 'Saturday' THEN 6
+          WHEN 'Sunday' THEN 7
+          ELSE 8
+        END,
+        time_slot`,
+      [class_name]
+    );
+
+    return resultSet.rows._array;
+  } catch (error) {
+    console.error("Error occurred during GetTimetableByClassName:", error);
+    throw error;
+  }
+}
+
 export {
   GetTeacherNames,
   GetTimeSlots,
@@ -126,4 +150,6 @@ export {
   GetTimeslotBasedClassRoomTimetable,
   GetSubjectsSchedule,
   GetDataSyncDate,
+  GetClassNames,
+  GetTimetableByClassName,
 };
