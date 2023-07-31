@@ -1,5 +1,13 @@
 import React from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  Touchable,
+  TouchableOpacity,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 export function Header({ title }) {
   return (
@@ -15,13 +23,22 @@ export function Header({ title }) {
     </View>
   );
 }
+
 export const HeaderImage = () => {
+  const navigation = useNavigation();
+
   return (
-    <Image
-      source={require("../../assets/logo.png")}
-      resizeMode="contain"
-      style={headerStyles.image}
-    />
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate("Home");
+      }}
+    >
+      <Image
+        source={require("../../assets/logo.png")}
+        resizeMode="contain"
+        style={headerStyles.image}
+      />
+    </TouchableOpacity>
   );
 };
 

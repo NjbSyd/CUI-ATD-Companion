@@ -45,25 +45,61 @@ export default function Timetable() {
   return (
     <View style={styles.container}>
       {isClassNameSelected ? (
-        <View style={styles.slotSelectorPlaceholder}>
-          <Text style={styles.selectedClassText}>
-            {selectedClassname.label}
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setIsClassNameSelected(false);
-              setSelectedClassname(null);
-              setSelectedClassData([]);
-              setSelectedClassDayData([]);
-              setSelection(-1);
-            }}
-          >
-            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-          </TouchableOpacity>
-        </View>
+        <>
+          <View style={styles.slotSelectorPlaceholder}>
+            <Text style={styles.selectedClassText}>
+              {selectedClassname.label} TimeTable
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                setIsClassNameSelected(false);
+                setSelectedClassname(null);
+                setSelectedClassData([]);
+                setSelectedClassDayData([]);
+                setSelection(-1);
+              }}
+            >
+              <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.btnGroup} horizontal={true}>
+            {daysOfWeek.map((day, index) => (
+              <TouchableOpacity
+                key={day}
+                style={[
+                  styles.button,
+                  { backgroundColor: selection === index ? "#000" : "#fff" },
+                ]}
+                disabled={!isClassNameSelected}
+                onPress={() => {
+                  setSelection(index);
+                  filterDayData(day);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      color: isClassNameSelected
+                        ? selection === index
+                          ? "#fff"
+                          : "#000"
+                        : "#d1d1d1",
+                    },
+                  ]}
+                >
+                  {day.substring(0, 3)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </>
       ) : (
         <Dropdown
           style={styles.slotSelector}
+          inputSearchStyle={styles.slotSearch}
+          containerStyle={styles.slotOptionsContainer}
+          keyboardAvoiding={true}
           data={classNames}
           labelField="label"
           valueField="value"
@@ -72,49 +108,25 @@ export default function Timetable() {
           }}
           placeholder={"Select a Class"}
           value={selectedClassname}
-          mode={"modal"}
           search={true}
-          searchPlaceholder="Class name"
+          searchPlaceholder="Enter a Class name to search"
           autoScroll={false}
-          inputSearchStyle={{ backgroundColor: "#d1fff6" }}
         />
       )}
-      <View style={styles.btnGroup} horizontal={true}>
-        {daysOfWeek.map((day, index) => (
-          <TouchableOpacity
-            key={day}
-            style={[
-              styles.button,
-              { backgroundColor: selection === index ? "#000" : "#fff" },
-            ]}
-            disabled={!isClassNameSelected}
-            onPress={() => {
-              setSelection(index);
-              filterDayData(day);
-            }}
-          >
-            <Text
-              style={[
-                styles.text,
-                {
-                  color: isClassNameSelected
-                    ? selection === index
-                      ? "#fff"
-                      : "#000"
-                    : "#d1d1d1",
-                },
-              ]}
-            >
-              {day.substring(0, 3)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+
       <ScrollView style={styles.scrollView}>
-        {selectedClassDayData.length <= 0 ? (
-          <NoResults />
+        {isClassNameSelected ? (
+          selection <= -1 ? (
+            <Text style={styles.requestText}>
+              Select a day to view timetable
+            </Text>
+          ) : selectedClassDayData.length > 0 ? (
+            <List data={selectedClassDayData} type={"Classroom"} />
+          ) : (
+            <NoResults />
+          )
         ) : (
-          <List data={selectedClassDayData} type={"Classroom"} />
+          <NoResults />
         )}
       </ScrollView>
     </View>
@@ -147,18 +159,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  slotSelector: {
-    width: "90%",
-    padding: 10,
-    marginTop: 10,
-    marginLeft: "5%",
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-  },
   slotSelectorPlaceholder: {
     marginVertical: 10,
-    width: "30%",
+    width: "auto",
     alignSelf: "center",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -172,9 +175,37 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
     letterSpacing: 1,
+    marginRight: 20,
   },
   scrollView: {
     maxWidth: "90%",
     margin: 20,
+  },
+  slotSelector: {
+    alignSelf: "center",
+    width: "95%",
+    padding: 10,
+    marginTop: 10,
+    borderWidth: 0.3,
+    borderColor: "#000",
+    borderRadius: 5,
+  },
+  slotOptionsContainer: {
+    borderColor: "#000",
+    borderWidth: 0.3,
+    borderRadius: 5,
+  },
+  slotSearch: {
+    backgroundColor: "#000",
+    color: "#fff",
+    letterSpacing: 1,
+    borderRadius: 5,
+    height: 60,
+  },
+  requestText: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
   },
 });

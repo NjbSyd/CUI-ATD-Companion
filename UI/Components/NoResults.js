@@ -1,12 +1,10 @@
 import { View, StyleSheet, Image } from "react-native";
 
 const NoResults = () => {
+  let imageSource = require("../../assets/noresults.jpg");
   return (
     <View style={styles.view}>
-      <Image
-        source={require("../../assets/noresults.jpg")}
-        style={styles.img}
-      />
+      <Image source={imageSource} style={styles.img} />
     </View>
   );
 };

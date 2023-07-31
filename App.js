@@ -8,10 +8,27 @@ import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
 import { MyStore } from "./Redux/Store";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as Update from "expo-updates";
+
+const ReactToUpdates = async () => {
+  Update.addListener((event) => {
+    if (event.type === Update.UpdateEventType.UPDATE_AVAILABLE) {
+      Update.reloadAsync();
+    }
+  });
+};
 
 const Stack = createNativeStackNavigator();
+
 export default function App() {
   useEffect(() => {
+    ReactToUpdates()
+      .then(() => {
+        console.log("Reacting to updates");
+      })
+      .catch((e) => {
+        console.log("Error reacting to updates: " + e);
+      });
     LogBox.ignoreAllLogs(true);
   });
   return (

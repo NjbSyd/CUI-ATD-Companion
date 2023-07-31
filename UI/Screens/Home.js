@@ -40,16 +40,19 @@ const Main = ({ navigation }) => {
   const renderButton = (iconName, screenName, screenDescription) => {
     return (
       <TouchableOpacity
-        style={[styles.button, { width: buttonWidth }]}
+        style={[
+          styles.button,
+          { width: buttonWidth, height: buttonWidth + 20 },
+        ]}
         onPress={() => navigation.navigate(screenName)}
       >
-        <FontAwesome5 name={iconName} size={50} color="white" />
+        <FontAwesome5 name={iconName} size={45} color="white" />
         <Text style={styles.buttonText}>{screenName}</Text>
         <Text
           style={{
             color: "white",
             textAlign: "center",
-            fontSize: 10,
+            fontSize: 12,
             margin: 20,
           }}
         >
@@ -100,7 +103,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     width: "100%",
     marginTop: 10,
-    flex: 2,
+    flex: 1,
   },
   button: {
     alignItems: "center",
@@ -114,9 +117,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    marginTop: 20,
+    marginTop: 10,
     fontSize: 20,
     fontWeight: "bold",
+    letterSpacing: 1,
   },
 });
 
