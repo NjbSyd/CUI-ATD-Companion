@@ -59,7 +59,7 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     for (const element of data) {
       await insertOrUpdateData(element);
     }
-    await insertOrUpdateDataSyncDate();
+    await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
   } catch (error) {
     console.log(error);
