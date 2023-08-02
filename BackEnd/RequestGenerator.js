@@ -46,7 +46,12 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
+      ToastAndroid.show(
+        "No Internet Connection! Using Old Data.",
+        ToastAndroid.SHORT
+      );
       setLoadingText("No Internet Connection😢");
+      await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
     }
     setLoadingText("Fetching Data ...");
@@ -54,7 +59,7 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     for (const element of data) {
       await insertOrUpdateData(element);
     }
-
+    await insertOrUpdateDataSyncDate();
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
   } catch (error) {
     console.log(error);
@@ -88,7 +93,6 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
     setLoadingText("Getting some things Ready...Sections✅");
 
     setLoadingText(`Data Updated from ${Mode}`);
-    await insertOrUpdateDataSyncDate(new Date().toJSON());
   } catch (error) {
     console.error("Error occurred:", error);
     throw error;
