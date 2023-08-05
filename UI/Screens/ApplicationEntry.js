@@ -7,6 +7,7 @@ import Main from "./Home";
 import { ReloadButton } from "../Components/ReloadButton";
 import { useDispatch } from "react-redux";
 import Timetable from "./Timetable";
+import StudentPortal from "./StudentPortal";
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ export default function ApplicationEntry() {
       <Stack.Screen name="Classrooms" component={Classroom} />
       <Stack.Screen name="Subjects" component={Subjects} />
       <Stack.Screen name={"Timetable"} component={Timetable} />
+      <Stack.Screen name={"Portal"} component={StudentPortal} />
     </Stack.Navigator>
   );
 }

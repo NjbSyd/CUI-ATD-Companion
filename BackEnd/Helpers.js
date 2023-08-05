@@ -1,3 +1,5 @@
+import { Alert, BackHandler } from "react-native";
+
 function shouldReloadData(lastSyncDate) {
   if (lastSyncDate === null) return true;
   // Parse the last sync date

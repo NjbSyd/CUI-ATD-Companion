@@ -1,31 +1,13 @@
 import React, { useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  Dimensions,
-  Alert,
-  BackHandler,
-} from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { View, StyleSheet, Dimensions, Alert, BackHandler } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { RenderButton } from "../Components/MainScreenButton";
+import { handleBackPress } from "../Functions/UIHelpers";
 
 const Main = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
-      const onBackPress = () => {
-        Alert.alert(
-          "Exit App",
-          "Are you sure you want to exit?",
-          [
-            { text: "Cancel", style: "cancel" },
-            { text: "Exit", onPress: () => BackHandler.exitApp() },
-          ],
-          { cancelable: false }
-        );
-        return true;
-      };
+      const onBackPress = handleBackPress;
 
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
 
@@ -37,51 +19,50 @@ const Main = ({ navigation }) => {
   const buttonsPerRow = 2;
   const buttonWidth = screenWidth / buttonsPerRow - 20;
 
-  const renderButton = (iconName, screenName, screenDescription) => {
-    return (
-      <TouchableOpacity
-        style={[
-          styles.button,
-          { width: buttonWidth, height: buttonWidth + 20 },
-        ]}
-        onPress={() => navigation.navigate(screenName)}
-      >
-        <FontAwesome5 name={iconName} size={45} color="white" />
-        <Text style={styles.buttonText}>{screenName}</Text>
-        <Text
-          style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 12,
-            margin: 20,
-          }}
-        >
-          {screenDescription}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.space} />
       <View style={styles.buttonContainer}>
-        {renderButton(
+        {RenderButton(
           "chalkboard-teacher",
           "Teachers",
-          "See a Teacher's schedule"
+          "See a Teacher's schedule",
+          true,
+          buttonWidth,
+          navigation
         )}
-        {renderButton(
+        {RenderButton(
           "university",
           "Classrooms",
-          "Search details based on RoomNo & TimeSlot"
+          "Search details based on RoomNo & TimeSlot",
+          true,
+          buttonWidth,
+          navigation
         )}
-        {renderButton(
+        {RenderButton(
           "book",
           "Subjects",
-          "Check assigned Teachers for a Subject"
+          "Check assigned Teachers for a Subject",
+          true,
+          buttonWidth,
+          navigation
         )}
-        {renderButton("calendar-alt", "Timetable", "Check a Class schedule")}
+        {RenderButton(
+          "calendar-alt",
+          "Timetable",
+          "Check a Class schedule",
+          true,
+          buttonWidth,
+          navigation
+        )}
+        {RenderButton(
+          "user",
+          "Portal",
+          "Login to SIS.CUI.ATD",
+          false,
+          buttonWidth,
+          navigation
+        )}
       </View>
     </View>
   );
@@ -105,23 +86,28 @@ const styles = StyleSheet.create({
     marginTop: 10,
     flex: 1,
   },
-  button: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgb(15, 44, 76)",
-    marginVertical: 10,
-    borderRadius: 10,
-    height: "35%",
-    borderColor: "rgb(15, 44, 76)",
-    borderWidth: 1,
-  },
-  buttonText: {
-    color: "white",
-    marginTop: 10,
-    fontSize: 20,
-    fontWeight: "bold",
-    letterSpacing: 1,
-  },
 });
 
 export default Main;
+const ScreensData = [
+  {
+    icon: "chalkboard-teacher",
+    title: "Teachers",
+    description: "See a Teacher's schedule",
+  },
+  {
+    icon: "university",
+    title: "Classrooms",
+    description: "Search details based on RoomNo & TimeSlot",
+  },
+  {
+    icon: "book",
+    title: "Subjects",
+    description: "Check assigned Teachers for a Subject",
+  },
+  {
+    icon: "calendar-alt",
+    title: "Timetable",
+    description: "Check a Class schedule",
+  },
+];
