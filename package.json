@@ -21,6 +21,7 @@
     "expo": "~48.0.18",
     "expo-sqlite": "~11.1.1",
     "expo-status-bar": "~1.4.4",
+    "expo-updates": "~0.16.4",
     "lottie-ios": "^3.4.0",
     "lottie-react-native": "5.1.4",
     "react": "18.2.0",

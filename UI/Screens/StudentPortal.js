@@ -1,7 +1,7 @@
 import { View, ToastAndroid, Button, StyleSheet } from "react-native";
 import WebView from "react-native-webview";
 import React, { useRef, useState } from "react";
-import { LoginScript } from "../Functions/UIHelpers";
+import { CheckCurrentPageScript, LoginScript } from "../Functions/UIHelpers";
 import { LinearProgress } from "@rneui/themed";
 
 export default function StudentPortal() {
@@ -30,9 +30,14 @@ export default function StudentPortal() {
         onLoadEnd={() => {
           setProgressFinished(true);
           setProgress(0);
+          webViewRef.current.injectJavaScript(CheckCurrentPageScript());
         }}
         source={{ uri: "https://sis.cuiatd.edu.pk/login.aspx" }}
         onMessage={(event) => {
+          if (
+            event.nativeEvent.data === "https://sis.cuiatd.edu.pk/login.aspx"
+          ) {
+          }
           ToastAndroid.show(event.nativeEvent.data, ToastAndroid.SHORT);
         }}
         injectedJavaScript={LoginScript(id, pass)}

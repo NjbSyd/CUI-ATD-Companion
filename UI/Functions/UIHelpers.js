@@ -49,6 +49,16 @@ function LoginScript(id, pass) {
   `;
 }
 
+function CheckCurrentPageScript() {
+  return `
+  current=document.URL;
+  if(current!=="https://sis.cuiatd.edu.pk/login.aspx"){
+  document.getElementById("profile-links").style.display="none";
+  }
+    window.ReactNativeWebView.postMessage(current);
+  `;
+}
+
 const handleBackPress = () => {
   Alert.alert(
     "Exit App",
@@ -62,4 +72,4 @@ const handleBackPress = () => {
   return true;
 };
 
-export { LoginScript, handleBackPress };
+export { LoginScript, handleBackPress, CheckCurrentPageScript };
