@@ -1,3 +1,4 @@
+[![Android Build](https://github.com/NjbSyd/Unofficial-CUI/actions/workflows/main.yml/badge.svg)](https://github.com/NjbSyd/Unofficial-CUI/actions/workflows/main.yml)
 # Welcome to the CUI Unofficial Timetable App! 🚀📅
 
 Introducing our cutting-edge CUI Unofficial Timetable App, your ultimate companion for hassle-free schedule management. Powered by the latest tech wizardry, this app brings you a smooth and intuitive experience that'll have you soaring through your classes like a pro! 🚀💻
