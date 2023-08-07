@@ -32,4 +32,4 @@ jobs:
         run: yarn install
 
       - name: Publish update
-        run: eas build --platform android --profile production --commit --no-wait --auto-approve --skip-credentials-check  --non-interactive --json  --no-prompt --no-publish --no-detect
+        run: eas build --platform android --profile production
