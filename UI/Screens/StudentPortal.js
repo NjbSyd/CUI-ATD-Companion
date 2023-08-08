@@ -1,14 +1,56 @@
-import { View, ToastAndroid, Button, StyleSheet } from "react-native";
+import { Alert, StyleSheet, ToastAndroid, View } from "react-native";
 import WebView from "react-native-webview";
 import React, { useRef, useState } from "react";
-import { CheckCurrentPageScript, LoginScript } from "../Functions/UIHelpers";
+import {
+  CheckCurrentPageScript,
+  DownloadProfileImage,
+  LoginScript,
+} from "../Functions/UIHelpers";
 import { LinearProgress } from "@rneui/themed";
+import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
 
-export default function StudentPortal() {
+export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
   const [progressFinished, setProgressFinished] = useState(false);
+  const [navigationCounter, setNavigationCounter] = useState(0);
   const webViewRef = useRef(null);
+  let { id, pass } = route.params;
+  id = id.split("-");
 
+  function handleLoadingEndEvent() {
+    webViewRef.current.injectJavaScript(CheckCurrentPageScript());
+    if (navigationCounter <= 0) {
+      console.log("If condition navigation counter is", navigationCounter);
+      webViewRef.current.injectJavaScript(LoginScript(id, pass));
+      setNavigationCounter(navigationCounter + 1);
+    } else {
+      setNavigationCounter(navigationCounter + 1);
+    }
+    setProgress(0);
+    setProgressFinished(true);
+  }
+
+  const handleOnMessageEvent = async (event) => {
+    try {
+      const currentPage = event.nativeEvent.data;
+      if (navigationCounter >= 2) {
+        if (currentPage === "https://sis.cuiatd.edu.pk/login.aspx") {
+          await DeleteUserCredentialsFromDB(id.join("-"));
+          Alert.alert(
+            "Login Failed",
+            "Please check your Registration No. and Password!",
+            ["OK"],
+            { cancelable: true }
+          );
+          navigation.navigate("Login");
+        } else {
+          await DownloadProfileImage(id.join("-"));
+        }
+      }
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
+  };
   return (
     <View
       style={{
@@ -27,26 +69,13 @@ export default function StudentPortal() {
         onLoadProgress={({ nativeEvent }) => {
           setProgress(nativeEvent.progress);
         }}
-        onLoadEnd={() => {
-          setProgressFinished(true);
-          setProgress(0);
-          webViewRef.current.injectJavaScript(CheckCurrentPageScript());
-        }}
+        onLoadEnd={handleLoadingEndEvent}
         source={{ uri: "https://sis.cuiatd.edu.pk/login.aspx" }}
-        onMessage={(event) => {
-          if (
-            event.nativeEvent.data === "https://sis.cuiatd.edu.pk/login.aspx"
-          ) {
-          }
-          ToastAndroid.show(event.nativeEvent.data, ToastAndroid.SHORT);
-        }}
-        injectedJavaScript={LoginScript(id, pass)}
+        onMessage={handleOnMessageEvent}
       />
     </View>
   );
 }
-let id = "FA20-BSE-023".split("-");
-let pass = "Olamba.1";
 
 const styles = StyleSheet.create({
   container: {

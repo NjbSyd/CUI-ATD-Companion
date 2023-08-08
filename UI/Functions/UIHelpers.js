@@ -1,10 +1,12 @@
 import { Alert, BackHandler } from "react-native";
+import * as FileSystem from "expo-file-system";
+import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
 
 function LoginScript(id, pass) {
   return `
   try {
   if (document.URL === "https://sis.cuiatd.edu.pk/login.aspx") {
-    const delay = 1000;
+    const delay = 300;
 
     const closePopupButton = document.querySelector("#cboxClose");
     setTimeout(() => {
@@ -72,4 +74,18 @@ const handleBackPress = () => {
   return true;
 };
 
-export { LoginScript, handleBackPress, CheckCurrentPageScript };
+async function DownloadProfileImage(regNo) {
+  const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
+  const imagePath = await FileSystem.downloadAsync(
+    imageUrl,
+    `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
+  );
+  await updateImagePath(regNo, imagePath.uri);
+}
+
+export {
+  LoginScript,
+  handleBackPress,
+  CheckCurrentPageScript,
+  DownloadProfileImage,
+};

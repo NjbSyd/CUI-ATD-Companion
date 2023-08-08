@@ -1,8 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  id: "",
-  pass: "",
+  users: [
+    {
+      label: "null",
+      image: "null",
+    },
+  ],
 };
 
 const StudentCredentialSlice = createSlice({
@@ -10,8 +14,7 @@ const StudentCredentialSlice = createSlice({
   initialState,
   reducers: {
     setRegistration: (state, action) => {
-      state.id = action.payload.id;
-      state.pass = action.payload.pass;
+      state.users = [...action.payload];
     },
   },
 });

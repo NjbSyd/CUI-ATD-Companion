@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CUI Unofficial",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
@@ -39,7 +39,7 @@
     "updates": {
       "url": "https://u.expo.dev/f45b966a-2ad8-472a-9ba9-d266061b7883",
       "enabled": true,
-      "fallbackToCacheTimeout": 10000,
+      "fallbackToCacheTimeout": 3000,
       "checkAutomatically": "ON_LOAD"
     }
   }

@@ -7,6 +7,7 @@ import {
   GetSubjectNames,
   GetTeacherNames,
   GetTimeSlots,
+  GetUsers,
 } from "./SQLiteSearchFunctions";
 import { setTeacherNames } from "../Redux/TeacherSlice";
 import { setClassRoom } from "../Redux/ClassRoomSlice";
@@ -14,13 +15,16 @@ import { setSubjectNames } from "../Redux/SubjectSlice";
 import { setTimeslot } from "../Redux/TimeslotSlice";
 import {
   createDataSyncDateTable,
-  initializeDatabase,
+  createUserCredentialsTable,
+  createTimetableDataTable,
   insertOrUpdateData,
   insertOrUpdateDataSyncDate,
 } from "./SQLiteFunctions";
 import { shouldReloadData } from "./Helpers";
 import { ToastAndroid } from "react-native";
 import { setClassNames } from "../Redux/SectionSlice";
+import { setRegistration } from "../Redux/StudentCredentialsSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const API_URL = "https://timetable-scrapper.onrender.com/timetable";
 
@@ -37,7 +41,8 @@ async function FetchDataFromMongoDB() {
 async function PopulateGlobalState(setLoadingText, StateDispatcher) {
   try {
     await createDataSyncDateTable();
-    await initializeDatabase();
+    await createTimetableDataTable();
+    await createUserCredentialsTable();
     const DataSyncDate = await GetDataSyncDate();
     const shouldReload = shouldReloadData(DataSyncDate);
     if (!shouldReload) {
@@ -68,6 +73,28 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
   }
 }
 
+async function UpdateUserCredentialsState(StateDispatcher, setLoadingText) {
+  let users = await GetUsers();
+  if (users.length === 0) {
+    setLoadingText
+      ? setLoadingText("Getting some things Ready...Users❌")
+      : null;
+    return;
+  }
+  setLoadingText ? setLoadingText("Getting some things Ready...Users✅") : null;
+  let usernames = [];
+  let singleUserModel = {
+    label: "",
+    image: "",
+  };
+  for (let i = 0; i < users.length; i++) {
+    singleUserModel.label = users[i].label;
+    singleUserModel.image = users[i].image;
+    usernames.push(singleUserModel);
+  }
+  StateDispatcher(setRegistration(usernames));
+}
+
 async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
   try {
     setLoadingText("Getting some things Ready...");
@@ -91,6 +118,7 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
     const sectionNames = await GetClassNames();
     StateDispatcher(setClassNames(sectionNames));
     setLoadingText("Getting some things Ready...Sections✅");
+    await UpdateUserCredentialsState(StateDispatcher, setLoadingText);
 
     setLoadingText(`Data Updated from ${Mode}`);
   } catch (error) {
@@ -99,4 +127,4 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
   }
 }
 
-export { PopulateGlobalState, FetchDataFromSQLite };
+export { PopulateGlobalState, FetchDataFromSQLite, UpdateUserCredentialsState };

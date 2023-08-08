@@ -1,9 +1,9 @@
 import * as SQLite from "expo-sqlite";
 
-const db = SQLite.openDatabase("TimeTable.db");
+const TimetableDB = SQLite.openDatabase("TimeTable.db");
 
-const initializeDatabase = async () => {
-  db.transaction((tx) => {
+const createTimetableDataTable = async () => {
+  TimetableDB.transaction((tx) => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS timetables (
         _id TEXT PRIMARY KEY,
@@ -25,7 +25,7 @@ const initializeDatabase = async () => {
 
 const insertOrUpdateData = async (inputData) => {
   try {
-    db.transaction((tx) => {
+    TimetableDB.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM timetables WHERE _id = ? LIMIT 1`,
         [inputData._id],
@@ -81,7 +81,7 @@ const insertOrUpdateData = async (inputData) => {
 };
 
 const createDataSyncDateTable = async () => {
-  db.transaction((tx) => {
+  TimetableDB.transaction((tx) => {
     tx.executeSql(
       `CREATE TABLE IF NOT EXISTS SyncDate (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +99,7 @@ const createDataSyncDateTable = async () => {
 const insertOrUpdateDataSyncDate = async (inputDate) => {
   await createDataSyncDateTable();
   try {
-    db.transaction((tx) => {
+    TimetableDB.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM SyncDate WHERE id = 1 LIMIT 1`,
         [],
@@ -138,9 +138,98 @@ const insertOrUpdateDataSyncDate = async (inputDate) => {
   }
 };
 
+const createUserCredentialsTable = async () => {
+  try {
+    await TimetableDB.transaction(async (tx) => {
+      await tx.executeSql(
+        `CREATE TABLE IF NOT EXISTS UserCredentials (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          RegistrationNumber TEXT,
+          Password TEXT,
+          Image TEXT
+        );`
+      );
+    });
+  } catch (error) {
+    console.error("Error creating UserCredentials table:", error);
+  }
+};
+
+const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
+  await createUserCredentialsTable();
+  let nothing = "null";
+  try {
+    TimetableDB.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM UserCredentials WHERE RegistrationNumber = ? LIMIT 1`,
+        [registrationNumber],
+        (_, resultSet) => {
+          const rows = resultSet.rows._array;
+          if (rows.length === 0) {
+            tx.executeSql(
+              `INSERT INTO UserCredentials (RegistrationNumber, Password,Image) VALUES (?, ?,?)`,
+              [registrationNumber, password, nothing],
+              () => null,
+              (error) => {
+                console.error(
+                  "Error occurred during user credentials insert:",
+                  error
+                );
+                throw error;
+              }
+            );
+          } else {
+            tx.executeSql(
+              `UPDATE UserCredentials SET Password = ? WHERE RegistrationNumber = ?`,
+              [password, registrationNumber],
+              () => null,
+              (error) => {
+                console.error(
+                  "Error occurred during user credentials update:",
+                  error
+                );
+                throw error;
+              }
+            );
+          }
+        },
+        (error) => {
+          console.error("Error occurred during SELECT:", error);
+          throw error;
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error occurred:", error);
+  }
+};
+
+const updateImagePath = async (registrationNumber, imagePath) => {
+  await createUserCredentialsTable();
+  console.log(registrationNumber, imagePath, " passed to updateImagePath");
+  try {
+    TimetableDB.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE UserCredentials SET Image = ? WHERE RegistrationNumber = ?`,
+        [imagePath, registrationNumber],
+        () => null,
+        (error) => {
+          console.error("Error occurred during image path update:", error);
+          throw error;
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error occurred:", error);
+  }
+};
+
 export {
   insertOrUpdateData,
-  initializeDatabase,
+  createTimetableDataTable,
   createDataSyncDateTable,
   insertOrUpdateDataSyncDate,
+  insertOrUpdateUserCredentials,
+  createUserCredentialsTable,
+  updateImagePath,
 };

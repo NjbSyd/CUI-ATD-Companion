@@ -55,6 +55,51 @@ async function GetClassNames() {
   return await GetDistinctValues("class_name", "timetables", "class_name ASC");
 }
 
+async function GetUsers() {
+  try {
+    const distinctRegistrationNumbers = await GetDistinctValues(
+      "RegistrationNumber",
+      "UserCredentials",
+      "RegistrationNumber ASC"
+    );
+
+    const usersWithImages = await Promise.all(
+      distinctRegistrationNumbers.map(async (user) => {
+        const imagePath = await executeSqlAsync(
+          `SELECT Image FROM UserCredentials WHERE RegistrationNumber = ?`,
+          [user.value]
+        );
+        const image = imagePath.rows._array[0]?.Image;
+        return {
+          label: user.label,
+          image: image,
+        };
+      })
+    );
+
+    return usersWithImages;
+  } catch (error) {
+    console.error("Error occurred during GetUsers:", error);
+    throw error;
+  }
+}
+
+async function GetUserCredentialsByRegistrationNumber(RegistrationNumber) {
+  const tableName = "UserCredentials";
+
+  try {
+    const userCredentials = await executeSqlAsync(
+      `SELECT * FROM ${tableName} WHERE RegistrationNumber = ?`,
+      [RegistrationNumber]
+    );
+    let oneUser = userCredentials.rows._array;
+    return oneUser.length > 0 ? oneUser[0] : null;
+  } catch (error) {
+    console.error("Error occurred:", error);
+    throw error;
+  }
+}
+
 async function GetTeachersSchedule(teacher) {
   try {
     const resultSet = await executeSqlAsync(
@@ -141,6 +186,23 @@ async function GetTimetableByClassName(class_name) {
   }
 }
 
+// Function to delete user credentials from the UserCredentials table.
+async function DeleteUserCredentialsFromDB(registrationNumber) {
+  const tableName = "UserCredentials";
+  try {
+    // Assuming DeleteUserCredentialsFromDB is a separate function that interacts with the database.
+    await db.transaction(async (tx) => {
+      await tx.executeSql(
+        `DELETE FROM ${tableName} WHERE RegistrationNumber = ?`,
+        [registrationNumber]
+      );
+    });
+  } catch (error) {
+    console.error("Error occurred:", error);
+    throw error;
+  }
+}
+
 export {
   GetTeacherNames,
   GetTimeSlots,
@@ -152,4 +214,7 @@ export {
   GetDataSyncDate,
   GetClassNames,
   GetTimetableByClassName,
+  DeleteUserCredentialsFromDB,
+  GetUserCredentialsByRegistrationNumber,
+  GetUsers,
 };

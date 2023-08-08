@@ -57,7 +57,7 @@ const Main = ({ navigation }) => {
         )}
         {RenderButton(
           "user",
-          "Portal",
+          "Login",
           "Login to SIS.CUI.ATD",
           false,
           buttonWidth,
