@@ -13,7 +13,7 @@ export function Header({ title }) {
   return (
     <View style={headerStyles.container}>
       <Image
-        source={require("../../assets/logo.png")}
+        source={require("../../assets/Images/logo.png")}
         resizeMode="contain"
         style={headerStyles.image}
       />
@@ -34,7 +34,7 @@ export const HeaderImage = () => {
       }}
     >
       <Image
-        source={require("../../assets/logo.png")}
+        source={require("../../assets/Images/logo.png")}
         resizeMode="contain"
         style={headerStyles.image}
       />

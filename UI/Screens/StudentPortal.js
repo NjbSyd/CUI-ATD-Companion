@@ -1,6 +1,13 @@
-import { Alert, StyleSheet, ToastAndroid, View } from "react-native";
+import {
+  Alert,
+  Button,
+  StyleSheet,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import WebView from "react-native-webview";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CheckCurrentPageScript,
   DownloadProfileImage,
@@ -8,6 +15,7 @@ import {
 } from "../Functions/UIHelpers";
 import { LinearProgress } from "@rneui/themed";
 import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
+import { Entypo } from "@expo/vector-icons";
 
 export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
@@ -17,10 +25,15 @@ export default function StudentPortal({ route, navigation }) {
   let { id, pass } = route.params;
   id = id.split("-");
 
+  const onNavigationStateChange = (navState) => {
+    let url = navState.url;
+    navigation.setOptions({
+      title: url,
+    });
+  };
   function handleLoadingEndEvent() {
     webViewRef.current.injectJavaScript(CheckCurrentPageScript());
     if (navigationCounter <= 0) {
-      console.log("If condition navigation counter is", navigationCounter);
       webViewRef.current.injectJavaScript(LoginScript(id, pass));
       setNavigationCounter(navigationCounter + 1);
     } else {
@@ -71,6 +84,7 @@ export default function StudentPortal({ route, navigation }) {
         }}
         onLoadEnd={handleLoadingEndEvent}
         source={{ uri: "https://sis.cuiatd.edu.pk/login.aspx" }}
+        onNavigationStateChange={onNavigationStateChange}
         onMessage={handleOnMessageEvent}
       />
     </View>

@@ -206,7 +206,6 @@ const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
 
 const updateImagePath = async (registrationNumber, imagePath) => {
   await createUserCredentialsTable();
-  console.log(registrationNumber, imagePath, " passed to updateImagePath");
   try {
     TimetableDB.transaction((tx) => {
       tx.executeSql(

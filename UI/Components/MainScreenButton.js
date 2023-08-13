@@ -24,7 +24,7 @@ const RenderButton = (
             height: "40%",
             resizeMode: "contain",
           }}
-          source={require("../../assets/cui_logo_monochrome.png")}
+          source={require("../../assets/Images/cui_logo_monochrome.png")}
         />
       )}
       <Text style={styles.buttonText}>{screenName}</Text>

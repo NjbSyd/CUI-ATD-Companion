@@ -2,7 +2,7 @@ import React from "react";
 import { View, Modal, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 
-const LoadingPopup = ({visible}) => {
+const LoadingPopup = ({ visible }) => {
   return (
     <Modal animationType="fade" transparent={true} visible={visible}>
       <View style={styles.container}>
@@ -12,7 +12,7 @@ const LoadingPopup = ({visible}) => {
               flex: 1,
               alignSelf: "center",
             }}
-            source={require("../../assets/Loading.json")}
+            source={require("../../assets/Images/Loading.json")}
             autoPlay
             autoSize={true}
           />

@@ -67,7 +67,7 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
   } catch (error) {
-    console.log(error);
+    console.error(error);
     setLoadingText("Error Occurred⛔");
     throw error;
   }
@@ -83,13 +83,12 @@ async function UpdateUserCredentialsState(StateDispatcher, setLoadingText) {
   }
   setLoadingText ? setLoadingText("Getting some things Ready...Users✅") : null;
   let usernames = [];
-  let singleUserModel = {
-    label: "",
-    image: "",
-  };
+
   for (let i = 0; i < users.length; i++) {
-    singleUserModel.label = users[i].label;
-    singleUserModel.image = users[i].image;
+    let singleUserModel = {
+      label: users[i].label,
+      image: users[i].image,
+    };
     usernames.push(singleUserModel);
   }
   StateDispatcher(setRegistration(usernames));

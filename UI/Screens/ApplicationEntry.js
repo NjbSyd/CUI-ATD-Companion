@@ -9,6 +9,10 @@ import { useDispatch } from "react-redux";
 import Timetable from "./Timetable";
 import StudentPortal from "./StudentPortal";
 import LoginScreen from "./Login";
+import { TouchableOpacity } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import React from "react";
+import { Image } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,7 +39,29 @@ export default function ApplicationEntry() {
       <Stack.Screen name="Classrooms" component={Classroom} />
       <Stack.Screen name="Subjects" component={Subjects} />
       <Stack.Screen name={"Timetable"} component={Timetable} />
-      <Stack.Screen name={"Portal"} component={StudentPortal} />
+      <Stack.Screen
+        name={"Portal"}
+        component={StudentPortal}
+        options={{
+          headerTitleStyle: {
+            fontSize: 14,
+          },
+          headerRight: () => null,
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Login");
+              }}
+              style={{
+                marginRight: 20,
+                marginLeft: -5,
+              }}
+            >
+              <Entypo size={28} name={"cross"} />
+            </TouchableOpacity>
+          ),
+        }}
+      />
       <Stack.Screen name={"Login"} component={LoginScreen} />
     </Stack.Navigator>
   );

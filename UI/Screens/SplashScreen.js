@@ -27,7 +27,7 @@ export default function SplashScreen({ navigation }) {
     <View style={{ flex: 1 }}>
       <AnimatedLottieView
         style={styles.splashContainer}
-        source={require("../../assets/SplashScreen.json")}
+        source={require("../../assets/Images/SplashScreen.json")}
         resizeMode="center"
         autoPlay
         speed={1}
@@ -39,7 +39,7 @@ export default function SplashScreen({ navigation }) {
         <>
           <AnimatedLottieView
             style={styles.progressContainer}
-            source={require("../../assets/Progress.json")}
+            source={require("../../assets/Images/Progress.json")}
             resizeMode="center"
             autoPlay
             loop
@@ -47,7 +47,7 @@ export default function SplashScreen({ navigation }) {
           />
           <Image
             style={styles.image}
-            source={require("../../assets/icon.png")}
+            source={require("../../assets/Images/icon.png")}
           />
           <View
             style={{ position: "absolute", bottom: "27%", alignSelf: "center" }}

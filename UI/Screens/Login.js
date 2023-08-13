@@ -8,6 +8,7 @@ import {
   ToastAndroid,
   Alert,
   Button,
+  ScrollView,
 } from "react-native";
 import { CheckBox } from "@rneui/themed";
 import { insertOrUpdateUserCredentials } from "../../BackEnd/SQLiteFunctions";
@@ -15,9 +16,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { GetUserCredentialsByRegistrationNumber } from "../../BackEnd/SQLiteSearchFunctions";
 import { UpdateUserCredentialsState } from "../../BackEnd/RequestGenerator";
 import { useFocusEffect } from "@react-navigation/native";
+import { Avatar } from "react-native-paper";
 
 const LoginScreen = ({ navigation }) => {
   const StateDispatcher = useDispatch();
+  useEffect(() => {
+    navigation.setOptions({
+      title: "Portal",
+    });
+    users.filter((user) => user.image === "null");
+  }, []);
   useFocusEffect(
     useCallback(() => {
       UpdateUserCredentialsState(StateDispatcher)
@@ -25,7 +33,6 @@ const LoginScreen = ({ navigation }) => {
         .catch((error) => {
           console.error("Error occurred:", error);
         });
-      console.log(users);
     }, [])
   );
   let users = useSelector((state) => state.StudentCredentialsSlice.users);
@@ -65,63 +72,7 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {users.length !== 0 && users[0].label !== "null" && (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            flexWrap: "wrap",
-            justifyContent: "space-around",
-            width: "80%",
-            alignItems: "center",
-            marginTop: "20%",
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: "bold",
-              marginBottom: 20,
-              color: "#333",
-              width: "100%",
-            }}
-          >
-            Saved Users:
-          </Text>
-          {users.map((user, i) => (
-            <Button
-              key={i}
-              title={user.label}
-              color={"blue"}
-              onPress={() => {
-                GetUserCredentialsByRegistrationNumber(user.label).then(
-                  (res) => {
-                    setUsername(res.RegistrationNumber);
-                    setPassword(res.Password);
-                    setRememberMe(true);
-                    setShowPassword(false);
-                    navigation.navigate("Portal", {
-                      id: res.RegistrationNumber,
-                      pass: res.Password,
-                    });
-                  }
-                );
-              }}
-            >
-              {user.label}
-            </Button>
-          ))}
-        </View>
-      )}
-      <View
-        style={{
-          flex: 2,
-          width: "100%",
-          justifyContent: "flex-start",
-          alignItems: "center",
-          marginTop: "20%",
-        }}
-      >
+      <View style={styles.loginContainer}>
         <Text style={styles.title}>Welcome Back!</Text>
         <TextInput
           placeholder="Registration No: FA20-BSE-023"
@@ -158,6 +109,52 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </View>
+      {users.length !== 0 && users[0].label !== "null" && (
+        <ScrollView
+          style={{
+            flex: 1,
+          }}
+          contentContainerStyle={styles.savedUsersOuterContainer}
+        >
+          <Text style={styles.savedUsersLabel}>Saved Users:</Text>
+          {users.map((user, i) => (
+            <TouchableOpacity
+              key={i}
+              style={{
+                margin: 5,
+              }}
+              onPress={() => {
+                GetUserCredentialsByRegistrationNumber(user.label).then(
+                  (res) => {
+                    setUsername(res.RegistrationNumber);
+                    setPassword(res.Password);
+                    setRememberMe(true);
+                    setShowPassword(false);
+                    console.log(res);
+                    navigation.navigate("Portal", {
+                      id: res.RegistrationNumber,
+                      pass: res.Password,
+                    });
+                  }
+                );
+              }}
+            >
+              {user.image !== "null" ? (
+                <Avatar.Image size={60} source={{ uri: user.image }} />
+              ) : (
+                <Avatar.Text
+                  size={60}
+                  label={user.label.split("-")[2]}
+                  color={"white"}
+                  style={{
+                    backgroundColor: "#3e7fbd",
+                  }}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -166,7 +163,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    // justifyContent: "center",
     backgroundColor: "#f8f8f8",
   },
   title: {
@@ -234,6 +230,29 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+  },
+  savedUsersOuterContainer: {
+    flex: 1,
+    height: "100%",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    width: "80%",
+    alignItems: "center",
+  },
+  loginContainer: {
+    flex: 1.5,
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: "20%",
+  },
+  savedUsersLabel: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+    width: "100%",
   },
 });
 
