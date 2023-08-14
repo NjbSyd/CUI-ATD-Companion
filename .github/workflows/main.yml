@@ -1,10 +1,15 @@
-name: update
-on: push
+name: EAS Update
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   update:
     name: EAS Update
     runs-on: ubuntu-latest
+
     steps:
       - name: Check for EXPO_TOKEN
         run: |
@@ -14,13 +19,13 @@ jobs:
           fi
 
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
           node-version: 18.x
-          cache: yarn
+          cache: 'yarn'
 
       - name: Setup EAS
         uses: expo/expo-github-action@v8
@@ -33,3 +38,33 @@ jobs:
 
       - name: Publish update
         run: eas build --platform android --profile production
+
+      - name: Set GitHub Status (Success)
+        if: ${{ always() }}
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.TOKEN_GIT }}
+          script: |
+            github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              description: 'Build Successful',
+              context: 'EAS Build'
+            })
+
+      - name: Set GitHub Status (Failure)
+        if: ${{ failure() }}
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.TOKEN_GIT }}
+          script: |
+            github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'failure',
+              description: 'Build Failed',
+              context: 'EAS Build'
+            })
