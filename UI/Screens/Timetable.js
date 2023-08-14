@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
 import { useSelector } from "react-redux";
@@ -23,7 +23,13 @@ export default function Timetable() {
   const [selectedClassData, setSelectedClassData] = useState([]);
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const dropdownRef = useRef(null);
 
+  const openDropDown = () => {
+    setTimeout(() => {
+      dropdownRef.current.open();
+    }, 100);
+  };
   function handleOnClassChange(item) {
     setSelectedClassname(item);
     setIsClassNameSelected(true);
@@ -46,22 +52,23 @@ export default function Timetable() {
     <View style={styles.container}>
       {isClassNameSelected ? (
         <>
-          <View style={styles.slotSelectorPlaceholder}>
+          <TouchableOpacity
+            style={styles.slotSelectorPlaceholder}
+            onPress={() => {
+              setIsClassNameSelected(false);
+              setSelectedClassname(null);
+              setSelectedClassData([]);
+              setSelectedClassDayData([]);
+              setSelection(-1);
+              openDropDown();
+            }}
+          >
             <Text style={styles.selectedClassText}>
               {selectedClassname.label} TimeTable
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setIsClassNameSelected(false);
-                setSelectedClassname(null);
-                setSelectedClassData([]);
-                setSelectedClassDayData([]);
-                setSelection(-1);
-              }}
-            >
-              <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-            </TouchableOpacity>
-          </View>
+
+            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+          </TouchableOpacity>
           <View style={styles.btnGroup} horizontal={true}>
             {daysOfWeek.map((day, index) => (
               <TouchableOpacity
@@ -96,6 +103,7 @@ export default function Timetable() {
         </>
       ) : (
         <Dropdown
+          ref={dropdownRef}
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}

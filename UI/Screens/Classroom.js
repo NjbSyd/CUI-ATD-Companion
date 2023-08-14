@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import MagnifierButton from "../Components/SearchButton";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { List } from "../Components/List";
 import Loading from "../Components/Loading";
 import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
@@ -23,7 +23,13 @@ export function Classroom() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const dropdownRef = useRef(null);
 
+  const openDropDown = () => {
+    setTimeout(() => {
+      dropdownRef.current.open();
+    }, 100);
+  };
   function searchButtonOnPress() {
     setIsSearching(true);
     if (selectedTimeSlot === null || selectedRoom === null) {
@@ -42,26 +48,28 @@ export function Classroom() {
         setIsSearching(false);
       });
   }
+
   return (
     <View style={styles.container}>
       {resultingData.length > 0 ? (
-        <View style={styles.slotSelectorPlaceholder}>
+        <TouchableOpacity
+          style={styles.slotSelectorPlaceholder}
+          onPress={() => {
+            setSelectedTimeSlot(null);
+            setSelectedRoom(null);
+            setResultingData([]);
+            openDropDown();
+          }}
+        >
           <Text style={styles.selectedClassText}>
             Classroom: {selectedRoom + "\n"}Timeslot: {selectedTimeSlot}
           </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedTimeSlot(null);
-              setSelectedRoom(null);
-              setResultingData([]);
-            }}
-          >
-            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-          </TouchableOpacity>
-        </View>
+          <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+        </TouchableOpacity>
       ) : (
         <View style={styles.selectorContainer}>
           <Dropdown
+            ref={dropdownRef}
             style={styles.selectorView}
             containerStyle={styles.selectorList}
             data={timeslots}

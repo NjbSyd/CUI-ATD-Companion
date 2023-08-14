@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
@@ -17,25 +17,32 @@ export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
+  const dropdownRef = useRef(null);
 
+  const openDropDown = () => {
+    setTimeout(() => {
+      dropdownRef.current.open();
+    }, 100);
+  };
   return (
     <View style={styles.container}>
       {selectedSubject !== null ? (
-        <View style={styles.slotSelectorPlaceholder}>
+        <TouchableOpacity
+          style={styles.slotSelectorPlaceholder}
+          onPress={() => {
+            setSelectedSubject(null);
+            setSelectedSubjectData([]);
+            openDropDown();
+          }}
+        >
           <Text style={styles.selectedClassText}>
             Teachers for: {"\n" + selectedSubject.label}
           </Text>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedSubject(null);
-              setSelectedSubjectData([]);
-            }}
-          >
-            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-          </TouchableOpacity>
-        </View>
+          <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+        </TouchableOpacity>
       ) : (
         <Dropdown
+          ref={dropdownRef}
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}

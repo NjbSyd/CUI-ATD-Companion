@@ -1,13 +1,6 @@
-import {
-  Alert,
-  Button,
-  StyleSheet,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   CheckCurrentPageScript,
   DownloadProfileImage,
@@ -29,8 +22,26 @@ export default function StudentPortal({ route, navigation }) {
     let url = navState.url;
     navigation.setOptions({
       title: url,
+      headerTitleStyle: {
+        fontSize: 14,
+      },
+      headerRight: () => null,
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+          style={{
+            marginRight: 20,
+            marginLeft: -5,
+          }}
+        >
+          <Entypo size={28} name={"cross"} />
+        </TouchableOpacity>
+      ),
     });
   };
+
   function handleLoadingEndEvent() {
     webViewRef.current.injectJavaScript(CheckCurrentPageScript());
     if (navigationCounter <= 0) {
@@ -90,14 +101,3 @@ export default function StudentPortal({ route, navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  buttonBar: {
-    flexDirection: "row",
-    margin: 10,
-  },
-});
