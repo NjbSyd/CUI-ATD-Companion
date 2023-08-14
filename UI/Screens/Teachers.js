@@ -5,13 +5,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetTeachersSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
 import { useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
+import BannerAds from "../../Ads/BannerAd";
 
 export function Teachers() {
   const teachersNames = useSelector((state) => state.TeacherSlice.teacher);
@@ -70,6 +71,7 @@ export function Teachers() {
           <List data={selectedTeacherData} type={"Teacher"} />
         )}
       </ScrollView>
+      <BannerAds />
     </View>
   );
 }
@@ -84,6 +86,7 @@ const styles = StyleSheet.create({
   scrollView: {
     width: "90%",
     margin: 20,
+    maxHeight: "80%",
   },
   label: {
     fontSize: 18,

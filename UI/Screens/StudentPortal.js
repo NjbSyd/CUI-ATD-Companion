@@ -9,6 +9,7 @@ import {
 import { LinearProgress } from "@rneui/themed";
 import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
 import { Entypo } from "@expo/vector-icons";
+import BannerAds from "../../Ads/BannerAd";
 
 export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
@@ -98,6 +99,7 @@ export default function StudentPortal({ route, navigation }) {
         onNavigationStateChange={onNavigationStateChange}
         onMessage={handleOnMessageEvent}
       />
+      <BannerAds/>
     </View>
   );
 }

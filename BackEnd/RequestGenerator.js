@@ -9,10 +9,10 @@ import {
   GetTimeSlots,
   GetUsers,
 } from "./SQLiteSearchFunctions";
-import { setTeacherNames } from "../Redux/TeacherSlice";
-import { setClassRoom } from "../Redux/ClassRoomSlice";
-import { setSubjectNames } from "../Redux/SubjectSlice";
-import { setTimeslot } from "../Redux/TimeslotSlice";
+import {setTeacherNames} from "../Redux/TeacherSlice";
+import {setClassRoom} from "../Redux/ClassRoomSlice";
+import {setSubjectNames} from "../Redux/SubjectSlice";
+import {setTimeslot} from "../Redux/TimeslotSlice";
 import {
   createDataSyncDateTable,
   createUserCredentialsTable,
@@ -20,11 +20,11 @@ import {
   insertOrUpdateData,
   insertOrUpdateDataSyncDate,
 } from "./SQLiteFunctions";
-import { shouldReloadData } from "./Helpers";
-import { ToastAndroid } from "react-native";
-import { setClassNames } from "../Redux/SectionSlice";
-import { setRegistration } from "../Redux/StudentCredentialsSlice";
-import { useDispatch, useSelector } from "react-redux";
+import {shouldReloadData} from "./Helpers";
+import {ToastAndroid} from "react-native";
+import {setClassNames} from "../Redux/SectionSlice";
+import {setRegistration} from "../Redux/StudentCredentialsSlice";
+import {useDispatch, useSelector} from "react-redux";
 
 const API_URL = "https://timetable-scrapper.onrender.com/timetable";
 
@@ -52,8 +52,8 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
       ToastAndroid.show(
-        "No Internet Connection! Using Old Data.",
-        ToastAndroid.SHORT
+          "No Internet Connection! Using Old Data.",
+          ToastAndroid.SHORT
       );
       setLoadingText("No Internet Connection😢");
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
@@ -74,24 +74,30 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
 }
 
 async function UpdateUserCredentialsState(StateDispatcher, setLoadingText) {
-  let users = await GetUsers();
-  if (users.length === 0) {
-    setLoadingText
+  try {
+    let users = await GetUsers();
+    if (users.length === 0) {
+      setLoadingText
       ? setLoadingText("Getting some things Ready...Users❌")
       : null;
-    return;
-  }
-  setLoadingText ? setLoadingText("Getting some things Ready...Users✅") : null;
-  let usernames = [];
+      StateDispatcher(setRegistration([{label: "null", image: "null"}]));
+      return;
+    }
+    setLoadingText ? setLoadingText("Getting some things Ready...Users✅") : null;
+    let usernames = [];
 
-  for (let i = 0; i < users.length; i++) {
-    let singleUserModel = {
-      label: users[i].label,
-      image: users[i].image,
-    };
-    usernames.push(singleUserModel);
+    for (let i = 0; i < users.length; i++) {
+      let singleUserModel = {
+        label: users[i].label,
+        image: users[i].image,
+      };
+      usernames.push(singleUserModel);
+    }
+    StateDispatcher(setRegistration(usernames));
+  } catch (error) {
+    console.error("Error occurred:", error);
+    throw error;
   }
-  StateDispatcher(setRegistration(usernames));
 }
 
 async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
@@ -126,4 +132,4 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
   }
 }
 
-export { PopulateGlobalState, FetchDataFromSQLite, UpdateUserCredentialsState };
+export {PopulateGlobalState, FetchDataFromSQLite, UpdateUserCredentialsState};

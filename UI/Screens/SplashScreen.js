@@ -1,8 +1,9 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PopulateGlobalState } from "../../BackEnd/RequestGenerator";
 import { useDispatch } from "react-redux";
+import BannerAds from "../../Ads/BannerAd";
 
 export default function SplashScreen({ navigation }) {
   const StateDispatcher = useDispatch();

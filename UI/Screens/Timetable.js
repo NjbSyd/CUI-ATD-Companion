@@ -5,13 +5,14 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
 import { useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
+import BannerAds from "../../Ads/BannerAd";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -137,6 +138,7 @@ export default function Timetable() {
           <NoResults />
         )}
       </ScrollView>
+      <BannerAds />
     </View>
   );
 }
@@ -188,6 +190,7 @@ const styles = StyleSheet.create({
   scrollView: {
     maxWidth: "90%",
     margin: 20,
+    maxHeight: "80%",
   },
   slotSelector: {
     alignSelf: "center",
