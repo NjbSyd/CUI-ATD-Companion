@@ -1,4 +1,4 @@
-name: EAS Update
+name: App Build On Push
 
 on:
   push:
@@ -37,34 +37,4 @@ jobs:
         run: yarn install
 
       - name: Publish update
-        run: eas build --platform android --profile production
-
-      - name: Set GitHub Status (Success)
-        if: ${{ always() }}
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.TOKEN_GIT }}
-          script: |
-            github.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              description: 'Build Successful',
-              context: 'EAS Build'
-            })
-
-      - name: Set GitHub Status (Failure)
-        if: ${{ failure() }}
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{ secrets.TOKEN_GIT }}
-          script: |
-            github.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'failure',
-              description: 'Build Failed',
-              context: 'EAS Build'
-            })
+        run: eas build --platform android --profile production --non-interactive
