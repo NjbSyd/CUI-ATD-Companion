@@ -1,13 +1,7 @@
 import axios from "axios";
 import NetInfo from "@react-native-community/netinfo";
 import {
-  GetClassNames,
-  GetClassRooms,
-  GetDataSyncDate,
-  GetSubjectNames,
-  GetTeacherNames,
-  GetTimeSlots,
-  GetUsers,
+  GetClassNames, GetClassRooms, GetDataSyncDate, GetSubjectNames, GetTeacherNames, GetTimeSlots, GetUsers,
 } from "./SQLiteSearchFunctions";
 import {setTeacherNames} from "../Redux/TeacherSlice";
 import {setClassRoom} from "../Redux/ClassRoomSlice";
@@ -50,10 +44,7 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
-      ToastAndroid.show(
-          "No Internet Connection! Using Old Data.",
-          ToastAndroid.SHORT
-      );
+      ToastAndroid.show("No Internet Connection! Using Old Data.", ToastAndroid.SHORT);
       setLoadingText("No Internet Connection😢");
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
@@ -85,9 +76,7 @@ async function UpdateUserCredentialsState(StateDispatcher, setLoadingText) {
   try {
     let users = await GetUsers();
     if (users.length === 0) {
-      setLoadingText
-      ? setLoadingText("Getting some things Ready...Users❌")
-      : null;
+      setLoadingText ? setLoadingText("Getting some things Ready...Users❌") : null;
       StateDispatcher(setRegistration([{label: "null", image: "null"}]));
       return;
     }
@@ -96,8 +85,7 @@ async function UpdateUserCredentialsState(StateDispatcher, setLoadingText) {
 
     for (let i = 0; i < users.length; i++) {
       let singleUserModel = {
-        label: users[i].label,
-        image: users[i].image,
+        label: users[i].label, image: users[i].image,
       };
       usernames.push(singleUserModel);
     }
