@@ -10,7 +10,7 @@
     },
     "production": {
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       },
       "autoIncrement": true,
       "channel": "production"
