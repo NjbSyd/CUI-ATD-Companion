@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Modal, StyleSheet, Image, Text } from "react-native";
+import { View, Modal, StyleSheet} from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 
 const LoadingPopup = ({ visible }) => {
@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor:"rgba(0,0,0,0.2)"
   },
   popup: {
     width: "50%",

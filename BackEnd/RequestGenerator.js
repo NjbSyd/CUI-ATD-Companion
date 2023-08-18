@@ -24,7 +24,6 @@ import {shouldReloadData} from "./Helpers";
 import {ToastAndroid} from "react-native";
 import {setClassNames} from "../Redux/SectionSlice";
 import {setRegistration} from "../Redux/StudentCredentialsSlice";
-import {useDispatch, useSelector} from "react-redux";
 
 const API_URL = "https://timetable-scrapper.onrender.com/timetable";
 
@@ -59,6 +58,15 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
     }
+    setTimeout(() => {
+      setLoadingText("Hold On ...")
+    }, 4000)
+    setTimeout(() => {
+      setLoadingText("Request is being processed ...")
+    }, 10000)
+    setTimeout(() => {
+      setLoadingText("Just a moment ...")
+    }, 15000)
     setLoadingText("Fetching Data ...");
     const data = await FetchDataFromMongoDB();
     for (const element of data) {
@@ -123,9 +131,11 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
     const sectionNames = await GetClassNames();
     StateDispatcher(setClassNames(sectionNames));
     setLoadingText("Getting some things Ready...Sections✅");
+
     await UpdateUserCredentialsState(StateDispatcher, setLoadingText);
 
     setLoadingText(`Data Updated from ${Mode}`);
+
   } catch (error) {
     console.error("Error occurred:", error);
     throw error;

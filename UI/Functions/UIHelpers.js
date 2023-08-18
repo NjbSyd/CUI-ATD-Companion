@@ -1,6 +1,7 @@
-import { Alert, BackHandler } from "react-native";
+import {Alert, BackHandler} from "react-native";
 import * as FileSystem from "expo-file-system";
-import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
+import {updateImagePath} from "../../BackEnd/SQLiteFunctions";
+import {useFonts} from "expo-font";
 
 function LoginScript(id, pass) {
   return `
@@ -63,13 +64,13 @@ function CheckCurrentPageScript() {
 
 const handleBackPress = () => {
   Alert.alert(
-    "Exit App",
-    "Are you sure you want to exit?",
-    [
-      { text: "Cancel", style: "cancel" },
-      { text: "Exit", onPress: () => BackHandler.exitApp() },
-    ],
-    { cancelable: false }
+      "Exit App",
+      "Are you sure you want to exit?",
+      [
+        {text: "Cancel", style: "cancel"},
+        {text: "Exit", onPress: () => BackHandler.exitApp()},
+      ],
+      {cancelable: false}
   );
   return true;
 };
@@ -77,10 +78,20 @@ const handleBackPress = () => {
 async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
-    imageUrl,
-    `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
+      imageUrl,
+      `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
   );
   await updateImagePath(regNo, imagePath.uri);
+}
+
+
+function useCustomFonts() {
+  const [fontLoaded] = useFonts({
+    'yatra-one': require("../../assets/Fonts/YatraOne-Regular.ttf"),
+    'bricolage': require("../../assets/Fonts/BricolageGrotesque.ttf"),
+    'pilow':require("../../assets/Fonts/Pilowlava-Regular.otf")
+  })
+  return fontLoaded;
 }
 
 export {
@@ -88,4 +99,5 @@ export {
   handleBackPress,
   CheckCurrentPageScript,
   DownloadProfileImage,
+    useCustomFonts
 };

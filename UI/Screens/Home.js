@@ -1,28 +1,30 @@
-import React, { useCallback } from "react";
-import { View, ScrollView, StyleSheet, Dimensions, Alert, BackHandler } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { RenderButton } from "../Components/MainScreenButton";
-import { handleBackPress } from "../Functions/UIHelpers";
+import React, {useCallback, useEffect} from "react";
+import {BackHandler, Dimensions, ScrollView, StyleSheet, View} from "react-native";
+import {useFocusEffect} from "@react-navigation/native";
+import {RenderButton} from "../Components/MainScreenButton";
+import {handleBackPress} from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
+import {LoadAndDisplayInterstitialAd} from "../../Ads/InterstitialAd";
 
-const Main = ({ navigation }) => {
+const Main = ({navigation}) => {
   useFocusEffect(
       useCallback(() => {
         const onBackPress = handleBackPress;
-
         BackHandler.addEventListener("hardwareBackPress", onBackPress);
-
         return () =>
             BackHandler.removeEventListener("hardwareBackPress", onBackPress);
       }, [])
   );
+  useEffect(() => {
+    const unsub = LoadAndDisplayInterstitialAd();
+    return () => unsub()
+  }, [])
   const screenWidth = Dimensions.get("window").width;
   const buttonsPerRow = 2;
   const buttonWidth = screenWidth / buttonsPerRow - 20;
-
   return (
       <View style={styles.container}>
-        <View style={styles.space} />
+        <View style={styles.space}/>
         <ScrollView>
           <View style={styles.buttonContainer}>
             {RenderButton(
@@ -67,7 +69,7 @@ const Main = ({ navigation }) => {
             )}
           </View>
         </ScrollView>
-        <BannerAds />
+        <BannerAds/>
       </View>
   );
 };
