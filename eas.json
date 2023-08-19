@@ -8,6 +8,12 @@
         "buildType": "apk"
       }
     },
+    "testing": {
+      "channel": "testing",
+      "android": {
+        "buildType": "apk"
+      }
+    },
     "production": {
       "android": {
         "buildType": "app-bundle"
