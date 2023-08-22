@@ -23,7 +23,7 @@ const createTimetableDataTable = async () => {
   });
 };
 
-const insertOrUpdateData = async (inputData) => {
+const insertOrUpdateTimetableData = async (inputData) => {
   try {
     TimetableDB.transaction((tx) => {
       tx.executeSql(
@@ -224,7 +224,7 @@ const updateImagePath = async (registrationNumber, imagePath) => {
 };
 
 export {
-  insertOrUpdateData,
+  insertOrUpdateTimetableData,
   createTimetableDataTable,
   createDataSyncDateTable,
   insertOrUpdateDataSyncDate,

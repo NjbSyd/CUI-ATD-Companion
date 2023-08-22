@@ -10,6 +10,7 @@ import Timetable from "./Timetable";
 import StudentPortal from "./StudentPortal";
 import LoginScreen from "./Login";
 import {useFonts} from "expo-font";
+import Freeslots from "./Freeslots";
 
 const Stack = createNativeStackNavigator();
 
@@ -41,6 +42,7 @@ export default function ApplicationEntry() {
         <Stack.Screen name={"Timetable"} component={Timetable}/>
         <Stack.Screen name={"Portal"} component={StudentPortal}/>
         <Stack.Screen name={"Login"} component={LoginScreen}/>
+        <Stack.Screen name={"Freeslots"} component={Freeslots}/>
       </Stack.Navigator>
   );
 }

@@ -87,7 +87,7 @@ const LoginScreen = ({navigation}) => {
         setShowPassword(false);
         console.log(res);
         navigation.navigate("Portal", {
-          id: res.RegistrationNumber, pass: res.Password,
+          id: res.RegistrationNumber, pass: res.Password, img: res.Image
         });
       });
     }

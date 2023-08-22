@@ -32,6 +32,7 @@ const Main = ({navigation}) => {
                 "Teachers",
                 "See a Teacher's schedule",
                 true,
+                false,
                 buttonWidth,
                 navigation
             )}
@@ -40,6 +41,7 @@ const Main = ({navigation}) => {
                 "Classrooms",
                 "Search details based on RoomNo & TimeSlot",
                 true,
+                false,
                 buttonWidth,
                 navigation
             )}
@@ -48,6 +50,7 @@ const Main = ({navigation}) => {
                 "Subjects",
                 "Check assigned Teachers for a Subject",
                 true,
+                false,
                 buttonWidth,
                 navigation
             )}
@@ -56,6 +59,7 @@ const Main = ({navigation}) => {
                 "Timetable",
                 "Check a Class schedule",
                 true,
+                false,
                 buttonWidth,
                 navigation
             )}
@@ -64,8 +68,18 @@ const Main = ({navigation}) => {
                 "Login",
                 "Login to SIS.CUI.ATD",
                 false,
+                false,
                 buttonWidth,
                 navigation
+            )}
+            {RenderButton(
+                "calendar-plus",
+                "Freeslots",
+                "Find free-slots for arranging extra classes",
+                true,
+                false,
+                buttonWidth,
+                navigation,
             )}
           </View>
         </ScrollView>
@@ -81,14 +95,14 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   space: {
-    height: 20,
+    height: 10,
   },
   buttonContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     maxWidth: "100%",
-    marginTop: 10,
+    marginTop: 0,
     marginHorizontal: 10,
   },
 });

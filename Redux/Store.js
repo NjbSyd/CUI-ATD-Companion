@@ -5,6 +5,7 @@ import SubjectSlice from "./SubjectSlice";
 import TimeslotSlice from "./TimeslotSlice";
 import SectionSlice from "./SectionSlice";
 import StudentCredentialsSlice from "./StudentCredentialsSlice";
+import FreeslotsSlice from "./FreeslotsSlice";
 
 const rootReducer = combineReducers({
   ClassRoomSlice,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   SubjectSlice,
   TeacherSlice,
   SectionSlice,
-  StudentCredentialsSlice
+  StudentCredentialsSlice,
+  FreeslotsSlice,
 });
 export const MyStore = configureStore({
   reducer: rootReducer,

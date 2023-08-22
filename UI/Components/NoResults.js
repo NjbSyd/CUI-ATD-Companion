@@ -1,7 +1,7 @@
 import { View, StyleSheet, Image } from "react-native";
 
 const NoResults = () => {
-  let imageSource = require("../../assets/Images/noresults.jpg");
+  let imageSource = require("../../assets/Images/nodata.gif");
   return (
     <View style={styles.view}>
       <Image source={imageSource} style={styles.img} />

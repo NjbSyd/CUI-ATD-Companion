@@ -62,6 +62,13 @@ function CheckCurrentPageScript() {
   `;
 }
 
+function DisablePrintResultLink() {
+  return `
+  // document.getElementById("ctl00_DataContent_lnkPrint").style.display="none";
+  document.getElementById("ctl00_DataContent_lnkPrint").target="";
+  `
+}
+
 const handleBackPress = () => {
   Alert.alert(
       "Exit App",
@@ -74,6 +81,12 @@ const handleBackPress = () => {
   );
   return true;
 };
+
+async function CheckImageExists(regNo) {
+  const imageUri = `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`;
+  const imageInfo = await FileSystem.getInfoAsync(imageUri);
+  return imageInfo.exists;
+}
 
 async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
@@ -89,15 +102,50 @@ function useCustomFonts() {
   const [fontLoaded] = useFonts({
     'yatra-one': require("../../assets/Fonts/YatraOne-Regular.ttf"),
     'bricolage': require("../../assets/Fonts/BricolageGrotesque.ttf"),
-    'pilow':require("../../assets/Fonts/Pilowlava-Regular.otf")
+    'pilow': require("../../assets/Fonts/Pilowlava-Regular.otf")
   })
   return fontLoaded;
 }
+
+function CalculateTotalFreeSlots(daySchedule) {
+  let totalFreeSlots = 0;
+
+  for (const labSlots of Object.values(daySchedule)) {
+    totalFreeSlots += labSlots.length;
+  }
+
+  return totalFreeSlots;
+}
+
+function RemoveLabData(jsonData) {
+  const result = {};
+
+  for (const day in jsonData) {
+    const dayData = jsonData[day];
+    const cleanedDayData = {};
+
+    for (const room in dayData) {
+      const roomNameNormalized = room.toLowerCase();
+      if (!roomNameNormalized.includes('lab') && !roomNameNormalized.includes("(l)") && !roomNameNormalized.includes("lb")) {
+        cleanedDayData[room] = dayData[room];
+      }
+    }
+
+    result[day] = cleanedDayData;
+  }
+
+  return result;
+}
+
 
 export {
   LoginScript,
   handleBackPress,
   CheckCurrentPageScript,
   DownloadProfileImage,
-    useCustomFonts
+  useCustomFonts,
+  DisablePrintResultLink,
+  CheckImageExists,
+  CalculateTotalFreeSlots,
+  RemoveLabData
 };

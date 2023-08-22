@@ -11,23 +11,44 @@ import {
   createDataSyncDateTable,
   createUserCredentialsTable,
   createTimetableDataTable,
-  insertOrUpdateData,
+  insertOrUpdateTimetableData,
   insertOrUpdateDataSyncDate,
 } from "./SQLiteFunctions";
 import {shouldReloadData} from "./Helpers";
 import {ToastAndroid} from "react-native";
 import {setClassNames} from "../Redux/SectionSlice";
 import {setRegistration} from "../Redux/StudentCredentialsSlice";
+import {setFreeslots} from "../Redux/FreeslotsSlice";
+import {RemoveLabData} from "../UI/Functions/UIHelpers";
 
-const API_URL = "https://timetable-scrapper.onrender.com/timetable";
+const Timetable_API_URL = "https://timetable-scrapper.onrender.com/timetable";
+const FreeSlots_API_URL = "https://timetable-scrapper.onrender.com/freeslots";
 
-async function FetchDataFromMongoDB() {
+async function FetchTimetableDataFromMongoDB() {
   try {
-    const res = await axios.get(API_URL);
+    const res = await axios.get(Timetable_API_URL);
     return res.data;
   } catch (e) {
     ToastAndroid.show(e.message, ToastAndroid.SHORT);
     throw e;
+  }
+}
+
+async function FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText) {
+  if (setLoadingText === undefined) {
+    setLoadingText = (text) => {}
+  }
+  try {
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for 2 seconds
+    setLoadingText("Fetching freeslots ...");
+    const res = await axios.get(FreeSlots_API_URL);
+    const freeslots = RemoveLabData(res.data);
+    setLoadingText("Updating Freeslots ...");
+    StateDispatcher(setFreeslots(freeslots));
+    setLoadingText("Updated Freeslots✅");
+  } catch (e) {
+    setLoadingText("Error Occured ⛔");
+    alert("Error Occurred while fetching freeslots from server ⛔\n Please check your internet connection")
   }
 }
 
@@ -59,9 +80,9 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
       setLoadingText("Just a moment ...")
     }, 15000)
     setLoadingText("Fetching Data ...");
-    const data = await FetchDataFromMongoDB();
+    const data = await FetchTimetableDataFromMongoDB();
     for (const element of data) {
-      await insertOrUpdateData(element);
+      await insertOrUpdateTimetableData(element);
     }
     await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
@@ -130,4 +151,4 @@ async function FetchDataFromSQLite(setLoadingText, StateDispatcher, Mode) {
   }
 }
 
-export {PopulateGlobalState, FetchDataFromSQLite, UpdateUserCredentialsState};
+export {PopulateGlobalState, FetchDataFromSQLite, UpdateUserCredentialsState, FetchFreeslotsDataFromMongoDB};
