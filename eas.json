@@ -18,9 +18,6 @@
       "android": {
         "buildType": "app-bundle"
       },
-      "env": {
-        "EXPO_ASSET_PROCESSING_TIMEOUT": "30"
-      },
       "autoIncrement": true,
       "channel": "production"
     }
