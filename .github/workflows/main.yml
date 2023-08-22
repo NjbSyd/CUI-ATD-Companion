@@ -1,4 +1,4 @@
-name: App Build On Push
+name: Build Android
 
 on:
   push:
@@ -11,41 +11,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
       - name: Check commit messages for build flag
         id: check-commit
         run: |
           if [[ $(git log -1 --pretty=%B) == *"--build"* ]]; then
             echo "Build flag detected in commit message. Proceeding with the workflow."
-            echo "::set-output name=build_flag_detected::true"
+            echo "build_flag_detected=true" >> $GITHUB_ENV
           else
             echo "Build flag not detected in commit message. Skipping the workflow."
-            echo "::set-output name=build_flag_detected::false"
+            echo "build_flag_detected=false" >> $GITHUB_ENV
           fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+          cache: 'yarn'
+
+      - name: Set up Expo Application Services (EAS)
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Dependencies
+        run: yarn install
 
       - name: Conditional Workflow
-        if: steps.check-commit.outputs.build_flag_detected == 'true'
+        if: env.build_flag_detected == 'true'
         run: |
-          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
-            echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
-            exit 1
-          fi
-
-          # Checkout repository
-          uses: actions/checkout@v2
-
-          # Setup Node
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18.x
-            cache: 'yarn'
-
-          # Setup EAS
-          uses: expo/expo-github-action@v8
-          with:
-            eas-version: latest
-            token: ${{ secrets.EXPO_TOKEN }}
-
-          run: yarn install
-
           # Publish update
-          run: eas build --platform android --profile production --non-interactive
+          eas build --platform android --profile production --non-interactive
