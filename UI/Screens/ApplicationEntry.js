@@ -15,15 +15,15 @@ const Stack = createNativeStackNavigator();
 
 export default function ApplicationEntry() {
   const [fontLoaded] = useFonts({
-    'pilow': require("../../assets/Fonts/Pilowlava-Regular.otf")
-  })
+    'bricolage': require("../../assets/Fonts/BricolageGrotesque.ttf"),
+  });
   const StateDispatcher = useDispatch();
   return (
       <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
             headerRight: () => <HeaderImage/>,
-            headerTitleStyle: [{fontFamily: 'pilow'}, headerStyles.title],
+            headerTitleStyle: [{fontFamily: 'bricolage'}, headerStyles.title],
             animation: "slide_from_right",
           }}
       >

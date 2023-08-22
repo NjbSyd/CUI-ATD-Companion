@@ -39,8 +39,8 @@
     "updates": {
       "url": "https://u.expo.dev/f45b966a-2ad8-472a-9ba9-d266061b7883",
       "enabled": true,
-      "fallbackToCacheTimeout": 3000,
-      "checkAutomatically": "ON_LOAD"
+      "fallbackToCacheTimeout": 4000,
+      "checkAutomatically": "ON_ERROR_RECOVERY"
     }
   },
   "react-native-google-mobile-ads": {

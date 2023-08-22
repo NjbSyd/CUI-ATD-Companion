@@ -1,6 +1,6 @@
 import {View, StyleSheet, Image, Text} from "react-native";
 import AnimatedLottieView from "lottie-react-native";
-import React, { useState} from "react";
+import React, {useState} from "react";
 import {PopulateGlobalState} from "../../BackEnd/RequestGenerator";
 import {useDispatch} from "react-redux";
 import {useFonts} from "expo-font";
@@ -20,6 +20,7 @@ export default function SplashScreen({navigation}) {
         await PopulateGlobalState(setLoadingText, StateDispatcher);
         setTimeout(() => {
           navigation.navigate("ApplicationEntry")
+          alert("If You encounter any issues with data display, please use the reload icon on top right or restart the app.")
         }, 2000)
       }, 3000);
     } catch (error) {
