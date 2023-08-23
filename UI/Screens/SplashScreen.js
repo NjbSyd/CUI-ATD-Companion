@@ -20,7 +20,6 @@ export default function SplashScreen({navigation}) {
         await PopulateGlobalState(setLoadingText, StateDispatcher);
         setTimeout(() => {
           navigation.navigate("ApplicationEntry")
-          alert("If You encounter any issues with data display, please use the reload icon on top right or restart the app.")
         }, 2000)
       }, 3000);
     } catch (error) {

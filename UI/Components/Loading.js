@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   popup: {
     width: "50%",
     height: "15%",
-    backgroundColor: "rgba(55,159,234,0.75)",
+    backgroundColor: "rgba(10,192,232,0.73)",
     borderRadius: 10,
     padding: 20,
     alignItems: "center",

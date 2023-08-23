@@ -1,26 +1,72 @@
+import {useEffect, useState} from "react";
 import {AdEventType, InterstitialAd, TestIds} from "react-native-google-mobile-ads";
 import {adKeywords} from "./Keywords";
 
-const adId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2067708103851582/6662037963"
+const adId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2067708103851582/6662037963";
 
-const interstitialAd = InterstitialAd.createForAdRequest(adId, {
+const useInterstitialAd = () => {
+  const [loadedAd, setLoadedAd] = useState(false);
+  const [interstitialAd, setInterstitialAd] = useState(null);
+  const [retryTimer, setRetryTimer] = useState(null);
+  useEffect(() => {
+    const eventListeners = loadNewInterstitialAd();
+    return () => {
+      eventListeners();
+      if (interstitialAd) {
+        interstitialAd.removeAllListeners();
+      }
+      clearTimeout(retryTimer);
+    };
+  }, []);
+
+  const loadNewInterstitialAd = () => {
+    const newAd = InterstitialAd.createForAdRequest(adId, {
       requestNonPersonalizedAdsOnly: false,
       keywords: adKeywords()
-    }
-)
+    });
 
-export function LoadAndDisplayInterstitialAd() {
-  interstitialAd.load();
-  return interstitialAd.addAdEventsListener((eventInfo) => {
-    if (eventInfo.type === AdEventType.LOADED) {
-      console.log("Ad Loaded")
-      interstitialAd.show().then(() => {
+    const newEventListener = newAd.addAdEventsListener((eventInfo) => {
+      if (eventInfo.type === AdEventType.LOADED) {
+        setLoadedAd(true);
+        setInterstitialAd(newAd);
+      } else if (eventInfo.type === AdEventType.ERROR) {
+        setLoadedAd(false);
+        setInterstitialAd(null);
+        retryLoading();
+      } else if (eventInfo.type === AdEventType.CLOSED) {
+        setLoadedAd(false);
+        setInterstitialAd(null);
+        scheduleNextAdLoad();
+      }
+    });
 
-      });
-    } else if (eventInfo.type === AdEventType.ERROR) {
-      console.log(eventInfo.payload)
-    } else if (eventInfo.type === AdEventType.CLOSED) {
-      interstitialAd.removeAllListeners();
+    newAd.load();
+    return newEventListener;
+  };
+
+  const retryLoading = () => {
+    const timer = setTimeout(() => {
+      loadNewInterstitialAd();
+    }, 5000);
+    setRetryTimer(timer);
+  };
+
+  const scheduleNextAdLoad = () => {
+    const timer = setTimeout(() => {
+      if (!loadedAd) {
+        loadNewInterstitialAd();
+      }
+    }, 20000);
+    setRetryTimer(timer);
+  };
+
+  const displayAd = () => {
+    if (loadedAd && interstitialAd) {
+      interstitialAd.show().then(() => {});
     }
-  });
-}
+  };
+
+  return {loadedAd, displayAd};
+};
+
+export default useInterstitialAd;

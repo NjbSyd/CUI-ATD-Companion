@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "CUI Unofficial",
-    "version": "5.3.0",
+    "version": "5.4.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
@@ -23,7 +23,8 @@
         "foregroundImage": "./assets/Images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.njbsyd.cui.unofficial"
+      "package": "com.njbsyd.cui.unofficial",
+      "versionCode": 2
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"

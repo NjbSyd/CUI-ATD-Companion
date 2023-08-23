@@ -5,12 +5,12 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import React, {useRef, useState} from "react";
-import {GetTimetableByClassName} from "../../BackEnd/SQLiteSearchFunctions";
-import {Dropdown} from "react-native-element-dropdown";
-import {useSelector} from "react-redux";
-import {FontAwesome5} from "@expo/vector-icons";
-import {List} from "../Components/List";
+import React, { useRef, useState } from "react";
+import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
+import { Dropdown } from "react-native-element-dropdown";
+import { useSelector } from "react-redux";
+import { FontAwesome5 } from "@expo/vector-icons";
+import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
 
@@ -19,7 +19,7 @@ export default function Timetable() {
   const [selection, setSelection] = useState(-1);
   const [selectedClassname, setSelectedClassname] = useState(null);
   const [isClassNameSelected, setIsClassNameSelected] = useState(
-      selectedClassname !== null
+    selectedClassname !== null
   );
   const [selectedClassData, setSelectedClassData] = useState([]);
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
@@ -35,20 +35,20 @@ export default function Timetable() {
 
   const clickOnMonday = () => {
     if (buttonRef.current)
-      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick()
-  }
+      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
+  };
 
   function handleOnClassChange(item) {
     setSelectedClassname(item);
     setIsClassNameSelected(true);
     GetTimetableByClassName(item.value)
-    .then((res) => {
-      setSelectedClassData(res);
-      clickOnMonday()
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+      .then((res) => {
+        setSelectedClassData(res);
+        clickOnMonday();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }
 
   function filterDayData(day = daysOfWeek[selection]) {
@@ -57,101 +57,101 @@ export default function Timetable() {
   }
 
   return (
-      <View style={styles.container}>
-        {isClassNameSelected ? (
-            <>
+    <View style={styles.container}>
+      {isClassNameSelected ? (
+        <>
+          <TouchableOpacity
+            style={styles.slotSelectorPlaceholder}
+            onPress={() => {
+              setIsClassNameSelected(false);
+              setSelectedClassname(null);
+              setSelectedClassData([]);
+              setSelectedClassDayData([]);
+              setSelection(-1);
+              openDropDown();
+            }}
+          >
+            <Text style={styles.selectedClassText}>
+              {selectedClassname.label} TimeTable
+            </Text>
+
+            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+          </TouchableOpacity>
+          <View style={styles.btnGroup} horizontal={true}>
+            {daysOfWeek.map((day, index) => (
               <TouchableOpacity
-                  style={styles.slotSelectorPlaceholder}
-                  onPress={() => {
-                    setIsClassNameSelected(false);
-                    setSelectedClassname(null);
-                    setSelectedClassData([]);
-                    setSelectedClassDayData([]);
-                    setSelection(-1);
-                    openDropDown();
-                  }}
+                key={day}
+                ref={(ref) => {
+                  if (index === 0) {
+                    buttonRef.current = ref;
+                  }
+                }}
+                style={[
+                  styles.button,
+                  { backgroundColor: selection === index ? "#000" : "#fff" },
+                ]}
+                disabled={!isClassNameSelected}
+                onPress={() => {
+                  setSelection(index);
+                  filterDayData(day);
+                }}
               >
-                <Text style={styles.selectedClassText}>
-                  {selectedClassname.label} TimeTable
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      color: isClassNameSelected
+                        ? selection === index
+                          ? "#fff"
+                          : "#000"
+                        : "#d1d1d1",
+                    },
+                  ]}
+                >
+                  {day.substring(0, 3)}
                 </Text>
-
-                <FontAwesome5 name="edit" size={15} color="#4a6cef"/>
               </TouchableOpacity>
-              <View style={styles.btnGroup} horizontal={true}>
-                {daysOfWeek.map((day, index) => (
-                    <TouchableOpacity
-                        key={day}
-                        ref={(ref) => {
-                          if (index === 0) {
-                            buttonRef.current = ref
-                          }
-                        }}
-                        style={[
-                          styles.button,
-                          {backgroundColor: selection === index ? "#000" : "#fff"},
-                        ]}
-                        disabled={!isClassNameSelected}
-                        onPress={() => {
-                          setSelection(index);
-                          filterDayData(day);
-                        }}
-                    >
-                      <Text
-                          style={[
-                            styles.text,
-                            {
-                              color: isClassNameSelected
-                                     ? selection === index
-                                       ? "#fff"
-                                       : "#000"
-                                     : "#d1d1d1",
-                            },
-                          ]}
-                      >
-                        {day.substring(0, 3)}
-                      </Text>
-                    </TouchableOpacity>
-                ))}
-              </View>
-            </>
-        ) : (
-             <Dropdown
-                 ref={dropdownRef}
-                 style={styles.slotSelector}
-                 inputSearchStyle={styles.slotSearch}
-                 containerStyle={styles.slotOptionsContainer}
-                 keyboardAvoiding={true}
-                 data={classNames}
-                 labelField="label"
-                 valueField="value"
-                 onChange={(item) => {
-                   handleOnClassChange(item);
-                 }}
-                 placeholder={"Select a Class"}
-                 value={selectedClassname}
-                 search={true}
-                 searchPlaceholder="Enter a Class name to search"
-                 autoScroll={false}
-             />
-         )}
+            ))}
+          </View>
+        </>
+      ) : (
+        <Dropdown
+          ref={dropdownRef}
+          style={styles.slotSelector}
+          inputSearchStyle={styles.slotSearch}
+          containerStyle={styles.slotOptionsContainer}
+          keyboardAvoiding={true}
+          data={classNames}
+          labelField="label"
+          valueField="value"
+          onChange={(item) => {
+            handleOnClassChange(item);
+          }}
+          placeholder={"Select a Class"}
+          value={selectedClassname}
+          search={true}
+          searchPlaceholder="Enter a Class name to search"
+          autoScroll={false}
+        />
+      )}
 
-        <ScrollView style={styles.scrollView}>
-          {isClassNameSelected ? (
-              selection <= -1 ? (
-                  <Text style={styles.requestText}>
-                    Select a day to view timetable
-                  </Text>
-              ) : selectedClassDayData.length > 0 ? (
-                  <List data={selectedClassDayData} type={"Classroom"}/>
-              ) : (
-                      <NoResults/>
-                  )
+      <ScrollView style={styles.scrollView}>
+        {isClassNameSelected ? (
+          selection <= -1 ? (
+            <Text style={styles.requestText}>
+              Select a day to view timetable
+            </Text>
+          ) : selectedClassDayData.length > 0 ? (
+            <List data={selectedClassDayData} type={"Classroom"} />
           ) : (
-               <NoResults/>
-           )}
-        </ScrollView>
-        <BannerAds/>
-      </View>
+            <NoResults />
+          )
+        ) : (
+          <NoResults />
+        )}
+      </ScrollView>
+      <BannerAds />
+    </View>
   );
 }
 
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowColor: "#000",
     shadowOpacity: 0.2,
   },
@@ -202,9 +202,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginRight: 20,
   },
+
   scrollView: {
     maxWidth: "90%",
     margin: 20,
+    marginBottom: 80,
     maxHeight: "80%",
   },
   slotSelector: {

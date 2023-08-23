@@ -1,118 +1,100 @@
-import { Text, View } from "react-native";
+import { Text, View, StyleSheet } from "react-native";
+
+function renderClassroomBasedItem(item) {
+  const { _id, class_name, day, subject, teacher, class_room, time_slot } =
+    item;
+
+  return (
+    <View key={_id} style={styles.outerContainer}>
+      <View style={styles.innerTopContainer}>
+        <Text style={styles.topBoldText}>{class_name}</Text>
+        <Text style={styles.topBoldText}>{day}</Text>
+      </View>
+      <View style={styles.innerBottomContainer}>
+        <Text style={styles.bottomImportantText}>{subject}</Text>
+        {teacher && (
+          <Text style={styles.bottomNormalText}>{teacher.trim()}</Text>
+        )}
+        <Text style={styles.bottomNormalText}>{class_room}</Text>
+        <Text style={styles.bottomNormalText}>{time_slot}</Text>
+      </View>
+    </View>
+  );
+}
+
+function renderTeacherBasedItem(item) {
+  const { _id, class_name, day, subject, class_room, time_slot } = item;
+
+  return (
+    <View key={_id} style={styles.outerContainer}>
+      <View style={styles.innerTopContainer}>
+        <Text style={styles.topBoldText}>{class_name}</Text>
+        <Text style={styles.topBoldText}>{day}</Text>
+      </View>
+      <View style={styles.innerBottomContainer}>
+        <Text style={styles.bottomImportantText}>{subject}</Text>
+        <Text style={styles.bottomNormalText}>{class_room}</Text>
+        <Text style={styles.bottomNormalText}>{time_slot}</Text>
+      </View>
+    </View>
+  );
+}
+
+function renderSubjectBasedItem(item) {
+  const { _id, teacher, subject, class_name } = item;
+
+  return (
+    <View key={_id} style={styles.outerContainer}>
+      <View style={styles.innerTopContainer}>
+        <Text style={styles.topBoldText}>{teacher}</Text>
+      </View>
+      <View style={styles.innerBottomContainer}>
+        <Text style={styles.bottomImportantText}>{subject}</Text>
+        <Text style={styles.bottomNormalText}>{class_name}</Text>
+      </View>
+    </View>
+  );
+}
 
 export function List({ data, type }) {
-  if (data.length === 0) {
-    return <Text>No Record</Text>;
-  }
+  const renderItemMap = {
+    Classroom: renderClassroomBasedItem,
+    Teacher: renderTeacherBasedItem,
+    Subject: renderSubjectBasedItem,
+  };
 
-  function renderItemClassroomBased(item) {
-    return (
-      <View
-        key={item._id}
-        style={{
-          marginVertical: 10,
-          borderColor: "black",
-          borderRadius: 10,
-          borderWidth: 1,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            backgroundColor: "rgb(2, 201, 208)",
-            padding: 10,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {item.class_name}
-          </Text>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.day}</Text>
-        </View>
-        <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 16, color: "red" }}>{item.subject}</Text>
-          <Text style={{ fontSize: 14 }}>{item.teacher.trim()}</Text>
-          <Text style={{ fontSize: 14 }}>{item.class_room}</Text>
-          <Text style={{ fontSize: 14 }}>{item.time_slot}</Text>
-        </View>
-      </View>
-    );
-  }
+  const renderFunction = renderItemMap[type];
 
-  function renderItemTeacherBased(item) {
-    return (
-      <View
-        key={item._id}
-        style={{
-          marginVertical: 10,
-          borderColor: "black",
-          borderRadius: 10,
-          borderWidth: 1,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            backgroundColor: "rgb(2, 201, 208)",
-            padding: 10,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {item.class_name}
-          </Text>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.day}</Text>
-        </View>
-        <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 16, color: "red" }}>{item.subject}</Text>
-          <Text style={{ fontSize: 14 }}>{item.class_room}</Text>
-          <Text style={{ fontSize: 14 }}>{item.time_slot}</Text>
-        </View>
-      </View>
-    );
-  }
-
-  function renderItemSubjectBased(item) {
-    return (
-      <View
-        key={item._id}
-        style={{
-          marginVertical: 10,
-          borderColor: "black",
-          borderRadius: 10,
-          borderWidth: 1,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-evenly",
-            backgroundColor: "rgb(2, 201, 208)",
-            padding: 10,
-          }}
-        >
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-            {item.teacher}
-          </Text>
-        </View>
-        <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 16, color: "red" }}>{item.subject}</Text>
-          <Text style={{ fontSize: 16 }}>{item.class_name}</Text>
-        </View>
-      </View>
-    );
-  }
-
-  if (type === "Classroom") {
-    return data.map((item) => renderItemClassroomBased(item));
-  } else if (type === "Teacher") {
-    return data.map((item) => renderItemTeacherBased(item));
-  } else if (type === "Subject") {
-    return data.map((item) => renderItemSubjectBased(item));
-  } else {
+  if (!renderFunction) {
     return <Text>Invalid Type</Text>;
   }
+
+  return data.length === 0 ? <Text>No Record</Text> : data.map(renderFunction);
 }
+
+const styles = StyleSheet.create({
+  outerContainer: {
+    marginVertical: 10,
+    borderColor: "#cccccc",
+    borderRadius: 10,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  innerTopContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    backgroundColor: "#f0f0f0",
+    borderBottomColor: "#cccccc",
+    borderBottomWidth: 0.5,
+    padding: 10,
+    elevation: 10,
+  },
+  innerBottomContainer: {
+    padding: 10,
+  },
+  topBoldText: { fontSize: 18, fontWeight: "bold" },
+  bottomImportantText: { fontSize: 16, color: "red" },
+  bottomNormalText: {
+    fontSize: 16,
+  },
+});

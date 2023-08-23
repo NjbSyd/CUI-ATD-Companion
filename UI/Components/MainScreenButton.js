@@ -9,16 +9,27 @@ const RenderButton = (
     icon = true,
     disabled = false,
     buttonWidth,
-    navigation
+    navigation,
+    loadedAd,
+    showAd
 ) => {
   return (
-      <View style={disabled&&{
+      <View style={disabled && {
         opacity: 0.5,
       }}>
         <TouchableOpacity
             disabled={disabled}
             style={[styles.button, {width: buttonWidth, height: buttonWidth + 20}]}
-            onPress={() => navigation.navigate(screenName)}
+            onPress={() => {
+              if (loadedAd) {
+                try {
+                  showAd();
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+              navigation.navigate(screenName);
+            }}
         >
           {icon ? (
               <FontAwesome5 name={iconName} size={50} color="white"/>
