@@ -24,7 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.njbsyd.cui.unofficial",
-      "versionCode": 2
+      "versionCode": 5
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"
