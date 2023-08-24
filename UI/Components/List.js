@@ -1,4 +1,5 @@
-import { Text, View, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import React from "react";
 
 function renderClassroomBasedItem(item) {
   const { _id, class_name, day, subject, teacher, class_room, time_slot } =
@@ -56,17 +57,29 @@ function renderSubjectBasedItem(item) {
   );
 }
 
+function renderFreeSlotBasedItem(item) {
+  return (
+    <View key={item} style={styles.itemContainer}>
+      <Text style={styles.innerItemText}>{item}</Text>
+    </View>
+  );
+}
+
 export function List({ data, type }) {
   const renderItemMap = {
     Classroom: renderClassroomBasedItem,
     Teacher: renderTeacherBasedItem,
     Subject: renderSubjectBasedItem,
+    FreeSlot: renderFreeSlotBasedItem,
   };
 
   const renderFunction = renderItemMap[type];
 
   if (!renderFunction) {
     return <Text>Invalid Type</Text>;
+  }
+  if (type === "FreeSlot") {
+    data = Object.keys(data);
   }
 
   return data.length === 0 ? <Text>No Record</Text> : data.map(renderFunction);
@@ -96,5 +109,17 @@ const styles = StyleSheet.create({
   bottomImportantText: { fontSize: 16, color: "red" },
   bottomNormalText: {
     fontSize: 16,
+  },
+  innerItemText: {
+    fontSize: 16,
+  },
+  itemContainer: {
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    elevation: 5,
+    borderRadius: 5,
+    backgroundRadius: 50,
+    marginBottom: 10,
+    marginHorizontal: 30,
   },
 });

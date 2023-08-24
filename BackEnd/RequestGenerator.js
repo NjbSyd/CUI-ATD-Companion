@@ -21,7 +21,6 @@ import {
   insertOrUpdateDataSyncDate,
 } from "./SQLiteFunctions";
 import { shouldReloadData } from "./Helpers";
-import { ToastAndroid } from "react-native";
 import { setClassNames } from "../Redux/SectionSlice";
 import { setRegistration } from "../Redux/StudentCredentialsSlice";
 import { setFreeslots } from "../Redux/FreeslotsSlice";
@@ -35,16 +34,23 @@ async function FetchTimetableDataFromMongoDB() {
     const res = await axios.get(Timetable_API_URL);
     return res.data;
   } catch (e) {
-    ToastAndroid.show(e.message, ToastAndroid.SHORT);
     throw e;
   }
 }
 
-async function FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText) {
+async function FetchFreeslotsDataFromMongoDB(
+  StateDispatcher,
+  setLoadingText,
+  FreeSlotsAvailable
+) {
   if (setLoadingText === undefined) {
     setLoadingText = (text) => {};
   }
   try {
+    if (FreeSlotsAvailable) {
+      setLoadingText("FreeSlots up-to-date!");
+      return;
+    }
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for 2 seconds
     setLoadingText("Fetching freeslots ...");
     const res = await axios.get(FreeSlots_API_URL);
@@ -60,7 +66,14 @@ async function FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText) {
   }
 }
 
-async function PopulateGlobalState(setLoadingText, StateDispatcher) {
+async function PopulateGlobalState(
+  setLoadingText,
+  StateDispatcher,
+  FreeSlotsAvailable
+) {
+  if (FreeSlotsAvailable === undefined) {
+    FreeSlotsAvailable = false;
+  }
   try {
     await createDataSyncDateTable();
     await createTimetableDataTable();
@@ -69,15 +82,15 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     const shouldReload = shouldReloadData(DataSyncDate);
     if (!shouldReload) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
-      await FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText);
+      await FetchFreeslotsDataFromMongoDB(
+        StateDispatcher,
+        setLoadingText,
+        FreeSlotsAvailable
+      );
       return;
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
-      ToastAndroid.show(
-        "No Internet Connection! Using Old Data.",
-        ToastAndroid.SHORT
-      );
       setLoadingText("No Internet Connection😢");
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;

@@ -1,22 +1,24 @@
-import {Alert, ToastAndroid, TouchableOpacity, View} from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
-import React, {useRef, useState} from "react";
+import React, { useRef, useState } from "react";
 import {
-  CheckCurrentPageScript, CheckImageExists, DisablePrintResultLink,
+  CheckCurrentPageScript,
+  CheckImageExists,
+  DisablePrintResultLink,
   DownloadProfileImage,
   LoginScript,
 } from "../Functions/UIHelpers";
-import {LinearProgress} from "@rneui/themed";
-import {DeleteUserCredentialsFromDB} from "../../BackEnd/SQLiteSearchFunctions";
-import {Entypo} from "@expo/vector-icons";
+import { LinearProgress } from "@rneui/themed";
+import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
+import { Entypo } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
 
-export default function StudentPortal({route, navigation}) {
+export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
   const [progressFinished, setProgressFinished] = useState(false);
   const [navigationCounter, setNavigationCounter] = useState(0);
   const webViewRef = useRef(null);
-  let {id, pass, img} = route.params;
+  let { id, pass, img } = route.params;
   id = id.split("-");
 
   const onNavigationStateChange = (navState) => {
@@ -28,17 +30,17 @@ export default function StudentPortal({route, navigation}) {
       },
       headerRight: () => null,
       headerLeft: () => (
-          <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Login");
-              }}
-              style={{
-                marginRight: 20,
-                marginLeft: -5,
-              }}
-          >
-            <Entypo size={28} name={"cross"}/>
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("Login");
+          }}
+          style={{
+            marginRight: 20,
+            marginLeft: -5,
+          }}
+        >
+          <Entypo size={28} name={"cross"} />
+        </TouchableOpacity>
       ),
     });
   };
@@ -62,18 +64,19 @@ export default function StudentPortal({route, navigation}) {
         if (currentPage === "https://sis.cuiatd.edu.pk/login.aspx") {
           await DeleteUserCredentialsFromDB(id.join("-"));
           Alert.alert(
-              "Login Failed",
-              "Please check your Registration No. and Password!",
-              ["OK"],
-              {cancelable: true}
+            "Login Failed",
+            "Please check your Registration No. and Password!",
+            ["OK"],
+            { cancelable: true }
           );
           navigation.navigate("Login");
           return;
-        } else if (currentPage === "https://sis.cuiatd.edu.pk/StudentResultCard.aspx") {
-          webViewRef.current.injectJavaScript(DisablePrintResultLink())
+        } else if (
+          currentPage === "https://sis.cuiatd.edu.pk/StudentResultCard.aspx"
+        ) {
+          webViewRef.current.injectJavaScript(DisablePrintResultLink());
         }
-        if (img === "null" || (!await CheckImageExists(id.join("-")))) {
-          ToastAndroid.show("Downloading Profile Image...", ToastAndroid.SHORT);
+        if (img === "null" || !(await CheckImageExists(id.join("-")))) {
           await DownloadProfileImage(id.join("-"));
         }
       }
@@ -82,29 +85,29 @@ export default function StudentPortal({route, navigation}) {
     }
   };
   return (
-      <View
-          style={{
-            flex: 1,
-          }}
-      >
-        {!progressFinished && <LinearProgress value={progress} color="primary"/>}
-        <WebView
-            ref={(ref) => {
-              webViewRef.current = ref;
-            }}
-            onLoadStart={() => {
-              setProgress(0);
-              setProgressFinished(false);
-            }}
-            onLoadProgress={({nativeEvent}) => {
-              setProgress(nativeEvent.progress);
-            }}
-            onLoadEnd={handleLoadingEndEvent}
-            source={{uri: "https://sis.cuiatd.edu.pk/login.aspx"}}
-            onNavigationStateChange={onNavigationStateChange}
-            onMessage={handleOnMessageEvent}
-        />
-        <BannerAds/>
-      </View>
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      {!progressFinished && <LinearProgress value={progress} color="primary" />}
+      <WebView
+        ref={(ref) => {
+          webViewRef.current = ref;
+        }}
+        onLoadStart={() => {
+          setProgress(0);
+          setProgressFinished(false);
+        }}
+        onLoadProgress={({ nativeEvent }) => {
+          setProgress(nativeEvent.progress);
+        }}
+        onLoadEnd={handleLoadingEndEvent}
+        source={{ uri: "https://sis.cuiatd.edu.pk/login.aspx" }}
+        onNavigationStateChange={onNavigationStateChange}
+        onMessage={handleOnMessageEvent}
+      />
+      <BannerAds />
+    </View>
   );
 }

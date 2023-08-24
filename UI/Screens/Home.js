@@ -1,63 +1,154 @@
-import React, {useCallback, useEffect, useState} from "react";
-import {BackHandler, Dimensions, ScrollView, StyleSheet, View} from "react-native";
-import {useFocusEffect} from "@react-navigation/native";
-import {RenderButton} from "../Components/MainScreenButton";
-import {handleBackPress} from "../Functions/UIHelpers";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  BackHandler,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { RenderButton } from "../Components/MainScreenButton";
+import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
-import {FetchDataFromSQLite} from "../../BackEnd/RequestGenerator";
-import {useDispatch} from "react-redux";
+import { FetchDataFromSQLite } from "../../BackEnd/RequestGenerator";
+import { useDispatch, useSelector } from "react-redux";
 import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
+import { ReloadButton } from "../Components/ReloadButton";
 
-const Main = ({navigation}) => {
-  const {loadedAd, displayAd} = useInterstitialAd();
+const Main = ({ navigation }) => {
+  const { loadedAd, displayAd } = useInterstitialAd();
+  const FreeSlotsAvailable = useSelector(
+    (state) => state.FreeslotsSlice.available
+  );
   const StateDispatcher = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Loading ...");
 
   const reloadData = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
-      setLoading(false)
+      setLoading(false);
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  }
+  };
   useEffect(() => {
     reloadData().then(() => {});
+    navigation.setOptions({
+      headerLeft: () => <></>,
+      headerRight: () => (
+        <ReloadButton
+          StateDispatcher={StateDispatcher}
+          SetLoadingText={setLoadingText}
+          SetLoading={setLoading}
+          FreeSlotsAvailable={FreeSlotsAvailable}
+        />
+      ),
+    });
   }, []);
 
-  useFocusEffect(useCallback(() => {
-    const onBackPress = handleBackPress;
-    BackHandler.addEventListener("hardwareBackPress", onBackPress);
-    return () => BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-  }, []));
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = handleBackPress;
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [])
+  );
   const screenWidth = Dimensions.get("window").width;
   const buttonsPerRow = 2;
   const buttonWidth = screenWidth / buttonsPerRow - 20;
-  return (<View style={styles.container}>
-        <View style={styles.space}/>
-        <ScrollView>
-          <View style={styles.buttonContainer}>
-            {RenderButton("chalkboard-teacher", "Teachers", "See a Teacher's schedule", true, false, buttonWidth, navigation, loadedAd, displayAd,)}
-            {RenderButton("university", "Classrooms", "Search details based on RoomNo & TimeSlot", true, false, buttonWidth, navigation, loadedAd, displayAd,)}
-            {RenderButton("book", "Subjects", "Check assigned Teachers for a Subject", true, false, buttonWidth, navigation, loadedAd, displayAd,)}
-            {RenderButton("calendar-alt", "Timetable", "Check a Class schedule", true, false, buttonWidth, navigation, loadedAd, displayAd,)}
-            {RenderButton("user", "Login", "Login to SIS.CUI.ATD", false, false, buttonWidth, navigation, loadedAd, displayAd,)}
-            {RenderButton("calendar-plus", "Freeslots", "Find free-slots for arranging extra classes", true, false, buttonWidth, navigation, loadedAd, displayAd,)}
-          </View>
-        </ScrollView>
-        <LoadingPopup visible={loading}/>
-        <BannerAds/>
-      </View>);
+  return (
+    <View style={styles.container}>
+      <View style={styles.space} />
+      <ScrollView>
+        <View style={styles.buttonContainer}>
+          {RenderButton(
+            "chalkboard-teacher",
+            "Teachers",
+            "See a Teacher's schedule",
+            true,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+          {RenderButton(
+            "university",
+            "Classrooms",
+            "Search details based on RoomNo & TimeSlot",
+            true,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+          {RenderButton(
+            "book",
+            "Subjects",
+            "Check assigned Teachers for a Subject",
+            true,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+          {RenderButton(
+            "calendar-alt",
+            "Timetable",
+            "Check a Class schedule",
+            true,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+          {RenderButton(
+            "user",
+            "Login",
+            "Login to SIS.CUI.ATD",
+            false,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+          {RenderButton(
+            "calendar-plus",
+            "Freeslots",
+            "Find free-slots for arranging extra classes",
+            true,
+            false,
+            buttonWidth,
+            navigation,
+            loadedAd,
+            displayAd
+          )}
+        </View>
+      </ScrollView>
+      <LoadingPopup visible={loading} text={loadingText} />
+      <BannerAds />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, alignItems: "center", backgroundColor: "white",
-  }, space: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "white",
+  },
+  space: {
     height: 10,
-  }, buttonContainer: {
+  },
+  buttonContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",

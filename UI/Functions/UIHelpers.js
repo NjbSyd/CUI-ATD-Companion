@@ -1,7 +1,7 @@
-import {Alert, BackHandler} from "react-native";
+import { Alert, BackHandler } from "react-native";
 import * as FileSystem from "expo-file-system";
-import {updateImagePath} from "../../BackEnd/SQLiteFunctions";
-import {useFonts} from "expo-font";
+import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
+import { useFonts } from "expo-font";
 
 function LoginScript(id, pass) {
   return `
@@ -66,18 +66,18 @@ function DisablePrintResultLink() {
   return `
   // document.getElementById("ctl00_DataContent_lnkPrint").style.display="none";
   document.getElementById("ctl00_DataContent_lnkPrint").target="";
-  `
+  `;
 }
 
 const handleBackPress = () => {
   Alert.alert(
-      "Exit App",
-      "Are you sure you want to exit?",
-      [
-        {text: "Cancel", style: "cancel"},
-        {text: "Exit", onPress: () => BackHandler.exitApp()},
-      ],
-      {cancelable: false}
+    "Exit App",
+    "Are you sure you want to exit?",
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Exit", onPress: () => BackHandler.exitApp() },
+    ],
+    { cancelable: false }
   );
   return true;
 };
@@ -91,27 +91,31 @@ async function CheckImageExists(regNo) {
 async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
-      imageUrl,
-      `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
+    imageUrl,
+    `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
   );
   await updateImagePath(regNo, imagePath.uri);
 }
 
-
 function useCustomFonts() {
   const [fontLoaded] = useFonts({
-    'yatra-one': require("../../assets/Fonts/YatraOne-Regular.ttf"),
-    'bricolage': require("../../assets/Fonts/BricolageGrotesque.ttf"),
-    'pilow': require("../../assets/Fonts/Pilowlava-Regular.otf")
-  })
+    "yatra-one": require("../../assets/Fonts/YatraOne-Regular.ttf"),
+    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
+    pilow: require("../../assets/Fonts/Pilowlava-Regular.otf"),
+  });
   return fontLoaded;
 }
 
-function CalculateTotalFreeSlots(daySchedule) {
+function CalculateTotalFreeSlots(daySchedule, timeslot) {
   let totalFreeSlots = 0;
 
   for (const labSlots of Object.values(daySchedule)) {
-    totalFreeSlots += labSlots.length;
+    for (const slot of labSlots) {
+      if (slot === timeslot) {
+        totalFreeSlots++;
+        break;
+      }
+    }
   }
 
   return totalFreeSlots;
@@ -126,7 +130,11 @@ function RemoveLabData(jsonData) {
 
     for (const room in dayData) {
       const roomNameNormalized = room.toLowerCase();
-      if (!roomNameNormalized.includes('lab') && !roomNameNormalized.includes("(l)") && !roomNameNormalized.includes("lb")) {
+      if (
+        !roomNameNormalized.includes("lab") &&
+        !roomNameNormalized.includes("(l)") &&
+        !roomNameNormalized.includes("lb")
+      ) {
         cleanedDayData[room] = dayData[room];
       }
     }
@@ -137,6 +145,19 @@ function RemoveLabData(jsonData) {
   return result;
 }
 
+function FilterFreeSlotsByTimeSlot(classSchedule, timeSlot) {
+  const filteredSchedule = {};
+
+  for (const day in classSchedule) {
+    filteredSchedule[day] = {};
+    for (const className in classSchedule[day]) {
+      if (classSchedule[day][className].includes(timeSlot)) {
+        filteredSchedule[day][className] = classSchedule[day][className];
+      }
+    }
+  }
+  return filteredSchedule;
+}
 
 export {
   LoginScript,
@@ -147,5 +168,6 @@ export {
   DisablePrintResultLink,
   CheckImageExists,
   CalculateTotalFreeSlots,
-  RemoveLabData
+  RemoveLabData,
+  FilterFreeSlotsByTimeSlot,
 };

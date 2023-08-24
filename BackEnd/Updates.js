@@ -4,7 +4,6 @@ async function onFetchUpdateAsync(setLoadingText) {
   try {
     setLoadingText("Checking for updates...");
     const update = await Updates.checkForUpdateAsync();
-
     if (update.isAvailable) {
       setLoadingText("Downloading updates...");
       await Updates.fetchUpdateAsync();
@@ -16,4 +15,4 @@ async function onFetchUpdateAsync(setLoadingText) {
   }
 }
 
-export {onFetchUpdateAsync}
+export { onFetchUpdateAsync };
