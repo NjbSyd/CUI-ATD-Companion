@@ -66,14 +66,10 @@ async function FetchFreeslotsDataFromMongoDB(
   }
 }
 
-async function PopulateGlobalState(
-  setLoadingText,
-  StateDispatcher,
-  FreeSlotsAvailable
-) {
-  if (FreeSlotsAvailable === undefined) {
-    FreeSlotsAvailable = false;
-  }
+async function PopulateGlobalState(setLoadingText, StateDispatcher) {
+  // if (FreeSlotsAvailable === undefined) {
+  //   FreeSlotsAvailable = false;
+  // }
   try {
     await createDataSyncDateTable();
     await createTimetableDataTable();
@@ -82,11 +78,11 @@ async function PopulateGlobalState(
     const shouldReload = shouldReloadData(DataSyncDate);
     if (!shouldReload) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
-      await FetchFreeslotsDataFromMongoDB(
-        StateDispatcher,
-        setLoadingText,
-        FreeSlotsAvailable
-      );
+      // await FetchFreeslotsDataFromMongoDB(
+      //   StateDispatcher,
+      //   setLoadingText,
+      //   FreeSlotsAvailable
+      // );
       return;
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
@@ -111,7 +107,7 @@ async function PopulateGlobalState(
     }
     await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
-    await FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText);
+    // await FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText);
   } catch (error) {
     console.error(error);
     setLoadingText("Error Occurred⛔");

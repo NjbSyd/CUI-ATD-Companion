@@ -1,68 +1,81 @@
-import {Image, Text, StyleSheet, TouchableOpacity, View} from "react-native";
-import {FontAwesome5} from "@expo/vector-icons";
+import { Image, Text, StyleSheet, TouchableOpacity, View } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
+import { useFonts } from "expo-font";
 
 const RenderButton = (
-    iconName,
-    screenName,
-    screenDescription,
-    icon = true,
-    disabled = false,
-    buttonWidth,
-    navigation,
-    loadedAd,
-    showAd
+  iconName,
+  screenName,
+  screenDescription,
+  icon = true,
+  disabled = false,
+  buttonWidth,
+  navigation,
+  loadedAd,
+  showAd
 ) => {
+  const [fontLoaded] = useFonts({
+    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
+  });
   return (
-      <View style={disabled && {
-        opacity: 0.5,
-      }}>
-        <TouchableOpacity
-            disabled={disabled}
-            style={[styles.button, {width: buttonWidth, height: buttonWidth + 20}]}
-            onPress={() => {
-              if (loadedAd) {
-                try {
-                  showAd();
-                } catch (e) {
-                  console.log(e);
-                }
-              }
-              navigation.navigate(screenName);
+    <View
+      style={
+        disabled && {
+          opacity: 0.5,
+        }
+      }
+    >
+      <TouchableOpacity
+        disabled={disabled}
+        style={[
+          styles.button,
+          { width: buttonWidth, height: buttonWidth + 20 },
+        ]}
+        onPress={() => {
+          if (loadedAd) {
+            try {
+              showAd();
+            } catch (e) {
+              console.log(e);
+            }
+          }
+          navigation.navigate(screenName);
+        }}
+      >
+        {icon ? (
+          <FontAwesome5 name={iconName} size={50} color="white" />
+        ) : (
+          <Image
+            style={{
+              width: "35%",
+              height: "35%",
+              marginVertical: -5,
+              resizeMode: "contain",
             }}
+            source={require("../../assets/Images/cui_logo_monochrome.png")}
+          />
+        )}
+        <Text style={styles.buttonText}>{screenName}</Text>
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontSize: 12,
+            margin: 20,
+            fontFamily: "bricolage",
+          }}
         >
-          {icon ? (
-              <FontAwesome5 name={iconName} size={50} color="white"/>
-          ) : (
-               <Image
-                   style={{
-                     width: "40%",
-                     height: "40%",
-                     resizeMode: "contain",
-                   }}
-                   source={require("../../assets/Images/cui_logo_monochrome.png")}
-               />
-           )}
-          <Text style={styles.buttonText}>{screenName}</Text>
-          <Text
-              style={{
-                color: "white",
-                textAlign: "center",
-                fontSize: 12,
-                margin: 20,
-              }}
-          >
-            {screenDescription}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          {screenDescription}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    justifyContent: "center",
+    paddingTop: 20,
     backgroundColor: "rgb(15, 44, 76)",
     marginVertical: 10,
     borderRadius: 10,
@@ -79,4 +92,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {RenderButton};
+export { RenderButton };

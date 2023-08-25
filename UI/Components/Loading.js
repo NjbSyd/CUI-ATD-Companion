@@ -1,25 +1,36 @@
 import React from "react";
-import {View, Modal, StyleSheet, Text} from "react-native";
+import { View, Modal, StyleSheet, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
+import { useFonts } from "expo-font";
 
-const LoadingPopup = ({visible, text}) => {
+const LoadingPopup = ({ visible, text }) => {
+  const [fontLoaded] = useFonts({
+    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
+  });
   return (
-      <Modal animationType="fade" transparent={true} visible={visible}>
-        <View style={styles.container}>
-          <View style={styles.popup}>
-            <AnimatedLottieView
-                style={{
-                  flex: 1,
-                  alignSelf: "center",
-                }}
-                source={require("../../assets/Images/Loading.json")}
-                autoPlay
-                autoSize={true}
-            />
-            {text && <Text>{text}</Text>}
-          </View>
+    <Modal animationType="slide" transparent={true} visible={visible}>
+      <View style={styles.container}>
+        <View style={styles.popup}>
+          <AnimatedLottieView
+            style={styles.animation}
+            source={require("../../assets/Images/Loading.json")}
+            autoPlay
+            autoSize={true}
+          />
+          {text && (
+            <Text
+              style={[
+                styles.text,
+                { fontFamily: "bricolage" },
+                text.length >= 25 && { fontSize: 14 },
+              ]}
+            >
+              {text}
+            </Text>
+          )}
         </View>
-      </Modal>
+      </View>
+    </Modal>
   );
 };
 
@@ -28,25 +39,28 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.2)"
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   popup: {
-    width: "50%",
-    height: "15%",
-    backgroundColor: "rgba(10,192,232,0.73)",
+    width: "70%",
+    height: "18%",
+    backgroundColor: "rgb(15, 44, 76)",
     borderRadius: 10,
-    padding: 20,
     alignItems: "center",
     justifyContent: "center",
+    elevation: 5,
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    shadowColor: "white",
+    padding: 5,
   },
-  image: {
-    width: 30,
-    height: 30,
+  animation: {
+    flex: 1,
+    alignSelf: "center",
   },
-  txt: {
-    fontSize: 30,
-    fontWeight: "bold",
-    marginHorizontal: 5,
+  text: {
+    fontSize: 21,
+    color: "#fff",
   },
 });
 

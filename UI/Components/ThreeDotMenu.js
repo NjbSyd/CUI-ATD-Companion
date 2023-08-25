@@ -10,10 +10,11 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   FetchDataFromSQLite,
+  FetchFreeslotsDataFromMongoDB,
   PopulateGlobalState,
 } from "../../BackEnd/RequestGenerator";
 
-function DropdownMenu({ onReloadCache, onUpdateData }) {
+function DropdownMenu({ onReloadCache, onUpdateData, onFreeSlots }) {
   return (
     <View style={styles.dropdownContainer}>
       <TouchableOpacity style={styles.dropdownOption} onPress={onReloadCache}>
@@ -22,11 +23,14 @@ function DropdownMenu({ onReloadCache, onUpdateData }) {
       <TouchableOpacity style={styles.dropdownOption} onPress={onUpdateData}>
         <Text style={styles.optionText}>Update Data from Server</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.dropdownOption} onPress={onFreeSlots}>
+        <Text style={styles.optionText}>Fetch FreeSlots</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-function ReloadButton({
+function ThreeDotMenu({
   StateDispatcher,
   SetLoadingText,
   SetLoading,
@@ -35,22 +39,23 @@ function ReloadButton({
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleReloadCache = async () => {
-    setModalVisible(false);
-    SetLoading(true);
     try {
+      setModalVisible(false);
+      SetLoading(true);
       await FetchDataFromSQLite(SetLoadingText, StateDispatcher, "Local Cache");
       ToastAndroid.show("Reloaded Successfully✅", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);
     } finally {
       SetLoading(false);
+      SetLoadingText("Loading ...");
     }
   };
 
   const handleUpdateData = async () => {
-    SetLoading(true);
-    setModalVisible(false);
     try {
+      setModalVisible(false);
+      SetLoading(true);
       await PopulateGlobalState(
         SetLoadingText,
         StateDispatcher,
@@ -61,6 +66,25 @@ function ReloadButton({
       ToastAndroid.show(e, ToastAndroid.SHORT);
     } finally {
       SetLoading(false);
+      SetLoadingText("Loading ...");
+    }
+  };
+
+  const handleFreeSlotFetch = async () => {
+    try {
+      setModalVisible(false);
+      SetLoading(true);
+      await FetchFreeslotsDataFromMongoDB(
+        StateDispatcher,
+        SetLoadingText,
+        FreeSlotsAvailable
+      );
+      ToastAndroid.show("Freeslots Fetched Successfully✅", ToastAndroid.SHORT);
+    } catch (e) {
+      ToastAndroid.show(e, ToastAndroid.SHORT);
+    } finally {
+      SetLoading(false);
+      SetLoadingText("Loading ...");
     }
   };
 
@@ -78,6 +102,7 @@ function ReloadButton({
           <DropdownMenu
             onReloadCache={handleReloadCache}
             onUpdateData={handleUpdateData}
+            onFreeSlots={handleFreeSlotFetch}
           />
           <TouchableOpacity
             style={styles.closeButton}
@@ -144,4 +169,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { ReloadButton };
+export { ThreeDotMenu };

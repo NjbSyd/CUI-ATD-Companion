@@ -14,9 +14,12 @@ import { FetchDataFromSQLite } from "../../BackEnd/RequestGenerator";
 import { useDispatch, useSelector } from "react-redux";
 import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
-import { ReloadButton } from "../Components/ReloadButton";
+import { ThreeDotMenu } from "../Components/ThreeDotMenu";
+import { useIsFocused } from "@react-navigation/native";
 
 const Main = ({ navigation }) => {
+  const isFocused = useIsFocused();
+  const [numberOfFocus, setNumberOfFocus] = useState(0);
   const { loadedAd, displayAd } = useInterstitialAd();
   const FreeSlotsAvailable = useSelector(
     (state) => state.FreeslotsSlice.available
@@ -26,28 +29,41 @@ const Main = ({ navigation }) => {
   const [loadingText, setLoadingText] = useState("Loading ...");
 
   const reloadData = async () => {
-    try {
-      setLoading(true);
-      await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
-      setLoading(false);
-    } catch (e) {
-      console.log(e);
-    }
+    setLoading(true);
+    setTimeout(async () => {
+      try {
+        await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
+      } catch (e) {
+        console.log(e);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
   };
   useEffect(() => {
-    reloadData().then(() => {});
-    navigation.setOptions({
-      headerLeft: () => <></>,
-      headerRight: () => (
-        <ReloadButton
-          StateDispatcher={StateDispatcher}
-          SetLoadingText={setLoadingText}
-          SetLoading={setLoading}
-          FreeSlotsAvailable={FreeSlotsAvailable}
-        />
-      ),
-    });
-  }, []);
+    if (isFocused) {
+      setNumberOfFocus((prevCount) => prevCount + 1);
+
+      if (numberOfFocus === 0) {
+        reloadData().then(() => {});
+        navigation.setOptions({
+          headerLeft: () => <></>,
+          headerRight: () => (
+            <ThreeDotMenu
+              StateDispatcher={StateDispatcher}
+              SetLoadingText={setLoadingText}
+              SetLoading={setLoading}
+              FreeSlotsAvailable={FreeSlotsAvailable}
+            />
+          ),
+        });
+      } else {
+        if (loadedAd) {
+          displayAd();
+        }
+      }
+    }
+  }, [isFocused]);
 
   useFocusEffect(
     useCallback(() => {

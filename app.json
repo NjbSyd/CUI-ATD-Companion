@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "CUI Unofficial",
-    "version": "5.5.0",
+    "version": "5.6.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
-    "icon": "./assets/Images/icon.png",
+    "icon": "./assets/Images/icon.jpg",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/Images/splash.png",

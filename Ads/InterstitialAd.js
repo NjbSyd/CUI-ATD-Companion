@@ -1,8 +1,14 @@
-import {useEffect, useState} from "react";
-import {AdEventType, InterstitialAd, TestIds} from "react-native-google-mobile-ads";
-import {adKeywords} from "./Keywords";
+import { useEffect, useState } from "react";
+import {
+  AdEventType,
+  InterstitialAd,
+  TestIds,
+} from "react-native-google-mobile-ads";
+import { adKeywords } from "./Keywords";
 
-const adId = __DEV__ ? TestIds.INTERSTITIAL : "ca-app-pub-2067708103851582/6662037963";
+const adId = __DEV__
+  ? TestIds.INTERSTITIAL
+  : "ca-app-pub-2067708103851582/6662037963";
 
 const useInterstitialAd = () => {
   const [loadedAd, setLoadedAd] = useState(false);
@@ -22,7 +28,7 @@ const useInterstitialAd = () => {
   const loadNewInterstitialAd = () => {
     const newAd = InterstitialAd.createForAdRequest(adId, {
       requestNonPersonalizedAdsOnly: false,
-      keywords: adKeywords()
+      keywords: adKeywords(),
     });
 
     const newEventListener = newAd.addAdEventsListener((eventInfo) => {
@@ -61,12 +67,16 @@ const useInterstitialAd = () => {
   };
 
   const displayAd = () => {
-    if (loadedAd && interstitialAd) {
-      interstitialAd.show().then(() => {});
+    try {
+      if (loadedAd && interstitialAd) {
+        interstitialAd.show().then(() => {});
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
-  return {loadedAd, displayAd};
+  return { loadedAd, displayAd };
 };
 
 export default useInterstitialAd;

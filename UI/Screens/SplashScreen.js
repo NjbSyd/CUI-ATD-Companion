@@ -52,7 +52,7 @@ export default function SplashScreen({ navigation }) {
           />
           <Image
             style={styles.image}
-            source={require("../../assets/Images/icon.png")}
+            source={require("../../assets/Images/icon.jpg")}
           />
           <View
             style={{ position: "absolute", bottom: "27%", alignSelf: "center" }}
