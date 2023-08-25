@@ -18,7 +18,7 @@ jobs:
       - name: Check commit messages for build flag
         id: check-commit
         run: |
-          if [[ $(git log -1 --pretty=%B) == *"--build"* ]]; then
+          if [[ $(git log -1 --pretty=%B) == *"--update"* ]]; then
             echo "Build flag detected in commit message. Proceeding with the workflow."
             echo "build_flag_detected=true" >> $GITHUB_ENV
           else
@@ -44,5 +44,5 @@ jobs:
       - name: Conditional Workflow
         if: env.build_flag_detected == 'true'
         run: |
-          # Publish update
-          eas build --platform android --profile production --non-interactive
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          eas update --branch production --message "$COMMIT_MESSAGE"
