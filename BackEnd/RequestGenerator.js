@@ -26,8 +26,10 @@ import { setRegistration } from "../Redux/StudentCredentialsSlice";
 import { setFreeslots } from "../Redux/FreeslotsSlice";
 import { RemoveLabData } from "../UI/Functions/UIHelpers";
 
-const Timetable_API_URL = "https://timetable-scrapper.onrender.com/timetable";
-const FreeSlots_API_URL = "https://timetable-scrapper.onrender.com/freeslots";
+const Timetable_API_URL =
+  "http://cui-unofficial.eastus.cloudapp.azure.com:3000/timetable";
+const FreeSlots_API_URL =
+  "http://cui-unofficial.eastus.cloudapp.azure.com:3000/freeslots";
 
 async function FetchTimetableDataFromMongoDB() {
   try {
