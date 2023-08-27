@@ -13,6 +13,7 @@ import {
   FetchFreeslotsDataFromMongoDB,
   PopulateGlobalState,
 } from "../../BackEnd/RequestGenerator";
+import { useSelector } from "react-redux";
 
 function DropdownMenu({ onReloadCache, onUpdateData, onFreeSlots }) {
   return (
@@ -30,12 +31,10 @@ function DropdownMenu({ onReloadCache, onUpdateData, onFreeSlots }) {
   );
 }
 
-function ThreeDotMenu({
-  StateDispatcher,
-  SetLoadingText,
-  SetLoading,
-  FreeSlotsAvailable,
-}) {
+function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
+  const FreeSlotsAvailable = useSelector(
+    (state) => state.FreeslotsSlice.available
+  );
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleReloadCache = async () => {
@@ -56,11 +55,7 @@ function ThreeDotMenu({
     try {
       setModalVisible(false);
       SetLoading(true);
-      await PopulateGlobalState(
-        SetLoadingText,
-        StateDispatcher,
-        FreeSlotsAvailable
-      );
+      await PopulateGlobalState(SetLoadingText, StateDispatcher);
       ToastAndroid.show("Fetched Successfully!", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);
@@ -72,13 +67,14 @@ function ThreeDotMenu({
 
   const handleFreeSlotFetch = async () => {
     try {
+      console.log(FreeSlotsAvailable);
       setModalVisible(false);
+      if (FreeSlotsAvailable) {
+        ToastAndroid.show("FreeSlots already available", ToastAndroid.SHORT);
+        return;
+      }
       SetLoading(true);
-      await FetchFreeslotsDataFromMongoDB(
-        StateDispatcher,
-        SetLoadingText,
-        FreeSlotsAvailable
-      );
+      await FetchFreeslotsDataFromMongoDB(StateDispatcher, SetLoadingText);
       ToastAndroid.show("Freeslots Fetched Successfully✅", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);

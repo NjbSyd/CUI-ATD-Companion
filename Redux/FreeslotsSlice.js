@@ -1,25 +1,22 @@
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   available: false,
   freeslots: "No data",
-}
+};
 
 const FreeslotsSlice = createSlice({
   name: "freeslots",
   initialState,
   reducers: {
     setFreeslots: (state, action) => {
-      if (action.payload === null) {
-        state.available = false;
-        state.freeslots = "No data";
-      } else {
-        state.available = true;
-        state.freeslots = action.payload;
-      }
-    }
-  }
+      state.freeslots = action.payload;
+    },
+    setFreeslotsAvailable: (state, action) => {
+      state.available = action.payload;
+    },
+  },
 });
 
-export const {setFreeslots} = FreeslotsSlice.actions;
+export const { setFreeslots, setFreeslotsAvailable } = FreeslotsSlice.actions;
 export default FreeslotsSlice.reducer;

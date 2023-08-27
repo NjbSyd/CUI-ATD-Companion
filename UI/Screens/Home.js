@@ -11,7 +11,7 @@ import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
 import { FetchDataFromSQLite } from "../../BackEnd/RequestGenerator";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
 import { ThreeDotMenu } from "../Components/ThreeDotMenu";
@@ -21,16 +21,14 @@ const Main = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [numberOfFocus, setNumberOfFocus] = useState(0);
   const { loadedAd, displayAd } = useInterstitialAd();
-  const FreeSlotsAvailable = useSelector(
-    (state) => state.FreeslotsSlice.available
-  );
+
   const StateDispatcher = useDispatch();
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading ...");
 
   const reloadData = async () => {
-    setLoading(true);
     setTimeout(async () => {
+      setLoading(true);
       try {
         await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
       } catch (e) {
@@ -38,7 +36,7 @@ const Main = ({ navigation }) => {
       } finally {
         setLoading(false);
       }
-    }, 1000);
+    }, 2000);
   };
   useEffect(() => {
     if (isFocused) {
@@ -53,7 +51,6 @@ const Main = ({ navigation }) => {
               StateDispatcher={StateDispatcher}
               SetLoadingText={setLoadingText}
               SetLoading={setLoading}
-              FreeSlotsAvailable={FreeSlotsAvailable}
             />
           ),
         });

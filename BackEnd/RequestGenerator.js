@@ -23,13 +23,33 @@ import {
 import { shouldReloadData } from "./Helpers";
 import { setClassNames } from "../Redux/SectionSlice";
 import { setRegistration } from "../Redux/StudentCredentialsSlice";
-import { setFreeslots } from "../Redux/FreeslotsSlice";
+import { setFreeslots, setFreeslotsAvailable } from "../Redux/FreeslotsSlice";
 import { RemoveLabData } from "../UI/Functions/UIHelpers";
 
 const Timetable_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/timetable";
 const FreeSlots_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/freeslots";
+
+const LOADING_MESSAGES = {
+  FETCHING: "Fetching...",
+  UPDATING: "Updating...",
+  ERROR: "Error Occurred",
+  NO_CONNECTION: "No Internet Connection",
+  READY: "Getting some things Ready...",
+};
+
+async function updateLoadingText(text, setLoadingText) {
+  if (setLoadingText) {
+    setLoadingText(text);
+  }
+}
+
+const setTimedLoadingText = (text, delay, setLoadingText) => {
+  setTimeout(async () => {
+    await updateLoadingText(text, setLoadingText);
+  }, delay);
+};
 
 async function FetchTimetableDataFromMongoDB() {
   try {
@@ -40,38 +60,28 @@ async function FetchTimetableDataFromMongoDB() {
   }
 }
 
-async function FetchFreeslotsDataFromMongoDB(
-  StateDispatcher,
-  setLoadingText,
-  FreeSlotsAvailable
-) {
+async function FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText) {
   if (setLoadingText === undefined) {
-    setLoadingText = (text) => {};
+    setLoadingText = () => {};
   }
   try {
-    if (FreeSlotsAvailable) {
-      setLoadingText("FreeSlots up-to-date!");
-      return;
-    }
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait for 2 seconds
-    setLoadingText("Fetching freeslots ...");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await updateLoadingText(LOADING_MESSAGES.FETCHING, setLoadingText);
     const res = await axios.get(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res.data);
-    setLoadingText("Updating Freeslots ...");
+    await updateLoadingText(LOADING_MESSAGES.UPDATING, setLoadingText);
     StateDispatcher(setFreeslots(freeslots));
-    setLoadingText("Updated Freeslots✅");
+    StateDispatcher(setFreeslotsAvailable(true));
+    await updateLoadingText(LOADING_MESSAGES.READY, setLoadingText);
   } catch (e) {
-    setLoadingText("Error Occurred ⛔");
+    await updateLoadingText(LOADING_MESSAGES.ERROR, setLoadingText);
     alert(
-      "Error Occurred while fetching freeslots from server ⛔\n Please check your internet connection"
+      "Error Occurred while fetching freeslots from server\nPlease check your internet connection"
     );
   }
 }
 
 async function PopulateGlobalState(setLoadingText, StateDispatcher) {
-  // if (FreeSlotsAvailable === undefined) {
-  //   FreeSlotsAvailable = false;
-  // }
   try {
     await createDataSyncDateTable();
     await createTimetableDataTable();
@@ -80,11 +90,6 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     const shouldReload = shouldReloadData(DataSyncDate);
     if (!shouldReload) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
-      // await FetchFreeslotsDataFromMongoDB(
-      //   StateDispatcher,
-      //   setLoadingText,
-      //   FreeSlotsAvailable
-      // );
       return;
     }
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
@@ -93,15 +98,10 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
     }
-    setTimeout(() => {
-      setLoadingText("Hold On ...");
-    }, 4000);
-    setTimeout(() => {
-      setLoadingText("Request is being processed ...");
-    }, 10000);
-    setTimeout(() => {
-      setLoadingText("Just a moment ...");
-    }, 15000);
+    setTimedLoadingText(LOADING_MESSAGES.READY, 0, setLoadingText);
+    setTimedLoadingText(LOADING_MESSAGES.FETCHING, 4000, setLoadingText);
+    setTimedLoadingText(LOADING_MESSAGES.UPDATING, 10000, setLoadingText);
+    setTimedLoadingText(LOADING_MESSAGES.READY, 15000, setLoadingText);
     setLoadingText("Fetching Data ...");
     const data = await FetchTimetableDataFromMongoDB();
     for (const element of data) {
@@ -109,7 +109,6 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
     }
     await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
-    // await FetchFreeslotsDataFromMongoDB(StateDispatcher, setLoadingText);
   } catch (error) {
     console.error(error);
     setLoadingText("Error Occurred⛔");

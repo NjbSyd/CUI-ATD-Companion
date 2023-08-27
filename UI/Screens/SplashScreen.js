@@ -71,6 +71,11 @@ export default function SplashScreen({ navigation }) {
               {loadingText}
             </Text>
           </View>
+          <Text style={styles.tipText}>
+            {
+              "*Tip*: If you experience data display issues\n\n Home ⨠ tap on three-dot at the top-right ⨠ Reload Data"
+            }
+          </Text>
         </>
       )}
     </View>
@@ -96,5 +101,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     position: "absolute",
     top: "20%",
+  },
+  tipText: {
+    marginHorizontal: 20,
+    textAlign: "left",
+    letterSpacing: 0.5,
+    position: "absolute",
+    bottom: "10%",
+    color: "red",
   },
 });

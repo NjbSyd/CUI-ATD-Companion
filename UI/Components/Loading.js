@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Modal, StyleSheet, Text } from "react-native";
+import { View, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import { useFonts } from "expo-font";
 
@@ -8,14 +8,13 @@ const LoadingPopup = ({ visible, text }) => {
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
+    <Modal animationType="fade" transparent={true} visible={visible}>
       <View style={styles.container}>
         <View style={styles.popup}>
-          <AnimatedLottieView
+          <ActivityIndicator
             style={styles.animation}
-            source={require("../../assets/Images/Loading.json")}
-            autoPlay
-            autoSize={true}
+            size={"large"}
+            color={"black"}
           />
           {text && (
             <Text
@@ -39,28 +38,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
   },
   popup: {
-    width: "70%",
-    height: "18%",
-    backgroundColor: "rgb(15, 44, 76)",
-    borderRadius: 10,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    elevation: 5,
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    shadowColor: "white",
-    padding: 5,
+    width: "80%",
+    height: "8%",
+    padding: 10,
+    backgroundColor: "#ccc",
   },
   animation: {
-    flex: 1,
-    alignSelf: "center",
+    position: "absolute",
+    left: 10,
   },
   text: {
     fontSize: 21,
-    color: "#fff",
   },
 });
 
