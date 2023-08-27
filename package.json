@@ -21,7 +21,7 @@
     "axios": "^1.4.0",
     "expo": "~48.0.18",
     "expo-dev-client": "~2.2.1",
-    "expo-file-system": "~15.2.2",
+    "expo-file-system": "~15.5.1",
     "expo-font": "~11.1.1",
     "expo-sqlite": "~11.1.1",
     "expo-status-bar": "~1.4.4",
