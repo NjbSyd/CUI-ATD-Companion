@@ -50,7 +50,6 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
       SetLoadingText("Loading ...");
     }
   };
-
   const handleUpdateData = async () => {
     try {
       setModalVisible(false);
@@ -67,7 +66,6 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
 
   const handleFreeSlotFetch = async () => {
     try {
-      console.log(FreeSlotsAvailable);
       setModalVisible(false);
       if (FreeSlotsAvailable) {
         ToastAndroid.show("FreeSlots already available", ToastAndroid.SHORT);

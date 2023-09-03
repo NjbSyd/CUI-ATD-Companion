@@ -19,6 +19,8 @@ import {
   createTimetableDataTable,
   insertOrUpdateTimetableData,
   insertOrUpdateDataSyncDate,
+  clearTimetableTable,
+  clearDataSyncDateTable,
 } from "./SQLiteFunctions";
 import { shouldReloadData } from "./Helpers";
 import { setClassNames } from "../Redux/SectionSlice";
@@ -32,7 +34,7 @@ const FreeSlots_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/freeslots";
 
 const LOADING_MESSAGES = {
-  FETCHING: "Fetching...",
+  FETCHING: "Please Wait...",
   UPDATING: "Updating...",
   ERROR: "Error Occurred",
   NO_CONNECTION: "No Internet Connection",
@@ -51,7 +53,7 @@ const setTimedLoadingText = (text, delay, setLoadingText) => {
   }, delay);
 };
 
-async function FetchTimetableDataFromMongoDB() {
+async function FetchTimetableDataFromMongoDB(setLoadingText) {
   try {
     const res = await axios.get(Timetable_API_URL);
     return res.data;
@@ -98,15 +100,17 @@ async function PopulateGlobalState(setLoadingText, StateDispatcher) {
       await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Local Cache");
       return;
     }
-    setTimedLoadingText(LOADING_MESSAGES.READY, 0, setLoadingText);
     setTimedLoadingText(LOADING_MESSAGES.FETCHING, 4000, setLoadingText);
     setTimedLoadingText(LOADING_MESSAGES.UPDATING, 10000, setLoadingText);
     setTimedLoadingText(LOADING_MESSAGES.READY, 15000, setLoadingText);
     setLoadingText("Fetching Data ...");
-    const data = await FetchTimetableDataFromMongoDB();
+    const data = await FetchTimetableDataFromMongoDB(setLoadingText);
+    setLoadingText("Removing Old Data...");
+    await clearTimetableTable();
     for (const element of data) {
       await insertOrUpdateTimetableData(element);
     }
+    await clearDataSyncDateTable();
     await insertOrUpdateDataSyncDate(new Date().toJSON());
     await FetchDataFromSQLite(setLoadingText, StateDispatcher, "Remote Server");
   } catch (error) {

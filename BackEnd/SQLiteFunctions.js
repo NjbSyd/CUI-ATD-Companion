@@ -223,10 +223,42 @@ const updateImagePath = async (registrationNumber, imagePath) => {
   }
 };
 
+const clearTimetableTable = async () => {
+  TimetableDB.transaction((tx) => {
+    tx.executeSql(
+      `DELETE FROM timetables;`,
+      [],
+      () => {
+        console.log("All data cleared from the timetables table.");
+      },
+      (error) => {
+        console.error("Error clearing data:", error);
+      }
+    );
+  });
+};
+
+const clearDataSyncDateTable = async () => {
+  TimetableDB.transaction((tx) => {
+    tx.executeSql(
+      `DELETE FROM SyncDate;`,
+      [],
+      () => {
+        console.log("All data cleared from the timetables table.");
+      },
+      (error) => {
+        console.error("Error clearing data:", error);
+      }
+    );
+  });
+};
+
 export {
   insertOrUpdateTimetableData,
   createTimetableDataTable,
+  clearTimetableTable,
   createDataSyncDateTable,
+  clearDataSyncDateTable,
   insertOrUpdateDataSyncDate,
   insertOrUpdateUserCredentials,
   createUserCredentialsTable,
