@@ -205,7 +205,6 @@ const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
 };
 
 const updateImagePath = async (registrationNumber, imagePath) => {
-  await createUserCredentialsTable();
   try {
     TimetableDB.transaction((tx) => {
       tx.executeSql(
@@ -253,7 +252,13 @@ const clearDataSyncDateTable = async () => {
   });
 };
 
+async function initializeAllDatabasesAndTables() {
+  await createTimetableDataTable();
+  await createDataSyncDateTable();
+  await createUserCredentialsTable();
+}
 export {
+  initializeAllDatabasesAndTables,
   insertOrUpdateTimetableData,
   createTimetableDataTable,
   clearTimetableTable,

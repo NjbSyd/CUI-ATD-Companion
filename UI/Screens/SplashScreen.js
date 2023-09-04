@@ -1,16 +1,17 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import React, { useState } from "react";
-import { PopulateGlobalState } from "../../BackEnd/RequestGenerator";
 import { useDispatch } from "react-redux";
 import { useFonts } from "expo-font";
 import { onFetchUpdateAsync } from "../../BackEnd/Updates";
+import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
+import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
+import { fakeSleep } from "../Functions/UIHelpers";
 
 export default function SplashScreen({ navigation }) {
   const [fontLoaded] = useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
-  const StateDispatcher = useDispatch();
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
 
@@ -18,12 +19,14 @@ export default function SplashScreen({ navigation }) {
     setInitialAnimationDone(true);
     try {
       await onFetchUpdateAsync(setLoadingText);
-      setTimeout(async () => {
-        await PopulateGlobalState(setLoadingText, StateDispatcher);
-        setTimeout(() => {
-          navigation.navigate("ApplicationEntry");
-        }, 2000);
-      }, 3000);
+      setLoadingText("Loading...");
+      await fakeSleep(2000);
+      await initializeAllDatabasesAndTables();
+      setLoadingText("initialized all tables...");
+      await fakeSleep(2000);
+      await updateDataFromServerIfNeeded(setLoadingText);
+      await fakeSleep(2000);
+      navigation.navigate("ApplicationEntry");
     } catch (error) {
       setLoadingText(error);
     }

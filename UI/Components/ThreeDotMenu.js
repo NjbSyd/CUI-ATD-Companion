@@ -8,12 +8,12 @@ import {
   ToastAndroid,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {
-  FetchDataFromSQLite,
-  FetchFreeslotsDataFromMongoDB,
-  PopulateGlobalState,
-} from "../../BackEnd/RequestGenerator";
 import { useSelector } from "react-redux";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import {
+  fetchAndStoreFreeslotsData,
+  updateDataFromServerIfNeeded,
+} from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 
 function DropdownMenu({ onReloadCache, onUpdateData, onFreeSlots }) {
   return (
@@ -41,7 +41,7 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
     try {
       setModalVisible(false);
       SetLoading(true);
-      await FetchDataFromSQLite(SetLoadingText, StateDispatcher, "Local Cache");
+      await fetchDataFromSQLite(StateDispatcher);
       ToastAndroid.show("Reloaded Successfully✅", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);
@@ -54,7 +54,8 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
     try {
       setModalVisible(false);
       SetLoading(true);
-      await PopulateGlobalState(SetLoadingText, StateDispatcher);
+      await updateDataFromServerIfNeeded();
+      await fetchDataFromSQLite();
       ToastAndroid.show("Fetched Successfully!", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);
@@ -72,7 +73,7 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
         return;
       }
       SetLoading(true);
-      await FetchFreeslotsDataFromMongoDB(StateDispatcher, SetLoadingText);
+      await fetchAndStoreFreeslotsData();
       ToastAndroid.show("Freeslots Fetched Successfully✅", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);

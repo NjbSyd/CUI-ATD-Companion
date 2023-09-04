@@ -11,13 +11,13 @@ import {
   CalculateTotalFreeSlots,
   FilterFreeSlotsByTimeSlot,
 } from "../Functions/UIHelpers";
-import { FetchFreeslotsDataFromMongoDB } from "../../BackEnd/RequestGenerator";
 import LoadingPopup from "../Components/Loading";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
 import { Dropdown } from "react-native-element-dropdown";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
+import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -154,10 +154,7 @@ export default function Freeslots() {
             style={styles.fetchDataBtn}
             onPress={async () => {
               setLoading(true);
-              await FetchFreeslotsDataFromMongoDB(
-                StateDispatcher,
-                setLoadingText
-              );
+              await fetchAndStoreFreeslotsData(StateDispatcher);
               setLoading(false);
             }}
           >

@@ -159,6 +159,13 @@ function FilterFreeSlotsByTimeSlot(classSchedule, timeSlot) {
   return filteredSchedule;
 }
 
+async function fakeSleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(`Slept for ${ms} milliseconds ⏰`);
+    }, ms);
+  });
+}
 export {
   LoginScript,
   handleBackPress,
@@ -170,4 +177,5 @@ export {
   CalculateTotalFreeSlots,
   RemoveLabData,
   FilterFreeSlotsByTimeSlot,
+  fakeSleep,
 };

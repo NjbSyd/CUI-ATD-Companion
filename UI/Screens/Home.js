@@ -10,12 +10,12 @@ import { useFocusEffect } from "@react-navigation/native";
 import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
-import { FetchDataFromSQLite } from "../../BackEnd/RequestGenerator";
 import { useDispatch } from "react-redux";
 import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
 import { ThreeDotMenu } from "../Components/ThreeDotMenu";
 import { useIsFocused } from "@react-navigation/native";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const Main = ({ navigation }) => {
   const isFocused = useIsFocused();
@@ -27,16 +27,14 @@ const Main = ({ navigation }) => {
   const [loadingText, setLoadingText] = useState("Loading ...");
 
   const reloadData = async () => {
-    setTimeout(async () => {
-      setLoading(true);
-      try {
-        await FetchDataFromSQLite(() => {}, StateDispatcher, "Local Cache");
-      } catch (e) {
-        console.log(e);
-      } finally {
-        setLoading(false);
-      }
-    }, 2000);
+    setLoading(true);
+    try {
+      await fetchDataFromSQLite(StateDispatcher);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => {
     if (isFocused) {
