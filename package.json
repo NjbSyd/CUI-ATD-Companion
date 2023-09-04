@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "author": "njbsyd",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "sharp-cli": "^4.1.1"
+    "sharp-cli": "^2.1.0"
   },
   "private": true
 }
