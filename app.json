@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "CUI Unofficial",
-    "version": "5.6.0",
-    "slug": "cui_unofficial",
+    "name": "CUI ATD Companion",
+    "version": "6.0.0",
+    "slug": "cuiatd_companion",
     "owner": "njbsyd",
     "orientation": "portrait",
-    "icon": "./assets/Images/icon.jpg",
+    "icon": "./assets/Images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/Images/splash.png",
@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.njbsyd.cui.unofficial"
     },
     "android": {
       "adaptiveIcon": {

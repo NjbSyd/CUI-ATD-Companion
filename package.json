@@ -1,6 +1,6 @@
 {
-  "name": "cui_unofficial",
-  "version": "1.0.0",
+  "name": "cuiatd_companion",
+  "version": "6.0.0",
   "author": "njbsyd",
   "scripts": {
     "start": "expo start --dev-client",
