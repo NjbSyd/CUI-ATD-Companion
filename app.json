@@ -2,6 +2,7 @@
   "expo": {
     "name": "CUI ATD Companion",
     "version": "6.0.0",
+    "runtimeVersion": "1.0.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
@@ -12,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.njbsyd.cui.unofficial"
@@ -32,9 +35,6 @@
       "eas": {
         "projectId": "f45b966a-2ad8-472a-9ba9-d266061b7883"
       }
-    },
-    "runtimeVersion": {
-      "policy": "sdkVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/f45b966a-2ad8-472a-9ba9-d266061b7883",
