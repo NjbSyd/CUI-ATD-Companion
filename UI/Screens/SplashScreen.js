@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Text, Alert, Linking } from "react-native";
+import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -8,7 +8,6 @@ import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerS
 import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
 import { fakeSleep } from "../Functions/UIHelpers";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { checkAppVersion } from "../../BackEnd/ApplicationVersionControl";
 
 export default function SplashScreen({ navigation }) {
   const [fontLoaded] = useFonts({
@@ -21,29 +20,6 @@ export default function SplashScreen({ navigation }) {
     setInitialAnimationDone(true);
     try {
       await onFetchUpdateAsync(setLoadingText);
-      const appVersion = checkAppVersion() || false;
-      if (!appVersion) {
-        setLoadingText(
-          "Update Required!\n Please update the app to the latest version."
-        );
-        Alert.alert(
-          "Update Required",
-          "Please update the app to the latest version.",
-          [
-            {
-              text: "Update",
-              onPress: () => {
-                Linking.openURL(
-                  "https://play.google.com/store/apps/details?id=com.njbsyd.cui.unofficial"
-                );
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-        return;
-      }
-
       setLoadingText("Loading...");
       await fakeSleep(2000);
       await initializeAllDatabasesAndTables();

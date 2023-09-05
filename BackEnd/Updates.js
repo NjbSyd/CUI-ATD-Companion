@@ -4,6 +4,7 @@ async function onFetchUpdateAsync(setLoadingText) {
   try {
     setLoadingText("Checking for App Updates...");
     const update = await Updates.checkForUpdateAsync();
+
     if (update.isAvailable) {
       setLoadingText("Downloading App Updates...");
       await Updates.fetchUpdateAsync();
