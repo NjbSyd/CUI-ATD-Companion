@@ -1,58 +1,42 @@
 import NetInfo from "@react-native-community/netinfo";
 import {
   clearTimetableTable,
-  clearDataSyncDateTable,
-  createDataSyncDateTable,
-  insertOrUpdateDataSyncDate,
   insertOrUpdateTimetableData,
-  createTimetableDataTable,
 } from "../SQLiteFunctions";
-import { GetDataSyncDate } from "../SQLiteSearchFunctions";
 import axios from "axios";
-import { RemoveLabData } from "../../UI/Functions/UIHelpers";
+import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
 import {
   setFreeslots,
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
-//TODO: Resolve the following error:
-// Date Based Data fetch: Error: SQLITE_ERROR: no such table: DataSyncDate
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+
 const Timetable_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/timetable";
 const FreeSlots_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/freeslots";
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// Function to check if an update is needed based on PKT (Pakistan Standard Time)
+// Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
   try {
-    // Retrieve the last sync date from AsyncStorage
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
 
     if (!lastSyncDate) {
-      // If no last sync date is found, update is needed
       console.log("No last sync date found, updating...");
       return true;
     }
 
-    // Get the current date and time in PKT (Pakistan Standard Time)
     const currentDate = new Date();
-    currentDate.setUTCHours(currentDate.getUTCHours() + 5); // Adjust for PKT
-
-    // Parse the last sync date from storage and ensure it's in PKT
     const lastSyncDateObj = new Date(lastSyncDate);
-    lastSyncDateObj.setUTCHours(lastSyncDateObj.getUTCHours() + 5); // Adjust for PKT
 
-    // Check if the date is different and it's past 7 in the morning
     if (
-      currentDate.toDateString() !== lastSyncDateObj.toDateString() &&
+      currentDate.getDate() > lastSyncDateObj.getDate() &&
       currentDate.getHours() >= 7
     ) {
-      // Update is needed
       console.log("Data is outdated, updating...");
-      return true;
+      return await askForDataUpdatePermission();
     } else {
-      // Data is up to date
       console.log("Data is up to date");
       return false;
     }
@@ -77,23 +61,38 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
         setLoadingText("No Internet Connection😢");
         return;
       }
-
       setLoadingText("Fetching Data ...");
       const timetableData = await fetchDataFromMongoDB(Timetable_API_URL);
-
+      await fakeSleep(1000);
       setLoadingText("Removing Old Data...");
       await clearTimetableTable();
-
-      for (const element of timetableData) {
+      await fakeSleep(1000);
+      let done = 0;
+      const total = timetableData.length;
+      setLoadingText(`Setting Up New Data...`);
+      for (let element of timetableData) {
+        if (element.subject.includes(";")) {
+          element.subject = element.subject
+            .replaceAll("&amp;", "")
+            .replaceAll("&lt;", "")
+            .replaceAll("/sup&gt;", "")
+            .replaceAll("th&lt;", "")
+            .replaceAll("sup&gt;", "")
+            .replaceAll("  ", " ");
+        }
         await insertOrUpdateTimetableData(element);
+        ++done;
+        await fakeSleep(1);
+        setLoadingText(
+          `Setting Up New Data... ${done}/${total}✅\nDon't worry! this will happen just this once`
+        );
       }
 
-      // Update the last sync date in AsyncStorage with the current date and time in UTC
       await AsyncStorage.setItem("lastSyncDate", new Date().toJSON());
 
       setLoadingText("Data Updated from Server");
     } else {
-      setLoadingText("Data is up to date");
+      setLoadingText("Proceeding with existing data...");
     }
   } catch (error) {
     console.error("Error updating data from server:", error);
@@ -130,6 +129,26 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     console.error("Error fetching free-slot data from MongoDB:", error);
     throw error;
   }
+}
+
+async function askForDataUpdatePermission() {
+  return new Promise((resolve) => {
+    Alert.alert(
+      "Data Update Permission",
+      "Existing data might be outdated. Do you want to update it?",
+      [
+        {
+          text: "Yes",
+          onPress: () => resolve(true), // User grants permission
+        },
+        {
+          text: "No",
+          onPress: () => resolve(false), // User declines permission
+        },
+      ],
+      { cancelable: false }
+    );
+  });
 }
 
 export {

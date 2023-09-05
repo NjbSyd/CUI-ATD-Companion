@@ -15,66 +15,25 @@ import {
   updateDataFromServerIfNeeded,
 } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 
-function DropdownMenu({ onReloadCache, onUpdateData, onFreeSlots }) {
+function DropdownMenu({ onReloadCache }) {
   return (
     <View style={styles.dropdownContainer}>
       <TouchableOpacity style={styles.dropdownOption} onPress={onReloadCache}>
         <Text style={styles.optionText}>Reload Local Cache</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.dropdownOption} onPress={onUpdateData}>
-        <Text style={styles.optionText}>Update Data from Server</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.dropdownOption} onPress={onFreeSlots}>
-        <Text style={styles.optionText}>Fetch FreeSlots</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
-  const FreeSlotsAvailable = useSelector(
-    (state) => state.FreeslotsSlice.available
-  );
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleReloadCache = async () => {
     try {
       setModalVisible(false);
       SetLoading(true);
-      await fetchDataFromSQLite(StateDispatcher);
+      await fetchDataFromSQLite(StateDispatcher, "all");
       ToastAndroid.show("Reloaded Successfully✅", ToastAndroid.SHORT);
-    } catch (e) {
-      ToastAndroid.show(e, ToastAndroid.SHORT);
-    } finally {
-      SetLoading(false);
-      SetLoadingText("Loading ...");
-    }
-  };
-  const handleUpdateData = async () => {
-    try {
-      setModalVisible(false);
-      SetLoading(true);
-      await updateDataFromServerIfNeeded();
-      await fetchDataFromSQLite();
-      ToastAndroid.show("Fetched Successfully!", ToastAndroid.SHORT);
-    } catch (e) {
-      ToastAndroid.show(e, ToastAndroid.SHORT);
-    } finally {
-      SetLoading(false);
-      SetLoadingText("Loading ...");
-    }
-  };
-
-  const handleFreeSlotFetch = async () => {
-    try {
-      setModalVisible(false);
-      if (FreeSlotsAvailable) {
-        ToastAndroid.show("FreeSlots already available", ToastAndroid.SHORT);
-        return;
-      }
-      SetLoading(true);
-      await fetchAndStoreFreeslotsData();
-      ToastAndroid.show("Freeslots Fetched Successfully✅", ToastAndroid.SHORT);
     } catch (e) {
       ToastAndroid.show(e, ToastAndroid.SHORT);
     } finally {
@@ -94,11 +53,7 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
         <View style={styles.modalContainer}>
-          <DropdownMenu
-            onReloadCache={handleReloadCache}
-            onUpdateData={handleUpdateData}
-            onFreeSlots={handleFreeSlotFetch}
-          />
+          <DropdownMenu onReloadCache={handleReloadCache} />
           <TouchableOpacity
             style={styles.closeButton}
             onPress={() => {

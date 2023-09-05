@@ -26,22 +26,11 @@ const Main = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading ...");
 
-  const reloadData = async () => {
-    setLoading(true);
-    try {
-      await fetchDataFromSQLite(StateDispatcher);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
   useEffect(() => {
     if (isFocused) {
       setNumberOfFocus((prevCount) => prevCount + 1);
 
       if (numberOfFocus === 0) {
-        reloadData().then(() => {});
         navigation.setOptions({
           headerLeft: () => <></>,
           headerRight: () => (

@@ -1,13 +1,24 @@
-import {Dropdown} from "react-native-element-dropdown";
-import {Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import MagnifierButton from "../Components/SearchButton";
-import {useRef, useState} from "react";
-import {List} from "../Components/List";
+import { useEffect, useRef, useState } from "react";
+import { List } from "../Components/List";
 import Loading from "../Components/Loading";
-import {GetTimeslotBasedClassRoomTimetable} from "../../BackEnd/SQLiteSearchFunctions";
+import {
+  GetClassRooms,
+  GetTimeslotBasedClassRoomTimetable,
+  GetTimeSlots,
+} from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import {useSelector} from "react-redux";
-import {FontAwesome5} from "@expo/vector-icons";
+import { useSelector } from "react-redux";
+import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
 
 export function Classroom() {
@@ -33,86 +44,85 @@ export function Classroom() {
       return;
     }
     GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
-    .then((res) => {
-      setResultingData(res);
-    })
-    .catch((err) => {
-      console.error(err);
-    })
-    .finally(() => {
-      setIsSearching(false);
-    });
+      .then((res) => {
+        setResultingData(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        setIsSearching(false);
+      });
   }
 
   return (
-      <View style={styles.container}>
-        {resultingData.length > 0 ? (
-            <TouchableOpacity
-                style={styles.slotSelectorPlaceholder}
-                onPress={() => {
-                  setSelectedTimeSlot(null);
-                  setSelectedRoom(null);
-                  setResultingData([]);
-                  openDropDown();
-                }}
-            >
-              <Text style={styles.selectedClassText}>
-                Classroom: {selectedRoom + "\n"}Timeslot: {selectedTimeSlot}
-              </Text>
-              <FontAwesome5 name="edit" size={15} color="#4a6cef"/>
-            </TouchableOpacity>
+    <View style={styles.container}>
+      {resultingData.length > 0 ? (
+        <TouchableOpacity
+          style={styles.slotSelectorPlaceholder}
+          onPress={() => {
+            setSelectedTimeSlot(null);
+            setSelectedRoom(null);
+            setResultingData([]);
+            openDropDown();
+          }}
+        >
+          <Text style={styles.selectedClassText}>
+            Classroom: {selectedRoom + "\n"}Timeslot: {selectedTimeSlot}
+          </Text>
+          <FontAwesome5 name="edit" size={15} color="#4a6cef" />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.selectorContainer}>
+          <Dropdown
+            ref={dropdownRef}
+            style={styles.selectorView}
+            containerStyle={styles.selectorList}
+            data={timeslots}
+            labelField="label"
+            valueField="value"
+            onChange={(item) => {
+              setSelectedTimeSlot(item.value);
+            }}
+            value={selectedTimeSlot}
+            mode={"modal"}
+            autoScroll={false}
+            placeholder={"Timeslot..."}
+            inputSearchStyle={{ backgroundColor: "#d1fff6" }}
+          />
+          <Dropdown
+            style={styles.selectorView}
+            containerStyle={styles.selectorList}
+            inputSearchStyle={styles.slotSearch}
+            keyboardAvoiding={true}
+            data={rooms}
+            mode={"modal"}
+            labelField="label"
+            valueField="value"
+            onChange={(item) => {
+              setSelectedRoom(item.value);
+            }}
+            value={selectedRoom}
+            search={true}
+            autoScroll={false}
+            placeholder={"Room#..."}
+            searchPlaceholder={"Enter a room number to search"}
+          />
+          <MagnifierButton onPress={searchButtonOnPress} />
+        </View>
+      )}
+      <ScrollView style={styles.scrollView}>
+        {resultingData.length === 0 ? (
+          <NoResults />
         ) : (
-             <View style={styles.selectorContainer}>
-               <Dropdown
-                   ref={dropdownRef}
-                   style={styles.selectorView}
-                   containerStyle={styles.selectorList}
-                   data={timeslots}
-                   labelField="label"
-                   valueField="value"
-                   onChange={(item) => {
-                     setSelectedTimeSlot(item.value);
-                   }}
-                   value={selectedTimeSlot}
-                   mode={"modal"}
-                   autoScroll={false}
-                   placeholder={"Timeslot..."}
-                   inputSearchStyle={{backgroundColor: "#d1fff6"}}
-               />
-               <Dropdown
-                   style={styles.selectorView}
-                   containerStyle={styles.selectorList}
-                   inputSearchStyle={styles.slotSearch}
-                   keyboardAvoiding={true}
-                   data={rooms}
-                   mode={"modal"}
-                   labelField="label"
-                   valueField="value"
-                   onChange={(item) => {
-                     setSelectedRoom(item.value);
-                   }}
-                   value={selectedRoom}
-                   search={true}
-                   autoScroll={false}
-                   placeholder={"Room#..."}
-                   searchPlaceholder={"Enter a room number to search"}
-               />
-               <MagnifierButton onPress={searchButtonOnPress}/>
-             </View>
-         )}
-        <ScrollView style={styles.scrollView}>
-          {resultingData.length === 0 ? (
-              <NoResults/>
-          ) : (
-               <List data={resultingData} type={"Classroom"}/>
-           )}
-        </ScrollView>
-        {isSearching && <Loading/>}
-        <BannerAds/>
-      </View>
+          <List data={resultingData} type={"Classroom"} />
+        )}
+      </ScrollView>
+      {isSearching && <Loading />}
+      <BannerAds />
+    </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

@@ -12,26 +12,27 @@ import { setTeacherNames } from "../../Redux/TeacherSlice";
 import { setSubjectNames } from "../../Redux/SubjectSlice";
 import { setClassNames } from "../../Redux/SectionSlice";
 import { setRegistration } from "../../Redux/StudentCredentialsSlice";
-import { createUserCredentialsTable } from "../SQLiteFunctions";
 
-async function fetchDataFromSQLite(StateDispatcher) {
+async function fetchDataFromSQLite(StateDispatcher, type) {
   try {
-    const classRooms = await GetClassRooms();
-    StateDispatcher(setClassRoom(classRooms));
+    if (type === "all") {
+      const classRooms = await GetClassRooms();
+      StateDispatcher(setClassRoom(classRooms));
 
-    const timeSlots = await GetTimeSlots();
-    StateDispatcher(setTimeslot(timeSlots));
+      const timeSlots = await GetTimeSlots();
+      StateDispatcher(setTimeslot(timeSlots));
 
-    const teacherNames = await GetTeacherNames();
-    StateDispatcher(setTeacherNames(teacherNames));
+      const teacherNames = await GetTeacherNames();
+      StateDispatcher(setTeacherNames(teacherNames));
 
-    const subjectNames = await GetSubjectNames();
-    StateDispatcher(setSubjectNames(subjectNames));
+      const subjectNames = await GetSubjectNames();
+      StateDispatcher(setSubjectNames(subjectNames));
 
-    const sectionNames = await GetClassNames();
-    StateDispatcher(setClassNames(sectionNames));
+      const sectionNames = await GetClassNames();
+      StateDispatcher(setClassNames(sectionNames));
 
-    await updateUserCredentialsState(StateDispatcher);
+      await updateUserCredentialsState(StateDispatcher);
+    }
     return true;
   } catch (error) {
     console.error("Error fetching data from SQLite:", error);
