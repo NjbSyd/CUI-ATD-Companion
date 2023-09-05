@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "author": "njbsyd",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
     "dev-clean": "expo start --dev-client -c",
     "android": "expo run:android",
