@@ -45,7 +45,11 @@ export default function Freeslots() {
   return (
     <View style={styles.container}>
       {freeslotsAvailable ? (
-        <View>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
           {selectedTimeSlot === null ? (
             <Dropdown
               ref={dropdownRef}
@@ -164,7 +168,13 @@ export default function Freeslots() {
         </View>
       )}
       <LoadingPopup visible={loading} text={loadingText} />
-      <BannerAds />
+      <View
+        style={{
+          alignSelf: "flex-end",
+        }}
+      >
+        <BannerAds />
+      </View>
     </View>
   );
 }
@@ -218,7 +228,7 @@ const styles = StyleSheet.create({
   selectorView: {
     width: "90%",
     padding: 10,
-    height: "25%",
+    height: "10%",
     alignSelf: "center",
     marginVertical: 20,
     borderWidth: 0.3,

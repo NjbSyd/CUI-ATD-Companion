@@ -2,7 +2,7 @@
   "expo": {
     "name": "CUI ATD Companion",
     "version": "6.0.0",
-    "runtimeVersion": "1.5.0",
+    "runtimeVersion": "2.0.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.njbsyd.cui.unofficial",
-      "versionCode": 5
+      "versionCode": 6
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"
