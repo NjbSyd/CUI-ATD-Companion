@@ -21,7 +21,7 @@ export default function SplashScreen({ navigation }) {
     setInitialAnimationDone(true);
     try {
       await onFetchUpdateAsync(setLoadingText);
-      const appVersion = checkAppVersion();
+      const appVersion = checkAppVersion() || false;
       if (!appVersion) {
         setLoadingText(
           "Update Required!\n Please update the app to the latest version."
@@ -43,6 +43,7 @@ export default function SplashScreen({ navigation }) {
         );
         return;
       }
+
       setLoadingText("Loading...");
       await fakeSleep(2000);
       await initializeAllDatabasesAndTables();
