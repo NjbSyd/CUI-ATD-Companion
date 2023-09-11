@@ -14,12 +14,8 @@ import { useDispatch } from "react-redux";
 import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
 import { ThreeDotMenu } from "../Components/ThreeDotMenu";
-import { useIsFocused } from "@react-navigation/native";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const Main = ({ navigation }) => {
-  const isFocused = useIsFocused();
-  const [numberOfFocus, setNumberOfFocus] = useState(0);
   const { loadedAd, displayAd } = useInterstitialAd();
 
   const StateDispatcher = useDispatch();
@@ -27,30 +23,23 @@ const Main = ({ navigation }) => {
   const [loadingText, setLoadingText] = useState("Loading ...");
 
   useEffect(() => {
-    if (isFocused) {
-      setNumberOfFocus((prevCount) => prevCount + 1);
-
-      if (numberOfFocus === 0) {
-        navigation.setOptions({
-          headerLeft: () => <></>,
-          headerRight: () => (
-            <ThreeDotMenu
-              StateDispatcher={StateDispatcher}
-              SetLoadingText={setLoadingText}
-              SetLoading={setLoading}
-            />
-          ),
-        });
-      } else {
-        if (loadedAd) {
-          displayAd();
-        }
-      }
-    }
-  }, [isFocused]);
+    navigation.setOptions({
+      headerLeft: () => <></>,
+      headerRight: () => (
+        <ThreeDotMenu
+          StateDispatcher={StateDispatcher}
+          SetLoadingText={setLoadingText}
+          SetLoading={setLoading}
+        />
+      ),
+    });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
+      if (loadedAd) {
+        displayAd();
+      }
       const onBackPress = handleBackPress;
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>

@@ -71,15 +71,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
       const total = timetableData.length;
       setLoadingText(`Setting Up New Data...`);
       for (let element of timetableData) {
-        if (element.subject.includes(";")) {
-          element.subject = element.subject
-            .replaceAll("&amp;", "")
-            .replaceAll("&lt;", "")
-            .replaceAll("/sup&gt;", "")
-            .replaceAll("th&lt;", "")
-            .replaceAll("sup&gt;", "")
-            .replaceAll("  ", " ");
-        }
+        element.subject = cleanup(element.subject);
         await insertOrUpdateTimetableData(element);
         ++done;
         await fakeSleep(1);
@@ -156,3 +148,12 @@ export {
   updateDataFromServerIfNeeded,
   fetchAndStoreFreeslotsData,
 };
+
+// Helper function to clean up the input fields from the html tags, special characters and extra spaces.
+function cleanup(inputString) {
+  return inputString
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    .replace(/&[^;]+;/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}

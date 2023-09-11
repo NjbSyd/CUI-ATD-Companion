@@ -38,14 +38,16 @@ export default function SplashScreen({ navigation }) {
         );
       }
       await onFetchUpdateAsync(setLoadingText);
+      await fakeSleep(500);
       setLoadingText("Loading...");
-      await fakeSleep(2000);
+      await fakeSleep(1500);
       await initializeAllDatabasesAndTables();
-      await fakeSleep(2000);
+      await fakeSleep(1500);
       await updateDataFromServerIfNeeded(setLoadingText);
-      await fakeSleep(2000);
       setLoadingText("Setting up the environment...");
+      await fakeSleep(2000);
       await fetchDataFromSQLite(StateDispatcher, "all");
+      await fakeSleep(1000);
       navigation.navigate("ApplicationEntry");
     } catch (error) {
       setLoadingText(error);

@@ -6,19 +6,19 @@ import {
   View,
   StyleSheet,
   ToastAndroid,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import {
-  fetchAndStoreFreeslotsData,
-  updateDataFromServerIfNeeded,
-} from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 
 function DropdownMenu({ onReloadCache }) {
   return (
     <View style={styles.dropdownContainer}>
-      <TouchableOpacity style={styles.dropdownOption} onPress={onReloadCache}>
+      <TouchableOpacity
+        style={styles.dropdownOption}
+        onPress={onReloadCache}
+        pointerEvents="none"
+      >
         <Text style={styles.optionText}>Reload Local Cache</Text>
       </TouchableOpacity>
     </View>
@@ -52,20 +52,13 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
         <MaterialCommunityIcons name="dots-vertical" size={30} color="black" />
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
-        <View style={styles.modalContainer}>
+        <View
+          style={styles.modalContainer}
+          onTouchEnd={() => {
+            setModalVisible(false);
+          }}
+        >
           <DropdownMenu onReloadCache={handleReloadCache} />
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => {
-              setModalVisible(!modalVisible);
-            }}
-          >
-            <MaterialCommunityIcons
-              name="dots-vertical"
-              size={30}
-              color="black"
-            />
-          </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -77,29 +70,15 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   modalContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.1)",
+    justifyContent: "center",
     alignItems: "center",
   },
   closeButton: {
     position: "absolute",
     top: 13,
     right: 16,
-  },
-  optionsContainer: {
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#c6c6ce",
-    padding: 20,
-  },
-  optionButton: {
-    paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: "gray",
-    alignItems: "center",
-  },
-  optionText: {
-    fontSize: 16,
   },
   dropdownContainer: {
     position: "absolute",
@@ -109,13 +88,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#c6c6ce",
-
     zIndex: 1,
   },
   dropdownOption: {
     paddingVertical: 10,
     alignItems: "center",
     padding: 10,
+  },
+  optionText: {
+    fontSize: 16,
   },
 });
 
