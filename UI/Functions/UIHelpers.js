@@ -107,18 +107,21 @@ function useCustomFonts() {
 }
 
 function CalculateTotalFreeSlots(daySchedule, timeslot) {
-  let totalFreeSlots = 0;
-
-  for (const labSlots of Object.values(daySchedule)) {
-    for (const slot of labSlots) {
-      if (slot === timeslot) {
-        totalFreeSlots++;
-        break;
+  try {
+    let totalFreeSlots = 0;
+    for (const labSlots of Object.values(daySchedule)) {
+      for (const slot of labSlots) {
+        if (slot === timeslot) {
+          totalFreeSlots++;
+          break;
+        }
       }
     }
-  }
 
-  return totalFreeSlots;
+    return totalFreeSlots;
+  } catch (e) {
+    return 0;
+  }
 }
 
 function RemoveLabData(jsonData) {

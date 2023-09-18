@@ -1,16 +1,23 @@
-import { View, StyleSheet, Image, Text, Alert, Linking } from "react-native";
+import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useFonts } from "expo-font";
-import { onFetchUpdateAsync } from "../../BackEnd/Updates";
 import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
 import { fakeSleep } from "../Functions/UIHelpers";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { checkAppVersion } from "../../BackEnd/ApplicationVersionControl";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function SplashScreen({ navigation }) {
+  const focused = useIsFocused();
+  useEffect(() => {
+    if (focused) {
+      setInitialAnimationDone(false);
+      animationRef.current?.play();
+    }
+  }, [focused]);
+  const animationRef = useRef(null);
   const [fontLoaded] = useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
@@ -20,46 +27,47 @@ export default function SplashScreen({ navigation }) {
   const onAnimationFinish = async () => {
     setInitialAnimationDone(true);
     try {
-      if (!checkAppVersion()) {
-        Alert.alert(
-          "Update is required",
-          "Please update the app to latest version",
-          [
-            {
-              text: "OK",
-              onPress: () => {
-                Linking.openURL(
-                  "https://play.google.com/store/apps/details?id=com.njbsyd.cui.unofficial"
-                );
-              },
-            },
-          ],
-          { cancelable: false }
-        );
-      }
-      await onFetchUpdateAsync(setLoadingText);
-      await fakeSleep(500);
       setLoadingText("Loading...");
-      await fakeSleep(1500);
+      await fakeSleep(100);
       await initializeAllDatabasesAndTables();
-      await fakeSleep(1500);
-      await updateDataFromServerIfNeeded(setLoadingText);
+      await fakeSleep(100);
+      const response = await updateDataFromServerIfNeeded(setLoadingText);
+      if (response === "Error") {
+        navigation.navigate("Error", {
+          message: {
+            title: "Server Connection Error",
+            message: "Please check your internet connection and try again.",
+          },
+        });
+        return;
+      } else if (
+        typeof response === "object" &&
+        response?.title.toUpperCase().includes("UPDATE")
+      ) {
+        navigation.navigate("Error", { message: response });
+        return;
+      }
       setLoadingText("Setting up the environment...");
-      await fakeSleep(2000);
+      await fakeSleep(100);
       await fetchDataFromSQLite(StateDispatcher, "all");
-      await fakeSleep(1000);
+      await fakeSleep(100);
       navigation.navigate("ApplicationEntry");
     } catch (error) {
-      setLoadingText(error);
+      navigation.navigate("Error", {
+        message: {
+          title: "Something Went Wrong!",
+          message: error.message,
+        },
+      });
     }
   };
   return (
     <View style={{ flex: 1 }}>
       <AnimatedLottieView
+        ref={animationRef}
         style={styles.splashContainer}
         source={require("../../assets/Images/SplashScreen.json")}
         resizeMode="center"
-        autoPlay
         speed={1}
         loop={false}
         onAnimationFinish={onAnimationFinish}

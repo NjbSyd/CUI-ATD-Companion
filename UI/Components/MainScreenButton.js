@@ -2,6 +2,7 @@ import { Image, Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { useFonts } from "expo-font";
+import { BackgroundImage } from "@rneui/base";
 
 const RenderButton = (
   iconName,
@@ -42,31 +43,42 @@ const RenderButton = (
           navigation.navigate(screenName);
         }}
       >
-        {icon ? (
-          <FontAwesome5 name={iconName} size={50} color="white" />
-        ) : (
-          <Image
-            style={{
-              width: "35%",
-              height: "35%",
-              marginVertical: -5,
-              resizeMode: "contain",
-            }}
-            source={require("../../assets/Images/cui_logo_monochrome.png")}
-          />
-        )}
-        <Text style={styles.buttonText}>{screenName}</Text>
-        <Text
+        <BackgroundImage
           style={{
-            color: "white",
-            textAlign: "center",
-            fontSize: 12,
-            margin: 20,
-            fontFamily: "bricolage",
+            width: "100%",
+            height: "100%",
+            resizeMode: "stretch",
+            justifyContent: "center",
+            alignItems: "center",
           }}
+          source={require("../../assets/Images/gradient.png")}
         >
-          {screenDescription}
-        </Text>
+          {icon ? (
+            <FontAwesome5 name={iconName} size={50} color="white" />
+          ) : (
+            <Image
+              style={{
+                width: "35%",
+                height: "35%",
+                marginVertical: -5,
+                resizeMode: "contain",
+              }}
+              source={require("../../assets/Images/cui_logo_monochrome.png")}
+            />
+          )}
+          <Text style={styles.buttonText}>{screenName}</Text>
+          <Text
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontSize: 12,
+              margin: 20,
+              fontFamily: "bricolage",
+            }}
+          >
+            {screenDescription}
+          </Text>
+        </BackgroundImage>
       </TouchableOpacity>
     </View>
   );
@@ -75,10 +87,11 @@ const RenderButton = (
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    paddingTop: 20,
-    backgroundColor: "rgb(15, 44, 76)",
+    // paddingTop: 20,
+    // backgroundColor: "rgb(15, 44, 76)",
     marginVertical: 10,
     borderRadius: 10,
+    overflow: "hidden",
     height: "35%",
     borderColor: "rgb(15, 44, 76)",
     borderWidth: 1,

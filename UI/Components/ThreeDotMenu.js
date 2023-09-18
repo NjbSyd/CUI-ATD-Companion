@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
   ToastAndroid,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
@@ -84,10 +83,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 50,
     right: 20,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#47267d",
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#c6c6ce",
+    borderWidth: 2,
+    borderColor: "#fff",
     zIndex: 1,
   },
   dropdownOption: {
@@ -97,6 +96,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 16,
+    color: "white",
   },
 });
 

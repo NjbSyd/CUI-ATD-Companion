@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "CUI ATD Companion",
-    "version": "6.0.0",
-    "runtimeVersion": "2.0.0",
+    "version": "7.0.0",
+    "runtimeVersion": "3.0.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",
@@ -26,7 +26,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.njbsyd.cui.unofficial",
-      "versionCode": 6
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"
@@ -35,12 +35,6 @@
       "eas": {
         "projectId": "f45b966a-2ad8-472a-9ba9-d266061b7883"
       }
-    },
-    "updates": {
-      "url": "https://u.expo.dev/f45b966a-2ad8-472a-9ba9-d266061b7883",
-      "enabled": true,
-      "fallbackToCacheTimeout": 4000,
-      "checkAutomatically": "ON_ERROR_RECOVERY"
     }
   },
   "react-native-google-mobile-ads": {

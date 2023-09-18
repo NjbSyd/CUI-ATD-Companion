@@ -1,7 +1,7 @@
 import NetInfo from "@react-native-community/netinfo";
 import {
   clearTimetableTable,
-  insertOrUpdateTimetableData,
+  insertOrUpdateTimetableDataInBatch,
 } from "../SQLiteFunctions";
 import axios from "axios";
 import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
@@ -23,7 +23,6 @@ async function shouldUpdateDataFromServer() {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
 
     if (!lastSyncDate) {
-      console.log("No last sync date found, updating...");
       return true;
     }
 
@@ -34,14 +33,11 @@ async function shouldUpdateDataFromServer() {
       currentDate.getDate() > lastSyncDateObj.getDate() &&
       currentDate.getHours() >= 7
     ) {
-      console.log("Data is outdated, updating...");
       return await askForDataUpdatePermission();
     } else {
-      console.log("Data is up to date");
       return false;
     }
   } catch (error) {
-    console.error("Error checking data update status:", error);
     throw error;
   }
 }
@@ -52,44 +48,37 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    console.log("Checking if data update is needed...");
     const updateNeeded = await shouldUpdateDataFromServer();
-
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
-        setLoadingText("No Internet Connection😢");
-        return;
+        throw new Error(
+          "Please! Check your internet connection and try again."
+        );
       }
       setLoadingText("Fetching Data ...");
       const timetableData = await fetchDataFromMongoDB(Timetable_API_URL);
-      await fakeSleep(1000);
-      setLoadingText("Removing Old Data...");
-      await clearTimetableTable();
-      await fakeSleep(1000);
-      let done = 0;
-      const total = timetableData.length;
-      setLoadingText(`Setting Up New Data...`);
-      for (let element of timetableData) {
-        element.subject = cleanup(element.subject);
-        await insertOrUpdateTimetableData(element);
-        ++done;
-        await fakeSleep(1);
-        setLoadingText(
-          `Setting Up New Data... ${done}/${total}✅\nDon't worry! this will happen just this once`
-        );
+      if (
+        timetableData.title &&
+        timetableData?.title.toUpperCase().includes("UPDATE")
+      ) {
+        return timetableData;
       }
-
+      setLoadingText("Removing Old Data...");
+      await fakeSleep(100);
+      await clearTimetableTable();
+      setLoadingText("Removing Old Data...✅");
+      await fakeSleep(500);
+      await insertOrUpdateTimetableDataInBatch(timetableData);
       await AsyncStorage.setItem("lastSyncDate", new Date().toJSON());
-
-      setLoadingText("Data Updated from Server");
     } else {
       setLoadingText("Proceeding with existing data...");
+      await fakeSleep(1000);
     }
+    return "NoError";
   } catch (error) {
-    console.error("Error updating data from server:", error);
     setLoadingText("Error Occurred⛔");
-    throw error;
+    throw new Error("Please! Restart the App or Try Again.");
   }
 }
 
@@ -106,10 +95,9 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
   try {
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
-      console.warn("No internet connection. Free-slot data not updated.");
+      alert("No internet connection.");
       return;
     }
-
     const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res);
 
@@ -118,7 +106,6 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
 
     return true;
   } catch (error) {
-    console.error("Error fetching free-slot data from MongoDB:", error);
     throw error;
   }
 }
@@ -148,12 +135,3 @@ export {
   updateDataFromServerIfNeeded,
   fetchAndStoreFreeslotsData,
 };
-
-// Helper function to clean up the input fields from the html tags, special characters and extra spaces.
-function cleanup(inputString) {
-  return inputString
-    .replace(/<\/?[^>]+(>|$)/g, "")
-    .replace(/&[^;]+;/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}

@@ -120,39 +120,6 @@ const Main = ({ navigation }) => {
             loadedAd,
             displayAd
           )}
-          {RenderButton(
-            "calendar-plus",
-            "Freeslots",
-            "Find free-slots for arranging extra classes",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "calendar-plus",
-            "Freeslots",
-            "Find free-slots for arranging extra classes",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "calendar-plus",
-            "Freeslots",
-            "Find free-slots for arranging extra classes",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
         </View>
       </ScrollView>
       <LoadingPopup visible={loading} text={loadingText} />

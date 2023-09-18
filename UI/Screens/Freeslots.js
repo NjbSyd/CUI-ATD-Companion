@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import React, { useRef, useState } from "react";
 import {
   CalculateTotalFreeSlots,
+  fakeSleep,
   FilterFreeSlotsByTimeSlot,
 } from "../Functions/UIHelpers";
 import LoadingPopup from "../Components/Loading";
@@ -21,7 +22,7 @@ import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSid
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-export default function Freeslots() {
+export default function Freeslots({ navigation }) {
   const StateDispatcher = useDispatch();
   const freeslotsAvailable = useSelector(
     (state) => state.FreeslotsSlice.available
@@ -35,11 +36,19 @@ export default function Freeslots() {
   const [selectedDayData, setSelectedDayData] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const dropdownRef = useRef(null);
+  let buttonRef = useRef(null);
 
-  const openDropDown = () => {
-    setTimeout(() => {
-      dropdownRef.current.open();
-    }, 100);
+  const openDropDown = async () => {
+    await fakeSleep(100);
+    dropdownRef.current.open();
+  };
+
+  const clickOnMonday = async () => {
+    await fakeSleep(200);
+    if (buttonRef) {
+      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
+      setSelectedDayData(selectedTimeSlotData[0]);
+    }
   };
 
   return (
@@ -65,6 +74,9 @@ export default function Freeslots() {
                   item.value
                 );
                 setSelectedTimeSlotData(timeslotData);
+                clickOnMonday()
+                  .then(() => {})
+                  .catch(() => {});
               }}
               value={selectedTimeSlot}
               autoScroll={false}
@@ -80,7 +92,9 @@ export default function Freeslots() {
                   setSelectedTimeSlotData(null);
                   setSelectedDayData(null);
                   setSelection(-1);
-                  openDropDown();
+                  openDropDown()
+                    .then(() => {})
+                    .catch(() => {});
                 }}
               >
                 <Text style={styles.selectedClassText}>
@@ -99,6 +113,11 @@ export default function Freeslots() {
                         backgroundColor: selection === index ? "#000" : "#fff",
                       },
                     ]}
+                    ref={(ref) => {
+                      if (index === 0) {
+                        buttonRef.current = ref;
+                      }
+                    }}
                     onPress={() => {
                       setSelection(index);
                       setSelectedDayData(selectedTimeSlotData[day]);
@@ -135,7 +154,7 @@ export default function Freeslots() {
           {selection !== -1 && (
             <ScrollView
               style={{
-                marginBottom: "45%",
+                marginBottom: "10%",
                 marginTop: 10,
               }}
             >
@@ -157,9 +176,18 @@ export default function Freeslots() {
           <TouchableOpacity
             style={styles.fetchDataBtn}
             onPress={async () => {
-              setLoading(true);
-              await fetchAndStoreFreeslotsData(StateDispatcher);
-              setLoading(false);
+              try {
+                setLoading(true);
+                await fetchAndStoreFreeslotsData(StateDispatcher);
+                setLoading(false);
+              } catch (e) {
+                navigation.replace("Error", {
+                  message: {
+                    title: "Something Went Wrong!",
+                    message: e.message,
+                  },
+                });
+              }
             }}
           >
             <Text style={styles.buttonText}>Load Freeslots</Text>

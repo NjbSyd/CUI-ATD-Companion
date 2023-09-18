@@ -13,6 +13,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
+import { fakeSleep } from "../Functions/UIHelpers";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -27,15 +28,16 @@ export default function Timetable() {
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const openDropDown = () => {
-    setTimeout(() => {
-      dropdownRef.current.open();
-    }, 100);
+  const openDropDown = async () => {
+    await fakeSleep(100);
+    dropdownRef.current.open();
   };
 
-  const clickOnMonday = () => {
-    if (buttonRef.current)
+  const clickOnMonday = async () => {
+    await fakeSleep(200);
+    if (buttonRef.current) {
       buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
+    }
   };
 
   function handleOnClassChange(item) {
@@ -44,7 +46,9 @@ export default function Timetable() {
     GetTimetableByClassName(item.value)
       .then((res) => {
         setSelectedClassData(res);
-        clickOnMonday();
+        clickOnMonday()
+          .then(() => {})
+          .catch(() => {});
       })
       .catch((err) => {
         console.error(err);
@@ -68,7 +72,9 @@ export default function Timetable() {
               setSelectedClassData([]);
               setSelectedClassDayData([]);
               setSelection(-1);
-              openDropDown();
+              openDropDown()
+                .then(() => {})
+                .catch(() => {});
             }}
           >
             <Text style={styles.selectedClassText}>
