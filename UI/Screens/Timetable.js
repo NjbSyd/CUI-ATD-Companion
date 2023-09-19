@@ -4,16 +4,19 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
 import { fakeSleep } from "../Functions/UIHelpers";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -27,17 +30,12 @@ export default function Timetable() {
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
+  const Dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
 
   const openDropDown = async () => {
     await fakeSleep(100);
     dropdownRef.current.open();
-  };
-
-  const clickOnMonday = async () => {
-    await fakeSleep(200);
-    if (buttonRef.current) {
-      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
-    }
   };
 
   function handleOnClassChange(item) {
@@ -46,9 +44,6 @@ export default function Timetable() {
     GetTimetableByClassName(item.value)
       .then((res) => {
         setSelectedClassData(res);
-        clickOnMonday()
-          .then(() => {})
-          .catch(() => {});
       })
       .catch((err) => {
         console.error(err);
@@ -61,7 +56,31 @@ export default function Timetable() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={selectedClassData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          progressViewOffset={10}
+          colors={["#fff"]}
+          onRefresh={() => {
+            fetchDataFromSQLite(Dispatch, ["sections"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Classroom.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {isClassNameSelected ? (
         <>
           <TouchableOpacity
@@ -144,20 +163,18 @@ export default function Timetable() {
       <ScrollView style={styles.scrollView}>
         {isClassNameSelected ? (
           selection <= -1 ? (
-            <Text style={styles.requestText}>
-              Select a day to view timetable
-            </Text>
+            <NoSelection message={"Select a day to view timetable"} />
           ) : selectedClassDayData.length > 0 ? (
             <List data={selectedClassDayData} type={"Classroom"} />
           ) : (
-            <NoResults />
+            <NoResults message={`No Classes On ${daysOfWeek[selection]}`} />
           )
         ) : (
-          <NoResults />
+          <NoSelection message={"Pick A Class"} />
         )}
       </ScrollView>
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -207,6 +224,7 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 20,
+    flexWrap: "wrap",
   },
 
   scrollView: {

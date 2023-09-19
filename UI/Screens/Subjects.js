@@ -1,4 +1,5 @@
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,15 +11,19 @@ import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
 
 export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
   const dropdownRef = useRef(null);
+  const Dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
 
   const openDropDown = () => {
     setTimeout(() => {
@@ -26,7 +31,31 @@ export function Subjects() {
     }, 100);
   };
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={selectedSubjectData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          colors={["#fff"]}
+          progressViewOffset={10}
+          onRefresh={() => {
+            fetchDataFromSQLite(Dispatch, ["subjects"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Subjects.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {selectedSubject !== null ? (
         <TouchableOpacity
           style={styles.slotSelectorPlaceholder}
@@ -66,13 +95,17 @@ export function Subjects() {
       )}
       <ScrollView style={styles.scrollView}>
         {selectedSubjectData.length === 0 ? (
-          <NoResults />
+          selectedSubject !== null ? (
+            <NoResults />
+          ) : (
+            <NoSelection />
+          )
         ) : (
           <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 

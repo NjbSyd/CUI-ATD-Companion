@@ -10,6 +10,7 @@ import StudentPortal from "./StudentPortal";
 import LoginScreen from "./Login";
 import { useFonts } from "expo-font";
 import Freeslots from "./Freeslots";
+import ProfileScreen from "./ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,13 @@ export default function ApplicationEntry() {
         animation: "slide_from_right",
       }}
     >
+      <Stack.Screen
+        name={"AboutMe"}
+        component={ProfileScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen name="Home" component={Main} />
       <Stack.Screen name="Teachers" component={Teachers} />
       <Stack.Screen name="Classrooms" component={Classroom} />

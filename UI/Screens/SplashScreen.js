@@ -68,7 +68,7 @@ export default function SplashScreen({ navigation }) {
         style={styles.splashContainer}
         source={require("../../assets/Images/SplashScreen.json")}
         resizeMode="center"
-        speed={1}
+        speed={1.5}
         loop={false}
         onAnimationFinish={onAnimationFinish}
         autoSize

@@ -11,6 +11,7 @@ import {
 } from "../../Redux/FreeslotsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
+import { fetchDataFromSQLite } from "./FrontEndDataHandler";
 
 const Timetable_API_URL =
   "http://cui-unofficial.eastus.cloudapp.azure.com:3000/timetable";
@@ -49,6 +50,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
   }
   try {
     const updateNeeded = await shouldUpdateDataFromServer();
+    // const updateNeeded = true;
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
@@ -78,6 +80,9 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     return "NoError";
   } catch (error) {
     setLoadingText("Error Occurred⛔");
+    if (error.message.toUpperCase().includes("INTERNET")) {
+      throw new Error("Please! Check your internet connection and try again.");
+    }
     throw new Error("Please! Restart the App or Try Again.");
   }
 }
@@ -100,7 +105,7 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     }
     const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res);
-
+    await fetchDataFromSQLite(StateDispatcher, ["timeslots"]);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));
 

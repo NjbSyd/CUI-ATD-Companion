@@ -1,6 +1,7 @@
 import { Dropdown } from "react-native-element-dropdown";
 import {
   Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,9 +18,13 @@ import {
   GetTimeSlots,
 } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
+import { setClassRoom } from "../../Redux/ClassRoomSlice";
+import { setTimeslot } from "../../Redux/TimeslotSlice";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
 
 export function Classroom() {
   const rooms = useSelector((state) => state.ClassRoomSlice.classRoom);
@@ -28,13 +33,29 @@ export function Classroom() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef(null);
-
+  const StateDispatcher = useDispatch();
+  useEffect(() => {}, [rooms, timeslots, resultingData]);
   const openDropDown = () => {
     setTimeout(() => {
       dropdownRef.current.open();
     }, 100);
   };
+  function trySearch() {
+    setTimeout(() => {
+      if (selectedTimeSlot === null || selectedRoom === null) {
+        return;
+      }
+      GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
+        .then((res) => {
+          setResultingData(res);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }, 10);
+  }
 
   function searchButtonOnPress() {
     setIsSearching(true);
@@ -56,13 +77,35 @@ export function Classroom() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={resultingData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          colors={["#fff"]}
+          progressViewOffset={10}
+          onRefresh={() => {
+            fetchDataFromSQLite(StateDispatcher, ["classRooms", "timeSlots"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Classroom.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {resultingData.length > 0 ? (
         <TouchableOpacity
           style={styles.slotSelectorPlaceholder}
           onPress={() => {
-            setSelectedTimeSlot(null);
-            setSelectedRoom(null);
             setResultingData([]);
             openDropDown();
           }}
@@ -83,6 +126,7 @@ export function Classroom() {
             valueField="value"
             onChange={(item) => {
               setSelectedTimeSlot(item.value);
+              trySearch();
             }}
             value={selectedTimeSlot}
             mode={"modal"}
@@ -101,6 +145,7 @@ export function Classroom() {
             valueField="value"
             onChange={(item) => {
               setSelectedRoom(item.value);
+              trySearch();
             }}
             value={selectedRoom}
             search={true}
@@ -108,19 +153,28 @@ export function Classroom() {
             placeholder={"Room#..."}
             searchPlaceholder={"Enter a room number to search"}
           />
-          <MagnifierButton onPress={searchButtonOnPress} />
         </View>
       )}
       <ScrollView style={styles.scrollView}>
         {resultingData.length === 0 ? (
-          <NoResults />
+          selectedRoom !== null && selectedTimeSlot !== null ? (
+            <NoResults
+              message={`No Classes Found in Room: ${selectedRoom} at Time: ${selectedTimeSlot} `}
+            />
+          ) : (
+            <NoSelection
+              message={`Choose a ${selectedRoom === null ? "Room No" : ""}${
+                !selectedRoom && !selectedTimeSlot ? " & " : ""
+              }${selectedTimeSlot === null ? "TimeSlot" : ""}`}
+            />
+          )
         ) : (
           <List data={resultingData} type={"Classroom"} />
         )}
       </ScrollView>
       {isSearching && <Loading />}
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 

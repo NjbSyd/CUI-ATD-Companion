@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import {
-  TouchableOpacity,
-  Text,
-  Modal,
-  View,
-  StyleSheet,
-  ToastAndroid,
-} from "react-native";
+import { TouchableOpacity, Text, Modal, View, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 function DropdownMenu({ onReloadCache }) {
   return (
@@ -18,27 +10,17 @@ function DropdownMenu({ onReloadCache }) {
         onPress={onReloadCache}
         pointerEvents="none"
       >
-        <Text style={styles.optionText}>Reload Local Cache</Text>
+        <Text style={styles.optionText}>About</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
+function ThreeDotMenu({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleReloadCache = async () => {
-    try {
-      setModalVisible(false);
-      SetLoading(true);
-      await fetchDataFromSQLite(StateDispatcher, "all");
-      ToastAndroid.show("Reloaded Successfully✅", ToastAndroid.SHORT);
-    } catch (e) {
-      ToastAndroid.show(e, ToastAndroid.SHORT);
-    } finally {
-      SetLoading(false);
-      SetLoadingText("Loading ...");
-    }
+  const handleAboutScreenNavigator = () => {
+    navigation.navigate("AboutMe");
   };
 
   return (
@@ -57,7 +39,7 @@ function ThreeDotMenu({ StateDispatcher, SetLoadingText, SetLoading }) {
             setModalVisible(false);
           }}
         >
-          <DropdownMenu onReloadCache={handleReloadCache} />
+          <DropdownMenu onReloadCache={handleAboutScreenNavigator} />
         </View>
       </Modal>
     </View>

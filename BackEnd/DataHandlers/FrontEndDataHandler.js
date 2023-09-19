@@ -16,9 +16,6 @@ import { setRegistration } from "../../Redux/StudentCredentialsSlice";
 async function fetchDataFromSQLite(StateDispatcher, type) {
   try {
     if (type === "all") {
-      const classRooms = await GetClassRooms();
-      StateDispatcher(setClassRoom(classRooms));
-
       const timeSlots = await GetTimeSlots();
       StateDispatcher(setTimeslot(timeSlots));
 
@@ -28,10 +25,38 @@ async function fetchDataFromSQLite(StateDispatcher, type) {
       const subjectNames = await GetSubjectNames();
       StateDispatcher(setSubjectNames(subjectNames));
 
+      const classRooms = await GetClassRooms();
+      StateDispatcher(setClassRoom(classRooms));
+
       const sectionNames = await GetClassNames();
       StateDispatcher(setClassNames(sectionNames));
 
       await updateUserCredentialsState(StateDispatcher);
+    }
+    if (typeof type === "object") {
+      if (type.includes("timeSlots")) {
+        const timeSlots = await GetTimeSlots();
+        StateDispatcher(setTimeslot(timeSlots));
+      }
+      if (type.includes("teachers")) {
+        const teacherNames = await GetTeacherNames();
+        StateDispatcher(setTeacherNames(teacherNames));
+      }
+      if (type.includes("subjects")) {
+        const subjectNames = await GetSubjectNames();
+        StateDispatcher(setSubjectNames(subjectNames));
+      }
+      if (type.includes("classRooms")) {
+        const classRooms = await GetClassRooms();
+        StateDispatcher(setClassRoom(classRooms));
+      }
+      if (type.includes("sections")) {
+        const sectionNames = await GetClassNames();
+        StateDispatcher(setClassNames(sectionNames));
+      }
+      if (type.includes("registration")) {
+        await updateUserCredentialsState(StateDispatcher);
+      }
     }
     return true;
   } catch (error) {

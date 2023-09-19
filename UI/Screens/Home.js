@@ -25,13 +25,7 @@ const Main = ({ navigation }) => {
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => <></>,
-      headerRight: () => (
-        <ThreeDotMenu
-          StateDispatcher={StateDispatcher}
-          SetLoadingText={setLoadingText}
-          SetLoading={setLoading}
-        />
-      ),
+      headerRight: () => <ThreeDotMenu navigation={navigation} />,
     });
   }, []);
 

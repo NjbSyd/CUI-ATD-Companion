@@ -118,7 +118,7 @@ android {
         applicationId 'com.njbsyd.cui.unofficial'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
+        versionCode 8
         versionName "7.0.0"
     }
 

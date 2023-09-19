@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CalculateTotalFreeSlots,
   fakeSleep,
@@ -19,6 +19,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
+import NoSelection from "../Components/NoSelection";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -37,18 +39,10 @@ export default function Freeslots({ navigation }) {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const dropdownRef = useRef(null);
   let buttonRef = useRef(null);
-
+  useEffect(() => {}, [freeslots, freeslotsAvailable, timeSlots]);
   const openDropDown = async () => {
     await fakeSleep(100);
     dropdownRef.current.open();
-  };
-
-  const clickOnMonday = async () => {
-    await fakeSleep(200);
-    if (buttonRef) {
-      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
-      setSelectedDayData(selectedTimeSlotData[0]);
-    }
   };
 
   return (
@@ -74,9 +68,6 @@ export default function Freeslots({ navigation }) {
                   item.value
                 );
                 setSelectedTimeSlotData(timeslotData);
-                clickOnMonday()
-                  .then(() => {})
-                  .catch(() => {});
               }}
               value={selectedTimeSlot}
               autoScroll={false}
@@ -151,7 +142,7 @@ export default function Freeslots({ navigation }) {
               </View>
             </View>
           )}
-          {selection !== -1 && (
+          {selection !== -1 ? (
             <ScrollView
               style={{
                 marginBottom: "10%",
@@ -165,6 +156,10 @@ export default function Freeslots({ navigation }) {
                 <List data={selectedDayData} type="FreeSlot" />
               )}
             </ScrollView>
+          ) : (
+            <NoSelection
+              message={!selectedTimeSlot ? "Pick a TimeSlot" : "Select a Day"}
+            />
           )}
         </View>
       ) : (
@@ -179,6 +174,7 @@ export default function Freeslots({ navigation }) {
               try {
                 setLoading(true);
                 await fetchAndStoreFreeslotsData(StateDispatcher);
+                await fetchDataFromSQLite(StateDispatcher, ["timeSlots"]);
                 setLoading(false);
               } catch (e) {
                 navigation.replace("Error", {
@@ -192,7 +188,7 @@ export default function Freeslots({ navigation }) {
           >
             <Text style={styles.buttonText}>Load Freeslots</Text>
           </TouchableOpacity>
-          <NoResults />
+          <NoSelection message={"Press the button above to load FreeSlots"} />
         </View>
       )}
       <LoadingPopup visible={loading} text={loadingText} />
