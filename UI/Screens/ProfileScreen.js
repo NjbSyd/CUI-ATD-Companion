@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -8,10 +8,12 @@ import {
   StatusBar,
   Linking,
   ToastAndroid,
+  BackHandler,
 } from "react-native";
 import { Block, Text, theme, Button as GaButton } from "galio-framework";
 import nowTheme from "../Constants/Theme";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const StatusHeight = StatusBar.currentHeight;
 
@@ -20,6 +22,19 @@ const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const ProfileScreen = ({ navigation }) => {
+  useFocusEffect(
+    useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", () => {
+        navigation.navigate("Home");
+        return true;
+      });
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", () => {
+          navigation.navigate("Home");
+          return true;
+        });
+    }, [])
+  );
   return (
     <Block
       style={{

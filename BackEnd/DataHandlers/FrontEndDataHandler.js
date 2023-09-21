@@ -16,6 +16,8 @@ import { setRegistration } from "../../Redux/StudentCredentialsSlice";
 async function fetchDataFromSQLite(StateDispatcher, type) {
   try {
     if (type === "all") {
+      await updateUserCredentialsState(StateDispatcher);
+
       const timeSlots = await GetTimeSlots();
       StateDispatcher(setTimeslot(timeSlots));
 
@@ -30,8 +32,6 @@ async function fetchDataFromSQLite(StateDispatcher, type) {
 
       const sectionNames = await GetClassNames();
       StateDispatcher(setClassNames(sectionNames));
-
-      await updateUserCredentialsState(StateDispatcher);
     }
     if (typeof type === "object") {
       if (type.includes("timeSlots")) {

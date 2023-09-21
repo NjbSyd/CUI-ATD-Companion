@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
@@ -98,7 +97,7 @@ export function Subjects() {
           selectedSubject !== null ? (
             <NoResults />
           ) : (
-            <NoSelection />
+            <NoSelection message={"Select a Subject"} />
           )
         ) : (
           <List data={selectedSubjectData} type={"Subject"} />

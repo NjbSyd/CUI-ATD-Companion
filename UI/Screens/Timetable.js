@@ -6,7 +6,7 @@ import {
   ScrollView,
   RefreshControl,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,28 +29,30 @@ export default function Timetable() {
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const dropdownRef = useRef(null);
-  const buttonRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    setSelection(0);
+    filterDayData("Monday");
+  }, [selectedClassData]);
   const openDropDown = async () => {
     await fakeSleep(100);
     dropdownRef.current.open();
   };
 
-  function handleOnClassChange(item) {
-    setSelectedClassname(item);
-    setIsClassNameSelected(true);
-    GetTimetableByClassName(item.value)
-      .then((res) => {
-        setSelectedClassData(res);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+  async function handleOnClassChange(item) {
+    try {
+      setSelectedClassname(item);
+      setIsClassNameSelected(true);
+      const result = await GetTimetableByClassName(item.value);
+      setSelectedClassData(result);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  function filterDayData(day = daysOfWeek[selection]) {
+  function filterDayData(day = "Monday") {
     const dayData = selectedClassData.filter((item) => item.day === day);
     setSelectedClassDayData(dayData);
   }
@@ -106,11 +108,6 @@ export default function Timetable() {
             {daysOfWeek.map((day, index) => (
               <TouchableOpacity
                 key={day}
-                ref={(ref) => {
-                  if (index === 0) {
-                    buttonRef.current = ref;
-                  }
-                }}
                 style={[
                   styles.button,
                   { backgroundColor: selection === index ? "#000" : "#fff" },
@@ -230,7 +227,6 @@ const styles = StyleSheet.create({
   scrollView: {
     maxWidth: "90%",
     margin: 20,
-    marginBottom: 80,
     maxHeight: "80%",
   },
   slotSelector: {

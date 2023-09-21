@@ -22,20 +22,19 @@ const FreeSlots_API_URL =
 async function shouldUpdateDataFromServer() {
   try {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-
     if (!lastSyncDate) {
+      console.log("No last sync date found.");
       return true;
-    }
-
-    const currentDate = new Date();
-    const lastSyncDateObj = new Date(lastSyncDate);
-
-    if (
-      currentDate.getDate() > lastSyncDateObj.getDate() &&
-      currentDate.getHours() >= 7
-    ) {
-      return await askForDataUpdatePermission();
     } else {
+      if (!(await NetInfo.fetch()).isInternetReachable) {
+        return false;
+      }
+      const { data } = await axios.post(`${Timetable_API_URL}/shouldUpdate`, {
+        lastSyncDate,
+      });
+      if (data?.shouldUpdate) {
+        return await askForDataUpdatePermission(data?.lastScrapDate);
+      }
       return false;
     }
   } catch (error) {
@@ -115,11 +114,14 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
   }
 }
 
-async function askForDataUpdatePermission() {
+async function askForDataUpdatePermission(date) {
   return new Promise((resolve) => {
     Alert.alert(
       "Data Update Permission",
-      "Existing data might be outdated. Do you want to update it?",
+      `Data from ${new Date(date)
+        .toString()
+        .split("G")[0]
+        .trim()} has some changes ,Do you want to update it?`,
       [
         {
           text: "Yes",

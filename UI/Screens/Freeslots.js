@@ -32,14 +32,18 @@ export default function Freeslots({ navigation }) {
   const timeSlots = useSelector((state) => state.TimeslotSlice.timeSlot);
   const freeslots = useSelector((state) => state.FreeslotsSlice.freeslots);
   const [loading, setLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading ...");
   const [selection, setSelection] = useState(-1);
   const [selectedTimeSlotData, setSelectedTimeSlotData] = useState(null);
   const [selectedDayData, setSelectedDayData] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const dropdownRef = useRef(null);
-  let buttonRef = useRef(null);
   useEffect(() => {}, [freeslots, freeslotsAvailable, timeSlots]);
+  useEffect(() => {
+    if (selectedTimeSlotData) {
+      setSelection(0);
+      setSelectedDayData(selectedTimeSlotData["Monday"]);
+    }
+  }, [selectedTimeSlotData]);
   const openDropDown = async () => {
     await fakeSleep(100);
     dropdownRef.current.open();
@@ -104,11 +108,6 @@ export default function Freeslots({ navigation }) {
                         backgroundColor: selection === index ? "#000" : "#fff",
                       },
                     ]}
-                    ref={(ref) => {
-                      if (index === 0) {
-                        buttonRef.current = ref;
-                      }
-                    }}
                     onPress={() => {
                       setSelection(index);
                       setSelectedDayData(selectedTimeSlotData[day]);
@@ -191,7 +190,7 @@ export default function Freeslots({ navigation }) {
           <NoSelection message={"Press the button above to load FreeSlots"} />
         </View>
       )}
-      <LoadingPopup visible={loading} text={loadingText} />
+      <LoadingPopup visible={loading} text={"Loading..."} />
       <View
         style={{
           alignSelf: "flex-end",
