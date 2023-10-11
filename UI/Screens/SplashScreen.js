@@ -8,6 +8,7 @@ import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
 import { fakeSleep } from "../Functions/UIHelpers";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import { useIsFocused } from "@react-navigation/native";
+import { updateApp } from "../../BackEnd/OTAUpdates";
 
 export default function SplashScreen({ navigation }) {
   const focused = useIsFocused();
@@ -27,6 +28,7 @@ export default function SplashScreen({ navigation }) {
   const onAnimationFinish = async () => {
     setInitialAnimationDone(true);
     try {
+      await updateApp(setLoadingText);
       setLoadingText("Loading...");
       await fakeSleep(100);
       await initializeAllDatabasesAndTables();
@@ -47,6 +49,7 @@ export default function SplashScreen({ navigation }) {
         navigation.navigate("Error", { message: response });
         return;
       }
+      await fakeSleep(1000);
       setLoadingText("Setting up the environment...");
       await fakeSleep(100);
       await fetchDataFromSQLite(StateDispatcher, "all");

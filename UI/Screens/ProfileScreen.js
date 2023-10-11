@@ -4,19 +4,17 @@ import {
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
-  StatusBar,
   Linking,
   ToastAndroid,
   BackHandler,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Block, Text, theme, Button as GaButton } from "galio-framework";
 import nowTheme from "../Constants/Theme";
-import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-
-export const StatusHeight = StatusBar.currentHeight;
-
+import Theme from "../Constants/Theme";
 const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -43,172 +41,27 @@ const ProfileScreen = ({ navigation }) => {
         justifyContent: "space-between",
       }}
     >
-      <Block flex={0.4}>
-        <ImageBackground
-          source={require("../../assets/Images/me-bg.jpg")}
-          style={styles.profileContainer}
-          imageStyle={styles.profileBackground}
-        >
-          <Block flex>
-            <Block
-              style={{
-                position: "absolute",
-                width: width,
-                height: height * 0.6,
-                zIndex: 5,
-                paddingHorizontal: 20,
-              }}
-            >
-              <Block middle style={{ top: height * 0.15 }}>
-                <Image
-                  source={require("../../assets/Images/me.png")}
-                  style={styles.avatar}
-                />
-              </Block>
-              <Block style={{ top: height * 0.2 }}>
-                <Block middle>
-                  <Text
-                    style={{
-                      fontFamily: "montserrat-bold",
-                      marginBottom: theme.SIZES.BASE / 2,
-                      fontWeight: "900",
-                      fontSize: 26,
-                      letterSpacing: 2,
-                    }}
-                    color="#ffffff"
-                  >
-                    Najeeb Sayed
-                  </Text>
-                  <Text
-                    size={16}
-                    color="white"
-                    style={{
-                      marginTop: 5,
-                      fontFamily: "montserrat-bold",
-                      lineHeight: 20,
-                      fontWeight: "bold",
-                      fontSize: 18,
-                      opacity: 0.8,
-                    }}
-                  >
-                    Developer
-                  </Text>
-                </Block>
-              </Block>
-            </Block>
-
-            <Block
-              middle
-              row
-              style={{
-                position: "absolute",
-                width: width,
-                top: height * 0.6 - height * 0.2,
-                zIndex: 99,
-              }}
-            >
-              <GaButton
-                round
-                onlyIcon
-                shadowless
-                icon="github"
-                iconFamily="AntDesign"
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#4c5054"}
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL("https://github.com/NjbSyd");
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              />
-              <GaButton
-                round
-                onlyIcon
-                shadowless
-                icon="google-play"
-                iconFamily="Entypo"
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#4285f4"}
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL(
-                      "https://play.google.com/store/apps/dev?id=5430143247484849184"
-                    );
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              />
-              <GaButton
-                round
-                shadowless
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#25d366"}
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL(
-                      "https://api.whatsapp.com/send/?phone=923439555964&text=Hey!%20I%20want%20to%20ask%20about%20CUIATD%20Companion."
-                    );
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              >
-                <FontAwesome
-                  name={"whatsapp"}
-                  size={nowTheme.SIZES.BASE * 1.375}
-                  color={"#fff"}
-                />
-              </GaButton>
-              <GaButton
-                round
-                shadowless
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#ea4335"}
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL("mailto:tcanjb@gmail.com");
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              >
-                <MaterialCommunityIcons
-                  name={"gmail"}
-                  size={nowTheme.SIZES.BASE * 1.375}
-                  color={"#fff"}
-                />
-              </GaButton>
-            </Block>
-          </Block>
-        </ImageBackground>
-      </Block>
-      <Block />
       <Block
-        flex={0.7}
-        style={{ padding: theme.SIZES.BASE, marginTop: height * 0.15 }}
+        flex
+        style={{
+          padding: theme.SIZES.BASE,
+          marginTop: height * 0.05,
+          marginBottom: height * 0.005,
+        }}
       >
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Block flex style={{ marginTop: 20 }}>
+        <ScrollView showsVerticalScrollIndicator={true}>
+          <Block flex>
             <Block middle>
               <Text
                 style={{
                   color: "#2c2c2c",
-                  fontWeight: "bold",
-                  fontSize: 19,
-                  fontFamily: "montserrat-bold",
                   marginTop: 15,
                   zIndex: 2,
+                  fontFamily: "montserrat-bold",
+                  marginBottom: theme.SIZES.BASE / 2,
+                  fontWeight: "900",
+                  fontSize: 26,
+                  letterSpacing: 2,
                 }}
               >
                 About the App
@@ -222,7 +75,7 @@ const ProfileScreen = ({ navigation }) => {
                   zIndex: 2,
                   lineHeight: 25,
                   color: "#9A9A9A",
-                  paddingHorizontal: 15,
+                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
                 }}
               >
                 The CUIATD Companion App provides a simple and efficient way to
@@ -233,16 +86,26 @@ const ProfileScreen = ({ navigation }) => {
               </Text>
             </Block>
           </Block>
+          <View
+            style={{
+              marginTop: Theme.SIZES.BASE,
+              borderBottomColor: "#000",
+              borderBottomWidth: 0.5,
+            }}
+          />
           <Block flex>
             <Block middle>
               <Text
                 style={{
                   color: "#2c2c2c",
-                  fontWeight: "bold",
-                  fontSize: 19,
-                  fontFamily: "montserrat-bold",
                   marginTop: 15,
                   zIndex: 2,
+                  fontFamily: "montserrat-bold",
+                  marginBottom: theme.SIZES.BASE / 2,
+                  fontWeight: "900",
+                  fontSize: 26,
+                  letterSpacing: 2,
+                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
                 }}
               >
                 Privacy Policy
@@ -267,16 +130,25 @@ const ProfileScreen = ({ navigation }) => {
               </Text>
             </Block>
           </Block>
+          <View
+            style={{
+              marginTop: Theme.SIZES.BASE,
+              borderBottomColor: "#000",
+              borderBottomWidth: 0.5,
+            }}
+          />
           <Block flex>
             <Block middle>
               <Text
                 style={{
                   color: "#2c2c2c",
-                  fontWeight: "bold",
-                  fontSize: 19,
-                  fontFamily: "montserrat-bold",
                   marginTop: 15,
                   zIndex: 2,
+                  fontFamily: "montserrat-bold",
+                  marginBottom: theme.SIZES.BASE / 2,
+                  fontWeight: "900",
+                  fontSize: 26,
+                  letterSpacing: 2,
                 }}
               >
                 Data Source
@@ -290,7 +162,7 @@ const ProfileScreen = ({ navigation }) => {
                   zIndex: 2,
                   lineHeight: 25,
                   color: "#9A9A9A",
-                  paddingHorizontal: 15,
+                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
                 }}
               >
                 The data used in this app is sourced from the official CUI
@@ -302,8 +174,163 @@ const ProfileScreen = ({ navigation }) => {
               </Text>
             </Block>
           </Block>
+          <View
+            style={{
+              marginTop: Theme.SIZES.BASE,
+              borderBottomColor: "#000",
+              borderBottomWidth: 0.5,
+            }}
+          />
+          <Block
+            flex
+            style={{
+              marginTop: theme.SIZES.BASE / 2,
+            }}
+          >
+            <Block middle>
+              <Text
+                style={{
+                  fontFamily: "montserrat-bold",
+                  marginBottom: theme.SIZES.BASE / 2,
+                  fontWeight: "900",
+                  fontSize: 26,
+                  letterSpacing: 2,
+                }}
+                color="#000"
+              >
+                Contributors
+              </Text>
+            </Block>
+            <Block
+              row={true}
+              style={{ justifyContent: "center", marginBottom: 5 }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  try {
+                    Linking.openURL("https://github.com/NjbSyd");
+                  } catch (e) {
+                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                  }
+                }}
+              >
+                <Image
+                  source={{
+                    uri: "https://avatars.githubusercontent.com/u/95611072?v=4",
+                  }}
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  try {
+                    Linking.openURL("https://github.com/Nawaz393");
+                  } catch (e) {
+                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                  }
+                }}
+              >
+                <Image
+                  source={{
+                    uri: "https://avatars.githubusercontent.com/u/91367891?v=4",
+                  }}
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
+            </Block>
+          </Block>
+          <Block
+            flex
+            style={{
+              marginTop: theme.SIZES.BASE / 2,
+            }}
+          >
+            <Block middle>
+              <Text
+                style={{
+                  fontFamily: "montserrat-bold",
+                  fontWeight: "900",
+                  fontSize: 20,
+                  letterSpacing: 2,
+                }}
+                color="#000"
+              >
+                Get In Touch
+              </Text>
+            </Block>
+            <Block
+              row={true}
+              style={{
+                justifyContent: "center",
+                marginBottom: 5,
+              }}
+            >
+              <GaButton
+                round
+                onlyIcon
+                shadowless
+                icon="linkedin"
+                iconFamily="Entypo"
+                iconColor={nowTheme.COLORS.WHITE}
+                iconSize={nowTheme.SIZES.BASE * 1.375}
+                color={"#00a7ff"}
+                style={[styles.social, styles.shadow]}
+                onPress={() => {
+                  try {
+                    Linking.openURL(
+                      "https://play.google.com/store/apps/dev?id=5430143247484849184"
+                    );
+                  } catch (e) {
+                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                  }
+                }}
+              />
+              <GaButton
+                round
+                shadowless
+                iconColor={nowTheme.COLORS.WHITE}
+                iconSize={nowTheme.SIZES.BASE * 1.375}
+                color={"#ea4335"}
+                style={[styles.social, styles.shadow]}
+                onPress={() => {
+                  try {
+                    Linking.openURL("mailto:tcanjb@gmail.com");
+                  } catch (e) {
+                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                  }
+                }}
+              >
+                <MaterialCommunityIcons
+                  name={"gmail"}
+                  size={nowTheme.SIZES.BASE * 1.375}
+                  color={"#fff"}
+                />
+              </GaButton>
+              <GaButton
+                round
+                onlyIcon
+                shadowless
+                icon="google-play"
+                iconFamily="Entypo"
+                iconColor={nowTheme.COLORS.WHITE}
+                iconSize={nowTheme.SIZES.BASE * 1.375}
+                color={"#4285f4"}
+                style={[styles.social, styles.shadow]}
+                onPress={() => {
+                  try {
+                    Linking.openURL(
+                      "https://play.google.com/store/apps/dev?id=5430143247484849184"
+                    );
+                  } catch (e) {
+                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                  }
+                }}
+              />
+            </Block>
+          </Block>
         </ScrollView>
       </Block>
+
       <GaButton
         round
         onlyIcon
@@ -345,15 +372,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     height: height * 0.8,
   },
-  avatarContainer: {
-    position: "relative",
-    marginTop: -80,
-  },
   avatar: {
-    width: thumbMeasure,
-    height: thumbMeasure,
+    width: thumbMeasure * 0.6,
+    height: thumbMeasure * 0.6,
     borderRadius: 50,
-    borderWidth: 0,
+    borderWidth: 1.5,
+    borderColor: "#000",
+    marginHorizontal: 10,
   },
   nameInfo: {
     marginTop: 35,
