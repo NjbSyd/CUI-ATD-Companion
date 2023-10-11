@@ -28,7 +28,7 @@ export default function SplashScreen({ navigation }) {
   const onAnimationFinish = async () => {
     setInitialAnimationDone(true);
     try {
-      await updateApp(setLoadingText);
+      updateApp();
       setLoadingText("Loading...");
       await fakeSleep(100);
       await initializeAllDatabasesAndTables();

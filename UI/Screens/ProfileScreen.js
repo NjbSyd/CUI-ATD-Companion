@@ -278,7 +278,7 @@ const ProfileScreen = ({ navigation }) => {
                 onPress={() => {
                   try {
                     Linking.openURL(
-                      "https://play.google.com/store/apps/dev?id=5430143247484849184"
+                      "https://www.linkedin.com/in/najeeb-said-170477234/"
                     );
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
