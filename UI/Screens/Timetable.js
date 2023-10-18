@@ -17,6 +17,7 @@ import BannerAds from "../../Ads/BannerAd";
 import { fakeSleep } from "../Functions/UIHelpers";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -31,7 +32,16 @@ export default function Timetable() {
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-
+  useEffect(() => {
+    AsyncStorage.getItem("className")
+      .then((item) => {
+        if (item) {
+          let itemJSON = JSON.parse(item);
+          handleOnClassChange(itemJSON, true).then((r) => null);
+        }
+      })
+      .catch((r) => {});
+  }, []);
   useEffect(() => {
     setSelection(0);
     filterDayData("Monday");
@@ -41,12 +51,17 @@ export default function Timetable() {
     dropdownRef.current.open();
   };
 
-  async function handleOnClassChange(item) {
+  async function handleOnClassChange(item, selfCall = false) {
     try {
       setSelectedClassname(item);
       setIsClassNameSelected(true);
       const result = await GetTimetableByClassName(item.value);
       setSelectedClassData(result);
+      if (!selfCall) {
+        AsyncStorage.setItem("className", JSON.stringify(item)).then(() => {
+          console.log(item, " is saved.");
+        });
+      }
     } catch (e) {
       console.error(e);
     }
