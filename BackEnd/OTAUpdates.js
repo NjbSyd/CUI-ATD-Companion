@@ -1,5 +1,6 @@
 import * as Updates from "expo-updates";
 import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function updateApp() {
   try {
@@ -9,7 +10,8 @@ export function updateApp() {
           setTimeout(() => {
             Updates.reloadAsync().then((r) => console.log(r));
           }, 3000);
-          Alert.alert("Update", "App is updated. Restarting in 3 seconds.");
+          AsyncStorage.removeItem("lastSyncDate").then(() => null);
+          alert("Update \nApp is updated. Restarting in 3 seconds.");
         });
       }
     });
