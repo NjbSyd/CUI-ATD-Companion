@@ -6,9 +6,7 @@ export function updateApp() {
     Updates.checkForUpdateAsync().then((update) => {
       if (update.isAvailable) {
         Updates.fetchUpdateAsync().then(() => {
-          alert(
-            "Update \nApp is updated. Please restart the app to see changes"
-          );
+          alert("App is updated\nPlease restart the app to see changes");
         });
       }
     });
