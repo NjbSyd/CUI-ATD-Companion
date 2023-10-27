@@ -4,7 +4,6 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
@@ -143,11 +142,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   slotSearch: {
-    backgroundColor: "#000",
+    backgroundColor: "#9e63ff",
     color: "#fff",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    cursorColor: "#fff",
   },
   slotSelectorPlaceholder: {
     marginVertical: 10,
