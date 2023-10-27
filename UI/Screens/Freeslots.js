@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useRef, useState } from "react";
@@ -176,12 +177,15 @@ export default function Freeslots({ navigation }) {
                 await fetchDataFromSQLite(StateDispatcher, ["timeSlots"]);
                 setLoading(false);
               } catch (e) {
-                navigation.replace("Error", {
-                  message: {
-                    title: "Something Went Wrong!",
-                    message: e.message,
+                // navigation.replace("Error", {message: {title: "Something Went Wrong!", message: e.message,},});
+                Alert.alert("Something Went Wrong!", e.message, [
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      navigation.goBack();
+                    },
                   },
-                });
+                ]);
               }
             }}
           >
