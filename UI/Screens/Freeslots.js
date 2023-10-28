@@ -62,7 +62,8 @@ export default function Freeslots({ navigation }) {
             <Dropdown
               ref={dropdownRef}
               style={styles.selectorView}
-              containerStyle={styles.selectorList}
+              containerStyle={styles.slotOptionsContainer}
+              itemContainerStyle={styles.itemContainerStyle}
               data={timeSlots}
               labelField="label"
               valueField="value"
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
   selectorView: {
     width: "90%",
     padding: 10,
-    height: "10%",
+    height: 60,
     alignSelf: "center",
     marginVertical: 20,
     borderWidth: 0.3,
@@ -287,5 +288,22 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 10,
+  },
+  slotOptionsContainer: {
+    borderColor: "#000",
+    borderWidth: 0.3,
+    borderRadius: 5,
+    maxHeight: "90%",
+  },
+  slotSearch: {
+    color: "#000",
+    letterSpacing: 1,
+    borderRadius: 5,
+    height: 60,
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
 });

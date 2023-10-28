@@ -102,6 +102,7 @@ export function Classroom() {
             ref={dropdownRef}
             style={styles.selectorView}
             containerStyle={styles.selectorList}
+            itemContainerStyle={styles.itemContainerStyle}
             data={timeslots}
             labelField="label"
             valueField="value"
@@ -122,6 +123,7 @@ export function Classroom() {
             style={styles.selectorView}
             containerStyle={styles.selectorList}
             inputSearchStyle={styles.slotSearch}
+            itemContainerStyle={styles.itemContainerStyle}
             keyboardAvoiding={true}
             data={rooms}
             mode={"modal"}
@@ -211,11 +213,11 @@ const styles = StyleSheet.create({
     width: "95%",
   },
   slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    backgroundColor: "#eae7e7",
   },
   slotSelectorPlaceholder: {
     marginVertical: 10,
@@ -234,5 +236,9 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 10,
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
 });

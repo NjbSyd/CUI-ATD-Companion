@@ -13,8 +13,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 import { fetchDataFromSQLite } from "./FrontEndDataHandler";
 
-const Timetable_API_URL = "https://www.server.m-nawa-z-khan.rocks/timetable";
-const FreeSlots_API_URL = "https://www.server.m-nawa-z-khan.rocks/freeslots";
+// const Timetable_API_URL = "http://192.168.43.126:3000/timetable";
+// const Timetable_API_URL = "https://www.server.m-nawa-z-khan.rocks/timetable";
+// const FreeSlots_API_URL = "http://192.168.43.126:3000/freeslots";
+// const FreeSlots_API_URL = "https://www.server.m-nawa-z-khan.rocks/freeslots";
+const Timetable_API_URL =
+  "http://cui.eastasia.cloudapp.azure.com:3000/timetable";
+const FreeSlots_API_URL =
+  "http://cui.eastasia.cloudapp.azure.com:3000/freeslots";
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -27,7 +33,7 @@ async function shouldUpdateDataFromServer() {
         return false;
       }
       const { data } = await axios.post(
-        `${Timetable_API_URL}/shouldUpdate`,
+        encodeURI(`${Timetable_API_URL}/shouldUpdate`),
         {
           lastSyncDate,
         },

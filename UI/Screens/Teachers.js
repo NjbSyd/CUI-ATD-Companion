@@ -76,6 +76,7 @@ export function Teachers() {
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}
+          itemContainerStyle={styles.itemContainerStyle}
           keyboardAvoiding={true}
           data={teachersNames}
           labelField="label"
@@ -140,14 +141,19 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
+    marginTop: -60,
+    maxHeight: "90%",
   },
   slotSearch: {
-    backgroundColor: "#9e63ff",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
-    cursorColor: "#fff",
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
   slotSelectorPlaceholder: {
     marginVertical: 10,

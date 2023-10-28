@@ -157,6 +157,7 @@ export default function Timetable() {
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}
+          itemContainerStyle={styles.itemContainerStyle}
           keyboardAvoiding={true}
           data={classNames}
           labelField="label"
@@ -257,13 +258,19 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
+    marginTop: -60,
+    maxHeight: "90%",
   },
   slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
   requestText: {
     textAlign: "center",
