@@ -83,7 +83,7 @@ const handleBackPress = () => {
 };
 
 async function CheckImageExists(regNo) {
-  const imageUri = `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`;
+  const imageUri = `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`;
   const imageInfo = await FileSystem.getInfoAsync(imageUri);
   return imageInfo.exists;
 }
@@ -92,7 +92,7 @@ async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
     imageUrl,
-    `${FileSystem.cacheDirectory}/${regNo.toUpperCase()}.jpg`
+    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`
   );
   await updateImagePath(regNo, imagePath.uri);
 }
@@ -107,18 +107,21 @@ function useCustomFonts() {
 }
 
 function CalculateTotalFreeSlots(daySchedule, timeslot) {
-  let totalFreeSlots = 0;
-
-  for (const labSlots of Object.values(daySchedule)) {
-    for (const slot of labSlots) {
-      if (slot === timeslot) {
-        totalFreeSlots++;
-        break;
+  try {
+    let totalFreeSlots = 0;
+    for (const labSlots of Object.values(daySchedule)) {
+      for (const slot of labSlots) {
+        if (slot === timeslot) {
+          totalFreeSlots++;
+          break;
+        }
       }
     }
-  }
 
-  return totalFreeSlots;
+    return totalFreeSlots;
+  } catch (e) {
+    return 0;
+  }
 }
 
 function RemoveLabData(jsonData) {
@@ -159,6 +162,13 @@ function FilterFreeSlotsByTimeSlot(classSchedule, timeSlot) {
   return filteredSchedule;
 }
 
+async function fakeSleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(`Slept for ${ms} milliseconds ⏰`);
+    }, ms);
+  });
+}
 export {
   LoginScript,
   handleBackPress,
@@ -170,4 +180,5 @@ export {
   CalculateTotalFreeSlots,
   RemoveLabData,
   FilterFreeSlotsByTimeSlot,
+  fakeSleep,
 };

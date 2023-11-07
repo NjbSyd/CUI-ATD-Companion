@@ -53,7 +53,7 @@ const useInterstitialAd = () => {
   const retryLoading = () => {
     const timer = setTimeout(() => {
       loadNewInterstitialAd();
-    }, 5000);
+    }, 7000);
     setRetryTimer(timer);
   };
 
@@ -62,7 +62,7 @@ const useInterstitialAd = () => {
       if (!loadedAd) {
         loadNewInterstitialAd();
       }
-    }, 20000);
+    }, 60000);
     setRetryTimer(timer);
   };
 

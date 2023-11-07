@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import NoResults from "./NoResults";
 
 function renderClassroomBasedItem(item) {
   const { _id, class_name, day, subject, teacher, class_room, time_slot } =
@@ -66,6 +67,9 @@ function renderFreeSlotBasedItem(item) {
 }
 
 export function List({ data, type }) {
+  if (!data || data.length <= 0) {
+    return <NoResults />;
+  }
   const renderItemMap = {
     Classroom: renderClassroomBasedItem,
     Teacher: renderTeacherBasedItem,
