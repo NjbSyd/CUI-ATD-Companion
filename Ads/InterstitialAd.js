@@ -62,7 +62,7 @@ const useInterstitialAd = () => {
       if (!loadedAd) {
         loadNewInterstitialAd();
       }
-    }, 40000);
+    }, 60000);
     setRetryTimer(timer);
   };
 

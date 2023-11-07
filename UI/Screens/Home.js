@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   BackHandler,
   Dimensions,
@@ -10,28 +10,14 @@ import { useFocusEffect } from "@react-navigation/native";
 import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
-import { useDispatch } from "react-redux";
-import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
-import { ThreeDotMenu } from "../Components/ThreeDotMenu";
 
 const Main = ({ navigation }) => {
   const { loadedAd, displayAd } = useInterstitialAd();
 
-  const StateDispatcher = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading ...");
-
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => <></>,
-      headerRight: () => (
-        <ThreeDotMenu
-          StateDispatcher={StateDispatcher}
-          SetLoadingText={setLoadingText}
-          SetLoading={setLoading}
-        />
-      ),
     });
   }, []);
 
@@ -122,7 +108,6 @@ const Main = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-      <LoadingPopup visible={loading} text={loadingText} />
       <BannerAds />
     </View>
   );

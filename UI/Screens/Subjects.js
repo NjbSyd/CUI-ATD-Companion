@@ -1,24 +1,28 @@
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 import React, { useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
 
 export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
   const dropdownRef = useRef(null);
+  const Dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
 
   const openDropDown = () => {
     setTimeout(() => {
@@ -26,7 +30,31 @@ export function Subjects() {
     }, 100);
   };
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={selectedSubjectData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          colors={["#fff"]}
+          progressViewOffset={10}
+          onRefresh={() => {
+            fetchDataFromSQLite(Dispatch, ["subjects"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Subjects.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {selectedSubject !== null ? (
         <TouchableOpacity
           style={styles.slotSelectorPlaceholder}
@@ -47,6 +75,7 @@ export function Subjects() {
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}
+          itemContainerStyle={styles.itemContainerStyle}
           keyboardAvoiding={true}
           data={subjectNames}
           labelField="label"
@@ -66,13 +95,17 @@ export function Subjects() {
       )}
       <ScrollView style={styles.scrollView}>
         {selectedSubjectData.length === 0 ? (
-          <NoResults />
+          selectedSubject !== null ? (
+            <NoResults />
+          ) : (
+            <NoSelection message={"Select a Subject"} />
+          )
         ) : (
           <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -107,13 +140,19 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
+    marginTop: -60,
+    maxHeight: "90%",
   },
   slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
   slotSelectorPlaceholder: {
     marginVertical: 10,

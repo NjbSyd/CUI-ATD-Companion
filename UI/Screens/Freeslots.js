@@ -4,9 +4,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CalculateTotalFreeSlots,
   fakeSleep,
@@ -19,6 +20,8 @@ import { Dropdown } from "react-native-element-dropdown";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
+import NoSelection from "../Components/NoSelection";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -30,25 +33,21 @@ export default function Freeslots({ navigation }) {
   const timeSlots = useSelector((state) => state.TimeslotSlice.timeSlot);
   const freeslots = useSelector((state) => state.FreeslotsSlice.freeslots);
   const [loading, setLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading ...");
   const [selection, setSelection] = useState(-1);
   const [selectedTimeSlotData, setSelectedTimeSlotData] = useState(null);
   const [selectedDayData, setSelectedDayData] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const dropdownRef = useRef(null);
-  let buttonRef = useRef(null);
-
+  useEffect(() => {}, [freeslots, freeslotsAvailable, timeSlots]);
+  useEffect(() => {
+    if (selectedTimeSlotData) {
+      setSelection(0);
+      setSelectedDayData(selectedTimeSlotData["Monday"]);
+    }
+  }, [selectedTimeSlotData]);
   const openDropDown = async () => {
     await fakeSleep(100);
     dropdownRef.current.open();
-  };
-
-  const clickOnMonday = async () => {
-    await fakeSleep(200);
-    if (buttonRef) {
-      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
-      setSelectedDayData(selectedTimeSlotData[0]);
-    }
   };
 
   return (
@@ -63,7 +62,8 @@ export default function Freeslots({ navigation }) {
             <Dropdown
               ref={dropdownRef}
               style={styles.selectorView}
-              containerStyle={styles.selectorList}
+              containerStyle={styles.slotOptionsContainer}
+              itemContainerStyle={styles.itemContainerStyle}
               data={timeSlots}
               labelField="label"
               valueField="value"
@@ -74,9 +74,6 @@ export default function Freeslots({ navigation }) {
                   item.value
                 );
                 setSelectedTimeSlotData(timeslotData);
-                clickOnMonday()
-                  .then(() => {})
-                  .catch(() => {});
               }}
               value={selectedTimeSlot}
               autoScroll={false}
@@ -113,11 +110,6 @@ export default function Freeslots({ navigation }) {
                         backgroundColor: selection === index ? "#000" : "#fff",
                       },
                     ]}
-                    ref={(ref) => {
-                      if (index === 0) {
-                        buttonRef.current = ref;
-                      }
-                    }}
                     onPress={() => {
                       setSelection(index);
                       setSelectedDayData(selectedTimeSlotData[day]);
@@ -151,7 +143,7 @@ export default function Freeslots({ navigation }) {
               </View>
             </View>
           )}
-          {selection !== -1 && (
+          {selection !== -1 ? (
             <ScrollView
               style={{
                 marginBottom: "10%",
@@ -165,6 +157,10 @@ export default function Freeslots({ navigation }) {
                 <List data={selectedDayData} type="FreeSlot" />
               )}
             </ScrollView>
+          ) : (
+            <NoSelection
+              message={!selectedTimeSlot ? "Pick a TimeSlot" : "Select a Day"}
+            />
           )}
         </View>
       ) : (
@@ -179,23 +175,27 @@ export default function Freeslots({ navigation }) {
               try {
                 setLoading(true);
                 await fetchAndStoreFreeslotsData(StateDispatcher);
+                await fetchDataFromSQLite(StateDispatcher, ["timeSlots"]);
                 setLoading(false);
               } catch (e) {
-                navigation.replace("Error", {
-                  message: {
-                    title: "Something Went Wrong!",
-                    message: e.message,
+                // navigation.replace("Error", {message: {title: "Something Went Wrong!", message: e.message,},});
+                Alert.alert("Something Went Wrong!", e.message, [
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      navigation.goBack();
+                    },
                   },
-                });
+                ]);
               }
             }}
           >
             <Text style={styles.buttonText}>Load Freeslots</Text>
           </TouchableOpacity>
-          <NoResults />
+          <NoSelection message={"Press the button above to load FreeSlots"} />
         </View>
       )}
-      <LoadingPopup visible={loading} text={loadingText} />
+      <LoadingPopup visible={loading} text={"Loading..."} />
       <View
         style={{
           alignSelf: "flex-end",
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   selectorView: {
     width: "90%",
     padding: 10,
-    height: "10%",
+    height: 60,
     alignSelf: "center",
     marginVertical: 20,
     borderWidth: 0.3,
@@ -288,5 +288,22 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 10,
+  },
+  slotOptionsContainer: {
+    borderColor: "#000",
+    borderWidth: 0.3,
+    borderRadius: 5,
+    maxHeight: "90%",
+  },
+  slotSearch: {
+    color: "#000",
+    letterSpacing: 1,
+    borderRadius: 5,
+    height: 60,
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
 });

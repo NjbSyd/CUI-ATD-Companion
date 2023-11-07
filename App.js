@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { MyStore } from "./Redux/Store";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ErrorScreen from "./UI/Screens/ErrorScreen";
+import ProfileScreen from "./UI/Screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 

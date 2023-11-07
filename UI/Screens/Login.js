@@ -97,7 +97,7 @@ const LoginScreen = ({ navigation }) => {
     if (editSavedUsers) {
       DeleteUserCredentialsFromDB(user.label)
         .then(() => {
-          UpdateUserCredentialsState(StateDispatcher)
+          updateUserCredentialsState(StateDispatcher)
             .then(() => {})
             .catch((error) => {
               console.error("Error occurred:", error);

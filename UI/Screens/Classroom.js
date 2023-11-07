@@ -1,25 +1,22 @@
 import { Dropdown } from "react-native-element-dropdown";
 import {
-  Alert,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import MagnifierButton from "../Components/SearchButton";
 import { useEffect, useRef, useState } from "react";
 import { List } from "../Components/List";
-import Loading from "../Components/Loading";
-import {
-  GetClassRooms,
-  GetTimeslotBasedClassRoomTimetable,
-  GetTimeSlots,
-} from "../../BackEnd/SQLiteSearchFunctions";
+import LoadingPopup from "../Components/Loading";
+import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
 
 export function Classroom() {
   const rooms = useSelector((state) => state.ClassRoomSlice.classRoom);
@@ -28,21 +25,25 @@ export function Classroom() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef(null);
-
+  const StateDispatcher = useDispatch();
+  useEffect(() => {}, [rooms, timeslots, resultingData]);
+  useEffect(() => {
+    trySearch();
+  }, [selectedRoom, selectedTimeSlot]);
   const openDropDown = () => {
     setTimeout(() => {
       dropdownRef.current.open();
     }, 100);
   };
-
-  function searchButtonOnPress() {
-    setIsSearching(true);
+  function trySearch() {
     if (selectedTimeSlot === null || selectedRoom === null) {
       setIsSearching(false);
-      Alert.alert("Invalid Input", "Please select a room and a time slot");
       return;
     }
+    setIsSearching(true);
+    setResultingData([]);
     GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
       .then((res) => {
         setResultingData(res);
@@ -56,14 +57,37 @@ export function Classroom() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={resultingData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          colors={["#fff"]}
+          progressViewOffset={10}
+          onRefresh={() => {
+            fetchDataFromSQLite(StateDispatcher, ["classRooms", "timeSlots"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Classroom.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {resultingData.length > 0 ? (
         <TouchableOpacity
           style={styles.slotSelectorPlaceholder}
           onPress={() => {
-            setSelectedTimeSlot(null);
-            setSelectedRoom(null);
             setResultingData([]);
+            setSelectedTimeSlot(null);
             openDropDown();
           }}
         >
@@ -78,11 +102,16 @@ export function Classroom() {
             ref={dropdownRef}
             style={styles.selectorView}
             containerStyle={styles.selectorList}
+            itemContainerStyle={styles.itemContainerStyle}
             data={timeslots}
             labelField="label"
             valueField="value"
             onChange={(item) => {
+              const previoslySelectedTimeSlot = selectedTimeSlot;
               setSelectedTimeSlot(item.value);
+              if (item.value === previoslySelectedTimeSlot) {
+                trySearch();
+              }
             }}
             value={selectedTimeSlot}
             mode={"modal"}
@@ -94,13 +123,18 @@ export function Classroom() {
             style={styles.selectorView}
             containerStyle={styles.selectorList}
             inputSearchStyle={styles.slotSearch}
+            itemContainerStyle={styles.itemContainerStyle}
             keyboardAvoiding={true}
             data={rooms}
             mode={"modal"}
             labelField="label"
             valueField="value"
             onChange={(item) => {
+              const previoslySelectedRoom = selectedRoom;
               setSelectedRoom(item.value);
+              if (item.value === previoslySelectedRoom) {
+                trySearch();
+              }
             }}
             value={selectedRoom}
             search={true}
@@ -108,19 +142,30 @@ export function Classroom() {
             placeholder={"Room#..."}
             searchPlaceholder={"Enter a room number to search"}
           />
-          <MagnifierButton onPress={searchButtonOnPress} />
         </View>
       )}
       <ScrollView style={styles.scrollView}>
         {resultingData.length === 0 ? (
-          <NoResults />
+          selectedRoom !== null && selectedTimeSlot !== null && !isSearching ? (
+            <NoResults
+              message={`No Classes Found in Room: ${selectedRoom} at Time: ${selectedTimeSlot} `}
+            />
+          ) : (
+            !isSearching && (
+              <NoSelection
+                message={`Choose a ${selectedRoom === null ? "Room No" : ""}${
+                  !selectedRoom && !selectedTimeSlot ? " & " : ""
+                }${selectedTimeSlot === null ? "TimeSlot" : ""}`}
+              />
+            )
+          )
         ) : (
           <List data={resultingData} type={"Classroom"} />
         )}
       </ScrollView>
-      {isSearching && <Loading />}
+      <LoadingPopup text={"Searching..."} visible={isSearching} />
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -168,11 +213,11 @@ const styles = StyleSheet.create({
     width: "95%",
   },
   slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    backgroundColor: "#eae7e7",
   },
   slotSelectorPlaceholder: {
     marginVertical: 10,
@@ -191,5 +236,9 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 10,
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
 });
