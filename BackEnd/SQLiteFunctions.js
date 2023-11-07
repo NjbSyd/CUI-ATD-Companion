@@ -23,115 +23,62 @@ const createTimetableDataTable = async () => {
   });
 };
 
-const insertOrUpdateTimetableData = async (inputData) => {
+const insertOrUpdateTimetableDataInBatch = async (inputDataArray) => {
   try {
-    TimetableDB.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM timetables WHERE _id = ? LIMIT 1`,
-        [inputData._id],
-        (_, resultSet) => {
-          const rows = resultSet.rows._array;
-          if (rows.length === 0) {
-            tx.executeSql(
-              `INSERT INTO timetables (_id, class_name, class_room, day, subject, teacher, time_slot) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-              [
-                inputData._id,
-                inputData.class_name,
-                inputData.class_room,
-                inputData.day,
-                inputData.subject,
-                inputData.teacher,
-                inputData.time_slot,
-              ],
-              () => null,
-              (error) => {
-                console.error("Error occurred during insert:", error);
-                throw error;
+    await new Promise((resolve, reject) => {
+      TimetableDB.transaction((tx) => {
+        inputDataArray.forEach((inputData) => {
+          tx.executeSql(
+            `SELECT * FROM timetables WHERE _id = ? LIMIT 1`,
+            [inputData._id],
+            (_, resultSet) => {
+              const rows = resultSet.rows._array;
+              if (rows.length === 0) {
+                tx.executeSql(
+                  `INSERT INTO timetables (_id, class_name, class_room, day, subject, teacher, time_slot) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                  [
+                    inputData._id,
+                    inputData.class_name,
+                    inputData.class_room,
+                    inputData.day,
+                    inputData.subject,
+                    inputData.teacher,
+                    inputData.time_slot,
+                  ],
+                  () => null,
+                  (error) => {
+                    console.error("Error occurred during insert:", error);
+                    reject(error);
+                  }
+                );
+              } else {
+                tx.executeSql(
+                  `UPDATE timetables SET class_name = ?, class_room = ?, day = ?, subject = ?, teacher = ?, time_slot = ? WHERE _id = ?`,
+                  [
+                    inputData.class_name,
+                    inputData.class_room,
+                    inputData.day,
+                    inputData.subject,
+                    inputData.teacher,
+                    inputData.time_slot,
+                    inputData._id,
+                  ],
+                  () => null,
+                  (error) => {
+                    console.error("Error occurred during update:", error);
+                    reject(error);
+                  }
+                );
               }
-            );
-          } else {
-            tx.executeSql(
-              `UPDATE timetables SET class_name = ?, class_room = ?, day = ?, subject = ?, teacher = ?, time_slot = ? WHERE _id = ?`,
-              [
-                inputData.class_name,
-                inputData.class_room,
-                inputData.day,
-                inputData.subject,
-                inputData.teacher,
-                inputData.time_slot,
-                inputData._id,
-              ],
-              () => null,
-              (error) => {
-                console.error("Error occurred during update:", error);
-                throw error;
-              }
-            );
-          }
-        },
-        (error) => {
-          console.error("Error occurred during SELECT:", error);
-          throw error;
-        }
-      );
-    });
-  } catch (error) {
-    console.error("Error occurred:", error);
-  }
-};
-
-const createDataSyncDateTable = async () => {
-  TimetableDB.transaction((tx) => {
-    tx.executeSql(
-      `CREATE TABLE IF NOT EXISTS SyncDate (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        Date TEXT
-      );`,
-      [],
-      () => {},
-      (error) => {
-        console.error("Error creating SyncDate table:", error);
-      }
-    );
-  });
-};
-
-const insertOrUpdateDataSyncDate = async (inputDate) => {
-  await createDataSyncDateTable();
-  try {
-    TimetableDB.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM SyncDate WHERE id = 1 LIMIT 1`,
-        [],
-        (_, resultSet) => {
-          const rows = resultSet.rows._array;
-          if (rows.length === 0) {
-            tx.executeSql(
-              `INSERT INTO SyncDate (id, Date) VALUES (1, ?)`,
-              [inputDate],
-              () => null,
-              (error) => {
-                console.error("Error occurred during date insert:", error);
-                throw error;
-              }
-            );
-          } else {
-            tx.executeSql(
-              `UPDATE SyncDate SET Date = ? WHERE id = 1`,
-              [inputDate],
-              () => null,
-              (error) => {
-                console.error("Error occurred during date update:", error);
-                throw error;
-              }
-            );
-          }
-        },
-        (error) => {
-          console.error("Error occurred during SELECT:", error);
-          throw error;
-        }
-      );
+            },
+            (error) => {
+              console.error("Error occurred during SELECT:", error);
+              reject(error);
+            }
+          );
+        });
+        resolve();
+      }, reject);
     });
   } catch (error) {
     console.error("Error occurred:", error);
@@ -237,35 +184,16 @@ const clearTimetableTable = async () => {
   });
 };
 
-const clearDataSyncDateTable = async () => {
-  TimetableDB.transaction((tx) => {
-    tx.executeSql(
-      `DELETE FROM SyncDate;`,
-      [],
-      () => {
-        console.log("All data cleared from the timetables table.");
-      },
-      (error) => {
-        console.error("Error clearing data:", error);
-      }
-    );
-  });
-};
-
 async function initializeAllDatabasesAndTables() {
   await createTimetableDataTable();
-  await createDataSyncDateTable();
   await createUserCredentialsTable();
 }
 export {
   initializeAllDatabasesAndTables,
-  insertOrUpdateTimetableData,
   createTimetableDataTable,
   clearTimetableTable,
-  createDataSyncDateTable,
-  clearDataSyncDateTable,
-  insertOrUpdateDataSyncDate,
   insertOrUpdateUserCredentials,
   createUserCredentialsTable,
   updateImagePath,
+  insertOrUpdateTimetableDataInBatch,
 };

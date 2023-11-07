@@ -1,10 +1,10 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 
-const NoResults = ({ message }) => {
-  let imageSource = require("../../assets/Images/nodata.png");
+const NoSelection = ({ message }) => {
+  let imageSource = require("../../assets/Images/noselection.png");
   return (
     <View style={styles.view}>
-      <Text style={styles.txt}>{message || "No Results"}</Text>
+      <Text style={styles.txt}>{message || "Choose Something To View"}</Text>
       <Image source={imageSource} style={styles.img} />
     </View>
   );
@@ -32,4 +32,4 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
-export default NoResults;
+export default NoSelection;

@@ -12,26 +12,52 @@ import { setTeacherNames } from "../../Redux/TeacherSlice";
 import { setSubjectNames } from "../../Redux/SubjectSlice";
 import { setClassNames } from "../../Redux/SectionSlice";
 import { setRegistration } from "../../Redux/StudentCredentialsSlice";
-import { createUserCredentialsTable } from "../SQLiteFunctions";
 
-async function fetchDataFromSQLite(StateDispatcher) {
+async function fetchDataFromSQLite(StateDispatcher, type) {
   try {
-    const classRooms = await GetClassRooms();
-    StateDispatcher(setClassRoom(classRooms));
+    if (type === "all") {
+      await updateUserCredentialsState(StateDispatcher);
 
-    const timeSlots = await GetTimeSlots();
-    StateDispatcher(setTimeslot(timeSlots));
+      const timeSlots = await GetTimeSlots();
+      StateDispatcher(setTimeslot(timeSlots));
 
-    const teacherNames = await GetTeacherNames();
-    StateDispatcher(setTeacherNames(teacherNames));
+      const teacherNames = await GetTeacherNames();
+      StateDispatcher(setTeacherNames(teacherNames));
 
-    const subjectNames = await GetSubjectNames();
-    StateDispatcher(setSubjectNames(subjectNames));
+      const subjectNames = await GetSubjectNames();
+      StateDispatcher(setSubjectNames(subjectNames));
 
-    const sectionNames = await GetClassNames();
-    StateDispatcher(setClassNames(sectionNames));
+      const classRooms = await GetClassRooms();
+      StateDispatcher(setClassRoom(classRooms));
 
-    await updateUserCredentialsState(StateDispatcher);
+      const sectionNames = await GetClassNames();
+      StateDispatcher(setClassNames(sectionNames));
+    }
+    if (typeof type === "object") {
+      if (type.includes("timeSlots")) {
+        const timeSlots = await GetTimeSlots();
+        StateDispatcher(setTimeslot(timeSlots));
+      }
+      if (type.includes("teachers")) {
+        const teacherNames = await GetTeacherNames();
+        StateDispatcher(setTeacherNames(teacherNames));
+      }
+      if (type.includes("subjects")) {
+        const subjectNames = await GetSubjectNames();
+        StateDispatcher(setSubjectNames(subjectNames));
+      }
+      if (type.includes("classRooms")) {
+        const classRooms = await GetClassRooms();
+        StateDispatcher(setClassRoom(classRooms));
+      }
+      if (type.includes("sections")) {
+        const sectionNames = await GetClassNames();
+        StateDispatcher(setClassNames(sectionNames));
+      }
+      if (type.includes("registration")) {
+        await updateUserCredentialsState(StateDispatcher);
+      }
+    }
     return true;
   } catch (error) {
     console.error("Error fetching data from SQLite:", error);

@@ -1,5 +1,4 @@
 import * as SQLite from "expo-sqlite";
-
 const db = SQLite.openDatabase("TimeTable.db");
 
 async function executeSqlAsync(sqlStatement, params = []) {
@@ -22,10 +21,11 @@ async function GetDistinctValues(columnName, tableName, orderBy = "") {
       `SELECT DISTINCT ${columnName} FROM ${tableName} ${orderByClause}`
     );
 
-    return resultSet.rows._array.map((item) => ({
+    const results = resultSet.rows._array.map((item) => ({
       label: item[columnName],
       value: item[columnName],
     }));
+    return results;
   } catch (error) {
     console.error(
       `Error occurred during GetDistinctValues for ${columnName}:`,

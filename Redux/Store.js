@@ -1,4 +1,4 @@
-import {configureStore, combineReducers} from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import ClassRoomSlice from "./ClassRoomSlice";
 import TeacherSlice from "./TeacherSlice";
 import SubjectSlice from "./SubjectSlice";
@@ -16,6 +16,7 @@ const rootReducer = combineReducers({
   StudentCredentialsSlice,
   FreeslotsSlice,
 });
+
 export const MyStore = configureStore({
   reducer: rootReducer,
 });

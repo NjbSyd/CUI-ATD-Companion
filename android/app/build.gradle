@@ -118,8 +118,8 @@ android {
         applicationId 'com.njbsyd.cui.unofficial'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "6.0.0"
+        versionCode 9
+        versionName "8.0.0"
     }
 
     splits {

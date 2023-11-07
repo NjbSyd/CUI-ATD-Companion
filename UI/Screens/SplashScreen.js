@@ -1,44 +1,77 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useFonts } from "expo-font";
-import { onFetchUpdateAsync } from "../../BackEnd/Updates";
 import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
 import { fakeSleep } from "../Functions/UIHelpers";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { useIsFocused } from "@react-navigation/native";
+import { updateApp } from "../../BackEnd/OTAUpdates";
 
 export default function SplashScreen({ navigation }) {
+  const focused = useIsFocused();
+  useEffect(() => {
+    if (focused) {
+      setInitialAnimationDone(false);
+      animationRef.current?.play();
+    }
+  }, [focused]);
+  const animationRef = useRef(null);
   const [fontLoaded] = useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
-
+  const StateDispatcher = useDispatch();
   const onAnimationFinish = async () => {
     setInitialAnimationDone(true);
     try {
-      await onFetchUpdateAsync(setLoadingText);
+      updateApp();
       setLoadingText("Loading...");
-      await fakeSleep(2000);
+      await fakeSleep(100);
       await initializeAllDatabasesAndTables();
-      setLoadingText("initialized all tables...");
-      await fakeSleep(2000);
-      await updateDataFromServerIfNeeded(setLoadingText);
-      await fakeSleep(2000);
+      await fakeSleep(100);
+      const response = await updateDataFromServerIfNeeded(setLoadingText);
+      if (response === "Error") {
+        navigation.navigate("Error", {
+          message: {
+            title: "Server Connection Error",
+            message: "Please check your internet connection and try again.",
+          },
+        });
+        return;
+      } else if (
+        typeof response === "object" &&
+        response?.title.toUpperCase().includes("UPDATE")
+      ) {
+        navigation.navigate("Error", { message: response });
+        return;
+      }
+      await fakeSleep(1000);
+      setLoadingText("Setting up the environment...");
+      await fakeSleep(100);
+      await fetchDataFromSQLite(StateDispatcher, "all");
+      await fakeSleep(100);
       navigation.navigate("ApplicationEntry");
     } catch (error) {
-      setLoadingText(error);
+      navigation.navigate("Error", {
+        message: {
+          title: "Something Went Wrong!",
+          message: error.message,
+        },
+      });
     }
   };
   return (
     <View style={{ flex: 1 }}>
       <AnimatedLottieView
+        ref={animationRef}
         style={styles.splashContainer}
         source={require("../../assets/Images/SplashScreen.json")}
         resizeMode="center"
-        autoPlay
-        speed={1}
+        speed={1.5}
         loop={false}
         onAnimationFinish={onAnimationFinish}
         autoSize
@@ -55,7 +88,7 @@ export default function SplashScreen({ navigation }) {
           />
           <Image
             style={styles.image}
-            source={require("../../assets/Images/icon.jpg")}
+            source={require("../../assets/Images/icon.png")}
           />
           <View
             style={{ position: "absolute", bottom: "27%", alignSelf: "center" }}
@@ -66,6 +99,7 @@ export default function SplashScreen({ navigation }) {
                 color: "black",
                 marginVertical: 40,
                 alignSelf: "center",
+                textAlign: "center",
                 fontWeight: "100",
                 letterSpacing: 1,
                 fontFamily: fontLoaded ? "bricolage" : null,
@@ -74,11 +108,6 @@ export default function SplashScreen({ navigation }) {
               {loadingText}
             </Text>
           </View>
-          <Text style={styles.tipText}>
-            {
-              "*Tip*: If you experience data display issues\n\n Home ⨠ tap on three-dot at the top-right ⨠ Reload Data"
-            }
-          </Text>
         </>
       )}
     </View>

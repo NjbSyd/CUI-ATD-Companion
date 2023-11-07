@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   BackHandler,
   Dimensions,
@@ -10,58 +10,22 @@ import { useFocusEffect } from "@react-navigation/native";
 import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
-import { useDispatch } from "react-redux";
-import LoadingPopup from "../Components/Loading";
 import useInterstitialAd from "../../Ads/InterstitialAd";
-import { ThreeDotMenu } from "../Components/ThreeDotMenu";
-import { useIsFocused } from "@react-navigation/native";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const Main = ({ navigation }) => {
-  const isFocused = useIsFocused();
-  const [numberOfFocus, setNumberOfFocus] = useState(0);
   const { loadedAd, displayAd } = useInterstitialAd();
 
-  const StateDispatcher = useDispatch();
-  const [loading, setLoading] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading ...");
-
-  const reloadData = async () => {
-    setLoading(true);
-    try {
-      await fetchDataFromSQLite(StateDispatcher);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
   useEffect(() => {
-    if (isFocused) {
-      setNumberOfFocus((prevCount) => prevCount + 1);
-
-      if (numberOfFocus === 0) {
-        reloadData().then(() => {});
-        navigation.setOptions({
-          headerLeft: () => <></>,
-          headerRight: () => (
-            <ThreeDotMenu
-              StateDispatcher={StateDispatcher}
-              SetLoadingText={setLoadingText}
-              SetLoading={setLoading}
-            />
-          ),
-        });
-      } else {
-        if (loadedAd) {
-          displayAd();
-        }
-      }
-    }
-  }, [isFocused]);
+    navigation.setOptions({
+      headerLeft: () => <></>,
+    });
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
+      if (loadedAd) {
+        displayAd();
+      }
       const onBackPress = handleBackPress;
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
@@ -144,7 +108,6 @@ const Main = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-      <LoadingPopup visible={loading} text={loadingText} />
       <BannerAds />
     </View>
   );

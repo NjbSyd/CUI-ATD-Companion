@@ -4,15 +4,20 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  RefreshControl,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
+import { fakeSleep } from "../Functions/UIHelpers";
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import NoSelection from "../Components/NoSelection";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -25,39 +30,74 @@ export default function Timetable() {
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
   const dropdownRef = useRef(null);
-  const buttonRef = useRef(null);
-
-  const openDropDown = () => {
-    setTimeout(() => {
-      dropdownRef.current.open();
-    }, 100);
-  };
-
-  const clickOnMonday = () => {
-    if (buttonRef.current)
-      buttonRef.current._internalFiberInstanceHandleDEV.memoizedProps.onClick();
-  };
-
-  function handleOnClassChange(item) {
-    setSelectedClassname(item);
-    setIsClassNameSelected(true);
-    GetTimetableByClassName(item.value)
-      .then((res) => {
-        setSelectedClassData(res);
-        clickOnMonday();
+  const Dispatch = useDispatch();
+  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    AsyncStorage.getItem("className")
+      .then((item) => {
+        if (item) {
+          let itemJSON = JSON.parse(item);
+          handleOnClassChange(itemJSON, true).then((r) => null);
+        }
       })
-      .catch((err) => {
-        console.error(err);
-      });
+      .catch((r) => {});
+  }, []);
+  useEffect(() => {
+    setSelection(0);
+    filterDayData("Monday");
+  }, [selectedClassData]);
+  const openDropDown = async () => {
+    await fakeSleep(100);
+    dropdownRef.current.open();
+  };
+
+  async function handleOnClassChange(item, selfCall = false) {
+    try {
+      setSelectedClassname(item);
+      setIsClassNameSelected(true);
+      const result = await GetTimetableByClassName(item.value);
+      setSelectedClassData(result);
+      if (!selfCall) {
+        AsyncStorage.setItem("className", JSON.stringify(item)).then(() => {
+          console.log(item, " is saved.");
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  function filterDayData(day = daysOfWeek[selection]) {
+  function filterDayData(day = "Monday") {
     const dayData = selectedClassData.filter((item) => item.day === day);
     setSelectedClassDayData(dayData);
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      scrollEnabled={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          enabled={selectedClassData.length <= 0}
+          progressBackgroundColor={"#5a6e98"}
+          progressViewOffset={10}
+          colors={["#fff"]}
+          onRefresh={() => {
+            fetchDataFromSQLite(Dispatch, ["sections"])
+              .then(() => {
+                setRefreshing(false);
+              })
+              .catch((err) => {
+                console.log(
+                  "Classroom.js: Error fetching data from SQLite:",
+                  err
+                );
+              });
+          }}
+        />
+      }
+      contentContainerStyle={styles.container}
+    >
       {isClassNameSelected ? (
         <>
           <TouchableOpacity
@@ -68,7 +108,9 @@ export default function Timetable() {
               setSelectedClassData([]);
               setSelectedClassDayData([]);
               setSelection(-1);
-              openDropDown();
+              openDropDown()
+                .then(() => {})
+                .catch(() => {});
             }}
           >
             <Text style={styles.selectedClassText}>
@@ -81,11 +123,6 @@ export default function Timetable() {
             {daysOfWeek.map((day, index) => (
               <TouchableOpacity
                 key={day}
-                ref={(ref) => {
-                  if (index === 0) {
-                    buttonRef.current = ref;
-                  }
-                }}
                 style={[
                   styles.button,
                   { backgroundColor: selection === index ? "#000" : "#fff" },
@@ -120,6 +157,7 @@ export default function Timetable() {
           style={styles.slotSelector}
           inputSearchStyle={styles.slotSearch}
           containerStyle={styles.slotOptionsContainer}
+          itemContainerStyle={styles.itemContainerStyle}
           keyboardAvoiding={true}
           data={classNames}
           labelField="label"
@@ -138,20 +176,18 @@ export default function Timetable() {
       <ScrollView style={styles.scrollView}>
         {isClassNameSelected ? (
           selection <= -1 ? (
-            <Text style={styles.requestText}>
-              Select a day to view timetable
-            </Text>
+            <NoSelection message={"Select a day to view timetable"} />
           ) : selectedClassDayData.length > 0 ? (
             <List data={selectedClassDayData} type={"Classroom"} />
           ) : (
-            <NoResults />
+            <NoResults message={`No Classes On ${daysOfWeek[selection]}`} />
           )
         ) : (
-          <NoResults />
+          <NoSelection message={"Pick A Class"} />
         )}
       </ScrollView>
       <BannerAds />
-    </View>
+    </ScrollView>
   );
 }
 
@@ -201,12 +237,12 @@ const styles = StyleSheet.create({
     color: "#000",
     letterSpacing: 1,
     marginRight: 20,
+    flexWrap: "wrap",
   },
 
   scrollView: {
     maxWidth: "90%",
     margin: 20,
-    marginBottom: 80,
     maxHeight: "80%",
   },
   slotSelector: {
@@ -222,13 +258,19 @@ const styles = StyleSheet.create({
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
+    marginTop: -60,
+    maxHeight: "90%",
   },
   slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
+    color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
+    backgroundColor: "#eae7e7",
+  },
+  itemContainerStyle: {
+    borderColor: "#d7d4d4",
+    borderBottomWidth: 0.3,
   },
   requestText: {
     textAlign: "center",

@@ -1,63 +1,56 @@
 import NetInfo from "@react-native-community/netinfo";
 import {
   clearTimetableTable,
-  clearDataSyncDateTable,
-  createDataSyncDateTable,
-  insertOrUpdateDataSyncDate,
-  insertOrUpdateTimetableData,
-  createTimetableDataTable,
+  insertOrUpdateTimetableDataInBatch,
 } from "../SQLiteFunctions";
-import { GetDataSyncDate } from "../SQLiteSearchFunctions";
 import axios from "axios";
-import { RemoveLabData } from "../../UI/Functions/UIHelpers";
+import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
 import {
   setFreeslots,
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
-//TODO: Resolve the following error:
-// Date Based Data fetch: Error: SQLITE_ERROR: no such table: DataSyncDate
-const Timetable_API_URL =
-  "http://cui-unofficial.eastus.cloudapp.azure.com:3000/timetable";
-const FreeSlots_API_URL =
-  "http://cui-unofficial.eastus.cloudapp.azure.com:3000/freeslots";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+import { fetchDataFromSQLite } from "./FrontEndDataHandler";
 
-// Function to check if an update is needed based on PKT (Pakistan Standard Time)
+// const Timetable_API_URL = "http://192.168.43.126:3000/timetable";
+// const Timetable_API_URL = "https://www.server.m-nawa-z-khan.rocks/timetable";
+// const FreeSlots_API_URL = "http://192.168.43.126:3000/freeslots";
+// const FreeSlots_API_URL = "https://www.server.m-nawa-z-khan.rocks/freeslots";
+const Timetable_API_URL =
+  "http://cui.eastasia.cloudapp.azure.com:3000/timetable";
+const FreeSlots_API_URL =
+  "http://cui.eastasia.cloudapp.azure.com:3000/freeslots";
+
+// Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
   try {
-    // Retrieve the last sync date from AsyncStorage
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-
     if (!lastSyncDate) {
-      // If no last sync date is found, update is needed
-      console.log("No last sync date found, updating...");
-      return true;
-    }
-
-    // Get the current date and time in PKT (Pakistan Standard Time)
-    const currentDate = new Date();
-    currentDate.setUTCHours(currentDate.getUTCHours() + 5); // Adjust for PKT
-
-    // Parse the last sync date from storage and ensure it's in PKT
-    const lastSyncDateObj = new Date(lastSyncDate);
-    lastSyncDateObj.setUTCHours(lastSyncDateObj.getUTCHours() + 5); // Adjust for PKT
-
-    // Check if the date is different and it's past 7 in the morning
-    if (
-      currentDate.toDateString() !== lastSyncDateObj.toDateString() &&
-      currentDate.getHours() >= 7
-    ) {
-      // Update is needed
-      console.log("Data is outdated, updating...");
       return true;
     } else {
-      // Data is up to date
-      console.log("Data is up to date");
+      if (!(await NetInfo.fetch()).isInternetReachable) {
+        return false;
+      }
+      const { data } = await axios.post(
+        encodeURI(`${Timetable_API_URL}/shouldUpdate`),
+        {
+          lastSyncDate,
+        },
+        {
+          timeout: 5000,
+        }
+      );
+      if (data?.shouldUpdate) {
+        return await askForDataUpdatePermission(data?.lastScrapDate);
+      }
       return false;
     }
   } catch (error) {
-    console.error("Error checking data update status:", error);
+    const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+    if (lastSyncDate) {
+      return false;
+    }
     throw error;
   }
 }
@@ -68,43 +61,57 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    console.log("Checking if data update is needed...");
     const updateNeeded = await shouldUpdateDataFromServer();
-
+    // const updateNeeded = true;
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
-        setLoadingText("No Internet Connection😢");
-        return;
+        throw new Error(
+          "Please! Check your internet connection and try again."
+        );
       }
-
       setLoadingText("Fetching Data ...");
       const timetableData = await fetchDataFromMongoDB(Timetable_API_URL);
-
-      setLoadingText("Removing Old Data...");
-      await clearTimetableTable();
-
-      for (const element of timetableData) {
-        await insertOrUpdateTimetableData(element);
+      if (
+        timetableData.title &&
+        timetableData?.title.toUpperCase().includes("UPDATE")
+      ) {
+        return timetableData;
       }
-
-      // Update the last sync date in AsyncStorage with the current date and time in UTC
+      setLoadingText("Removing Old Data...");
+      await fakeSleep(100);
+      await clearTimetableTable();
+      setLoadingText("Removing Old Data...✅");
+      await fakeSleep(500);
+      await insertOrUpdateTimetableDataInBatch(timetableData);
       await AsyncStorage.setItem("lastSyncDate", new Date().toJSON());
-
-      setLoadingText("Data Updated from Server");
     } else {
-      setLoadingText("Data is up to date");
+      setLoadingText("Proceeding with existing data...");
     }
+    return "NoError";
   } catch (error) {
-    console.error("Error updating data from server:", error);
-    setLoadingText("Error Occurred⛔");
-    throw error;
+    const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+    if (error.message.toUpperCase().includes("INTERNET")) {
+      throw new Error("Please! Check your internet connection and try again.");
+    } else if (
+      error.message.toUpperCase().includes("TIMEOUT") &&
+      lastSyncDate
+    ) {
+      setLoadingText(
+        "Server Connection Timeout...⛔\nProceeding with existing data..."
+      );
+      return "NoError";
+    } else {
+      throw new Error("Please! Restart the App or Try Again.");
+    }
   }
 }
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await axios.get(URL);
+    const res = await axios.get(URL, {
+      timeout: 10000,
+    });
     return res.data;
   } catch (e) {
     throw e;
@@ -115,21 +122,46 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
   try {
     const isConnected = (await NetInfo.fetch()).isInternetReachable;
     if (!isConnected) {
-      console.warn("No internet connection. Free-slot data not updated.");
+      alert("No internet connection.");
       return;
     }
-
     const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res);
-
+    await fetchDataFromSQLite(StateDispatcher, ["timeslots"]);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));
 
     return true;
   } catch (error) {
-    console.error("Error fetching free-slot data from MongoDB:", error);
-    throw error;
+    if (error.message.toUpperCase().includes("TIMEOUT")) {
+      alert("Server is taking too long to respond.\nTry again later.");
+    } else {
+      throw error;
+    }
   }
+}
+
+async function askForDataUpdatePermission(date) {
+  return new Promise((resolve) => {
+    Alert.alert(
+      "Data Update Permission",
+      `Data from ${new Date(date)
+        .toString()
+        .split("G")[0]
+        .trim()} has some changes ,Do you want to update it?`,
+      [
+        {
+          text: "Yes",
+          onPress: () => resolve(true), // User grants permission
+        },
+        {
+          text: "No",
+          onPress: () => resolve(false), // User declines permission
+        },
+      ],
+      { cancelable: false }
+    );
+  });
 }
 
 export {

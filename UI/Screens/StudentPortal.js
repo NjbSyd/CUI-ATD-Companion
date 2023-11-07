@@ -17,12 +17,16 @@ export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
   const [progressFinished, setProgressFinished] = useState(false);
   const [navigationCounter, setNavigationCounter] = useState(0);
+  const [event, setEvent] = useState("none");
   const webViewRef = useRef(null);
   let { id, pass, img } = route.params;
   id = id.split("-");
 
   const onNavigationStateChange = (navState) => {
     let url = navState.url;
+    if (url !== "https://sis.cuiatd.edu.pk/login.aspx") {
+      setEvent("auto");
+    }
     navigation.setOptions({
       title: url,
       headerTitleStyle: {
@@ -86,6 +90,7 @@ export default function StudentPortal({ route, navigation }) {
   };
   return (
     <View
+      pointerEvents={event}
       style={{
         flex: 1,
       }}
