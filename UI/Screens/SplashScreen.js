@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Text } from "react-native";
+import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
 import AnimatedLottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -10,13 +10,20 @@ import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHand
 import { useIsFocused } from "@react-navigation/native";
 import { updateApp } from "../../BackEnd/OTAUpdates";
 
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
+
 export default function SplashScreen({ navigation }) {
   const focused = useIsFocused();
   useEffect(() => {
     if (focused) {
-      setInitialAnimationDone(false);
       animationRef.current?.play();
+      fetchDataAndSetupAppEnvironment().then(() => {});
     }
+    return () => {
+      setInitialAnimationDone(false);
+      setLoadingText("Loading...");
+    };
   }, [focused]);
   const animationRef = useRef(null);
   const [fontLoaded] = useFonts({
@@ -25,8 +32,7 @@ export default function SplashScreen({ navigation }) {
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Loading...");
   const StateDispatcher = useDispatch();
-  const onAnimationFinish = async () => {
-    setInitialAnimationDone(true);
+  const fetchDataAndSetupAppEnvironment = async () => {
     try {
       updateApp();
       setLoadingText("Loading...");
@@ -64,20 +70,29 @@ export default function SplashScreen({ navigation }) {
       });
     }
   };
+
   return (
-    <View style={{ flex: 1 }}>
-      <AnimatedLottieView
-        ref={animationRef}
-        style={styles.splashContainer}
-        source={require("../../assets/Images/SplashScreen.json")}
-        resizeMode="center"
-        speed={1.5}
-        loop={false}
-        onAnimationFinish={onAnimationFinish}
-        autoSize
-      />
+    <View style={styles.mainContainer}>
+      {!initialAnimationDone && (
+        <AnimatedLottieView
+          ref={animationRef}
+          style={styles.splashContainer}
+          source={require("../../assets/Images/SplashScreen.json")}
+          resizeMode="center"
+          speed={1.25}
+          loop={false}
+          onAnimationFinish={() => {
+            setInitialAnimationDone(true);
+          }}
+          autoSize
+        />
+      )}
       {initialAnimationDone && (
         <>
+          <Image
+            style={styles.image}
+            source={require("../../assets/Images/icon.png")}
+          />
           <AnimatedLottieView
             style={styles.progressContainer}
             source={require("../../assets/Images/Progress.json")}
@@ -86,28 +101,16 @@ export default function SplashScreen({ navigation }) {
             loop
             autoSize
           />
-          <Image
-            style={styles.image}
-            source={require("../../assets/Images/icon.png")}
-          />
-          <View
-            style={{ position: "absolute", bottom: "27%", alignSelf: "center" }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                color: "black",
-                marginVertical: 40,
-                alignSelf: "center",
-                textAlign: "center",
-                fontWeight: "100",
-                letterSpacing: 1,
+          <Text
+            style={[
+              styles.progressText,
+              {
                 fontFamily: fontLoaded ? "bricolage" : null,
-              }}
-            >
-              {loadingText}
-            </Text>
-          </View>
+              },
+            ]}
+          >
+            {loadingText}
+          </Text>
         </>
       )}
     </View>
@@ -116,30 +119,43 @@ export default function SplashScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   progressContainer: {
-    position: "absolute",
     alignSelf: "center",
-    bottom: "10%",
-    width: "100%",
+    width: windowWidth,
+    aspectRatio: 4.5,
+    marginBottom: -windowWidth * 0.1,
+    marginTop: -windowWidth * 0.05,
+    zIndex: 2,
   },
   splashContainer: {
-    width: "1000%",
-    height: "100%",
+    width: windowWidth,
+    height: windowHeight,
     alignSelf: "center",
   },
   image: {
-    width: "80%",
-    height: "40%",
-    zIndex: 1,
+    maxWidth: windowWidth * 0.8,
+    maxHeight: windowHeight * 0.4,
+    zIndex: -1,
     alignSelf: "center",
-    position: "absolute",
-    top: "20%",
   },
   tipText: {
     marginHorizontal: 20,
     textAlign: "left",
     letterSpacing: 0.5,
-    position: "absolute",
-    bottom: "10%",
     color: "red",
+  },
+  progressText: {
+    fontSize: 16,
+    color: "black",
+    alignSelf: "center",
+    textAlign: "center",
+    fontWeight: "100",
+    letterSpacing: 1,
+    zIndex: 3,
+  },
+  mainContainer: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingTop: windowWidth * 0.4,
   },
 });
