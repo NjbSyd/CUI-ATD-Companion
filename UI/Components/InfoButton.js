@@ -13,7 +13,7 @@ export default function InfoButton() {
         navigation.navigate("AboutMe");
       }}
     >
-      <MaterialIcons name="info-outline" size={24} color="black" />
+      <MaterialIcons name="info-outline" size={24} color="#000" />
     </TouchableOpacity>
   );
 }

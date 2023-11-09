@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 const COLORS = {
   DEFAULT: "#888888",
   PRIMARY: "#f96332",
@@ -43,6 +45,7 @@ const COLORS = {
   BEHANCE: "#1769ff",
   REDDIT: "#ff4500",
   GOOGLE: "#dd4b39",
+  MAIN: "#2f1952",
 };
 
 const SIZES = {
@@ -50,8 +53,14 @@ const SIZES = {
   FONT: 16,
   OPACITY: 0.8,
 };
-
+const ScreenWidth = Dimensions.get("window").width;
+const ScreenHeight = Dimensions.get("window").height;
+const buttonsPerRow = 2;
+const HomeScreenButtonWidth = ScreenWidth / buttonsPerRow - 20;
 export default {
   COLORS,
   SIZES,
+  HomeScreenButtonWidth,
+  ScreenWidth,
+  ScreenHeight,
 };

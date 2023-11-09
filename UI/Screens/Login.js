@@ -8,7 +8,6 @@ import {
   ToastAndroid,
   Alert,
   ScrollView,
-  KeyboardAvoidingView,
   Keyboard,
 } from "react-native";
 import { CheckBox } from "@rneui/themed";
@@ -228,7 +227,13 @@ const LoginScreen = ({ navigation }) => {
           ))}
         </ScrollView>
       )}
-      <BannerAds />
+      <View
+        style={{
+          display: isKeyboardOpen ? "none" : "flex",
+        }}
+      >
+        <BannerAds />
+      </View>
     </View>
   );
 };

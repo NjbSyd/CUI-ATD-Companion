@@ -26,6 +26,7 @@ export default function ApplicationEntry() {
         headerRight: () => <InfoButton />,
         headerTitleStyle: [{ fontFamily: "bricolage" }, headerStyles.title],
         animation: "slide_from_right",
+        headerStyle: headerStyles.container,
       }}
     >
       <Stack.Screen
@@ -35,10 +36,10 @@ export default function ApplicationEntry() {
           headerShown: false,
         }}
       />
-      <Stack.Screen name="Home" component={Main} />
-      <Stack.Screen name="Teachers" component={Teachers} />
-      <Stack.Screen name="Classrooms" component={Classroom} />
-      <Stack.Screen name="Subjects" component={Subjects} />
+      <Stack.Screen name={"Home"} component={Main} />
+      <Stack.Screen name={"Teachers"} component={Teachers} />
+      <Stack.Screen name={"Classrooms"} component={Classroom} />
+      <Stack.Screen name={"Subjects"} component={Subjects} />
       <Stack.Screen name={"Timetable"} component={Timetable} />
       <Stack.Screen name={"Portal"} component={StudentPortal} />
       <Stack.Screen name={"Login"} component={LoginScreen} />
@@ -50,23 +51,15 @@ export default function ApplicationEntry() {
 const headerStyles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "rgb(15, 44, 76)",
+    backgroundColor: "#fff",
     flexDirection: "row",
     alignItems: "center",
     padding: 5,
-    shadowColor: "#111",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 1.2,
-    elevation: 30,
     marginTop: "7%",
   },
   title: {
     fontSize: 28,
-    color: "rgb(15, 44, 76)",
+    color: "black",
     backgroundColor: "transparent",
   },
   image: {

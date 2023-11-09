@@ -1,22 +1,23 @@
 import { Dropdown } from "react-native-element-dropdown";
 import {
+  Keyboard,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { List } from "../Components/List";
 import LoadingPopup from "../Components/Loading";
 import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
+import Theme from "../Constants/Theme";
+import { fakeSleep } from "../Functions/UIHelpers";
+import { FontAwesome } from "@expo/vector-icons";
 
 export function Classroom() {
   const rooms = useSelector((state) => state.ClassRoomSlice.classRoom);
@@ -28,15 +29,32 @@ export function Classroom() {
   const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef(null);
   const StateDispatcher = useDispatch();
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardOpen(true);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardOpen(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   useEffect(() => {}, [rooms, timeslots, resultingData]);
   useEffect(() => {
     trySearch();
   }, [selectedRoom, selectedTimeSlot]);
-  const openDropDown = () => {
-    setTimeout(() => {
-      dropdownRef.current.open();
-    }, 100);
-  };
+
   function trySearch() {
     if (selectedTimeSlot === null || selectedRoom === null) {
       setIsSearching(false);
@@ -45,7 +63,8 @@ export function Classroom() {
     setIsSearching(true);
     setResultingData([]);
     GetTimeslotBasedClassRoomTimetable(selectedRoom, selectedTimeSlot)
-      .then((res) => {
+      .then(async (res) => {
+        await fakeSleep(200);
         setResultingData(res);
       })
       .catch((err) => {
@@ -82,69 +101,59 @@ export function Classroom() {
       }
       contentContainerStyle={styles.container}
     >
-      {resultingData.length > 0 ? (
-        <TouchableOpacity
-          style={styles.slotSelectorPlaceholder}
-          onPress={() => {
-            setResultingData([]);
-            setSelectedTimeSlot(null);
-            openDropDown();
+      <View style={styles.selectorContainer}>
+        <Dropdown
+          ref={dropdownRef}
+          style={styles.selectorView}
+          containerStyle={styles.selectorList}
+          itemContainerStyle={styles.itemContainerStyle}
+          data={timeslots}
+          labelField="label"
+          valueField="value"
+          onChange={(item) => {
+            const previoslySelectedTimeSlot = selectedTimeSlot;
+            setSelectedTimeSlot(item.value);
+            if (item.value === previoslySelectedTimeSlot) {
+              trySearch();
+            }
           }}
-        >
-          <Text style={styles.selectedClassText}>
-            Classroom: {selectedRoom + "\n"}Timeslot: {selectedTimeSlot}
-          </Text>
-          <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.selectorContainer}>
-          <Dropdown
-            ref={dropdownRef}
-            style={styles.selectorView}
-            containerStyle={styles.selectorList}
-            itemContainerStyle={styles.itemContainerStyle}
-            data={timeslots}
-            labelField="label"
-            valueField="value"
-            onChange={(item) => {
-              const previoslySelectedTimeSlot = selectedTimeSlot;
-              setSelectedTimeSlot(item.value);
-              if (item.value === previoslySelectedTimeSlot) {
-                trySearch();
-              }
-            }}
-            value={selectedTimeSlot}
-            mode={"modal"}
-            autoScroll={false}
-            placeholder={"Timeslot..."}
-            inputSearchStyle={{ backgroundColor: "#d1fff6" }}
-          />
-          <Dropdown
-            style={styles.selectorView}
-            containerStyle={styles.selectorList}
-            inputSearchStyle={styles.slotSearch}
-            itemContainerStyle={styles.itemContainerStyle}
-            keyboardAvoiding={true}
-            data={rooms}
-            mode={"modal"}
-            labelField="label"
-            valueField="value"
-            onChange={(item) => {
-              const previoslySelectedRoom = selectedRoom;
-              setSelectedRoom(item.value);
-              if (item.value === previoslySelectedRoom) {
-                trySearch();
-              }
-            }}
-            value={selectedRoom}
-            search={true}
-            autoScroll={false}
-            placeholder={"Room#..."}
-            searchPlaceholder={"Enter a room number to search"}
-          />
-        </View>
-      )}
-      <ScrollView style={styles.scrollView}>
+          renderRightIcon={() => (
+            <FontAwesome name="caret-down" size={24} color="black" />
+          )}
+          value={selectedTimeSlot}
+          mode={"modal"}
+          autoScroll={false}
+          placeholder={"Timeslot..."}
+          inputSearchStyle={{ backgroundColor: "#d1fff6" }}
+        />
+        <Dropdown
+          style={styles.selectorView}
+          containerStyle={styles.selectorList}
+          inputSearchStyle={styles.slotSearch}
+          itemContainerStyle={styles.itemContainerStyle}
+          keyboardAvoiding={true}
+          data={rooms}
+          mode={"modal"}
+          labelField="label"
+          valueField="value"
+          onChange={(item) => {
+            const previoslySelectedRoom = selectedRoom;
+            setSelectedRoom(item.value);
+            if (item.value === previoslySelectedRoom) {
+              trySearch();
+            }
+          }}
+          renderRightIcon={() => (
+            <FontAwesome name="caret-down" size={24} color="black" />
+          )}
+          value={selectedRoom}
+          search={true}
+          autoScroll={false}
+          placeholder={"Room#..."}
+          searchPlaceholder={"Enter a room number to search"}
+        />
+      </View>
+      <ScrollView style={styles.ResultScrollView}>
         {resultingData.length === 0 ? (
           selectedRoom !== null && selectedTimeSlot !== null && !isSearching ? (
             <NoResults
@@ -164,7 +173,13 @@ export function Classroom() {
         )}
       </ScrollView>
       <LoadingPopup text={"Searching..."} visible={isSearching} />
-      <BannerAds />
+      <View
+        style={{
+          display: isKeyboardOpen ? "none" : "flex",
+        }}
+      >
+        <BannerAds />
+      </View>
     </ScrollView>
   );
 }
@@ -176,10 +191,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  scrollView: {
+
+  ResultScrollView: {
     width: "90%",
-    maxHeight: "80%",
-    margin: 20,
+    marginHorizontal: Theme.ScreenWidth * 0.05,
+    marginBottom: Theme.ScreenHeight * 0.01,
+    maxHeight: Theme.ScreenHeight * 0.9,
   },
   label: {
     fontSize: 18,
@@ -189,13 +206,16 @@ const styles = StyleSheet.create({
     marginLeft: "6%",
   },
   selectorView: {
-    width: "45%",
-    padding: 10,
     marginVertical: 10,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-    marginRight: 10,
+    width: Theme.ScreenWidth * 0.45,
+    borderWidth: 1,
+    borderColor: "#4a6cef",
+    borderStyle: "dashed",
+    backgroundColor: "#f0f0f0",
+    borderRadius: Theme.ScreenWidth * 0.02,
+    paddingHorizontal: Theme.ScreenWidth * 0.025,
+    paddingVertical: Theme.ScreenHeight * 0.015,
+    elevation: 5,
   },
   selectorList: {
     width: "200%",
@@ -230,13 +250,7 @@ const styles = StyleSheet.create({
     borderColor: "#4a6cef",
     borderStyle: "dashed",
   },
-  selectedClassText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    letterSpacing: 1,
-    marginRight: 10,
-  },
+
   itemContainerStyle: {
     borderColor: "#d7d4d4",
     borderBottomWidth: 0.3,
