@@ -122,7 +122,6 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     }
     const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res);
-    console.log(freeslots);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));
     return true;
@@ -130,7 +129,7 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     if (error.message.toUpperCase().includes("TIMEOUT")) {
       alert("Server is taking too long to respond.\nTry again later.");
     } else {
-      console.error(error);
+      throw error;
     }
   }
 }
