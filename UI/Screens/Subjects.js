@@ -1,34 +1,50 @@
 import {
+  Keyboard,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
+  View,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome5 } from "@expo/vector-icons";
 import BannerAds from "../../Ads/BannerAd";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
+import Theme from "../Constants/Theme";
+import { FontAwesome } from "@expo/vector-icons";
 
 export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardOpen(true);
+      }
+    );
 
-  const openDropDown = () => {
-    setTimeout(() => {
-      dropdownRef.current.open();
-    }, 100);
-  };
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardOpen(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
   return (
     <ScrollView
       scrollEnabled={false}
@@ -55,45 +71,32 @@ export function Subjects() {
       }
       contentContainerStyle={styles.container}
     >
-      {selectedSubject !== null ? (
-        <TouchableOpacity
-          style={styles.slotSelectorPlaceholder}
-          onPress={() => {
-            setSelectedSubject(null);
-            setSelectedSubjectData([]);
-            openDropDown();
-          }}
-        >
-          <Text style={styles.selectedClassText}>
-            Teachers for: {"\n" + selectedSubject.label}
-          </Text>
-          <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-        </TouchableOpacity>
-      ) : (
-        <Dropdown
-          ref={dropdownRef}
-          style={styles.slotSelector}
-          inputSearchStyle={styles.slotSearch}
-          containerStyle={styles.slotOptionsContainer}
-          itemContainerStyle={styles.itemContainerStyle}
-          keyboardAvoiding={true}
-          data={subjectNames}
-          labelField="label"
-          valueField="value"
-          onChange={(item) => {
-            setSelectedSubject(item);
-            GetSubjectsSchedule(item.value).then((res) => {
-              setSelectedSubjectData(res);
-            });
-          }}
-          placeholder={"Select a Subject"}
-          value={selectedSubject}
-          search={true}
-          searchPlaceholder="Enter a Subject name to search"
-          autoScroll={false}
-        />
-      )}
-      <ScrollView style={styles.scrollView}>
+      <Dropdown
+        ref={dropdownRef}
+        style={styles.DropdownStyle}
+        inputSearchStyle={styles.Dropdown_InputSearchStyle}
+        containerStyle={styles.Dropdown_OptionsContainerStyle}
+        itemContainerStyle={styles.Dropdown_ItemContainerStyle}
+        keyboardAvoiding={true}
+        data={subjectNames}
+        labelField="label"
+        valueField="value"
+        renderRightIcon={() => (
+          <FontAwesome name="caret-down" size={24} color="black" />
+        )}
+        onChange={(item) => {
+          setSelectedSubject(item);
+          GetSubjectsSchedule(item.value).then((res) => {
+            setSelectedSubjectData(res);
+          });
+        }}
+        placeholder={"Select a Subject"}
+        value={selectedSubject}
+        search={true}
+        searchPlaceholder="Enter a Subject name to search"
+        autoScroll={false}
+      />
+      <ScrollView style={styles.ResultScrollView}>
         {selectedSubjectData.length === 0 ? (
           selectedSubject !== null ? (
             <NoResults />
@@ -104,7 +107,13 @@ export function Subjects() {
           <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
-      <BannerAds />
+      <View
+        style={{
+          display: isKeyboardOpen ? "none" : "flex",
+        }}
+      >
+        <BannerAds />
+      </View>
     </ScrollView>
   );
 }
@@ -116,61 +125,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-  scrollView: {
-    width: "90%",
-    margin: 20,
-    maxHeight: "80%",
+  ResultScrollView: {
+    width: Theme.ScreenWidth * 0.9,
+    marginHorizontal: Theme.ScreenWidth * 0.05,
+    marginBottom: Theme.ScreenHeight * 0.01,
+    maxHeight: Theme.ScreenHeight * 0.9,
   },
-  label: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 10,
-    alignSelf: "flex-start",
-    marginLeft: "6%",
-  },
-  slotSelector: {
-    width: "95%",
-    padding: 10,
-    marginTop: 10,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-  },
-  slotOptionsContainer: {
+  Dropdown_OptionsContainerStyle: {
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
-    marginTop: -60,
+    marginTop: -Theme.ScreenWidth * 0.15,
     maxHeight: "90%",
   },
-  slotSearch: {
+  Dropdown_InputSearchStyle: {
     color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
     backgroundColor: "#eae7e7",
   },
-  itemContainerStyle: {
+  Dropdown_ItemContainerStyle: {
     borderColor: "#d7d4d4",
     borderBottomWidth: 0.3,
   },
-  slotSelectorPlaceholder: {
+  DropdownStyle: {
     marginVertical: 10,
-    marginHorizontal: 20,
-    width: "auto",
-    alignSelf: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
+    width: Theme.ScreenWidth * 0.9,
+    borderWidth: 1,
     borderColor: "#4a6cef",
     borderStyle: "dashed",
-  },
-  selectedClassText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    letterSpacing: 1,
-    marginRight: 20,
+    backgroundColor: "#f0f0f0",
+    borderRadius: Theme.ScreenWidth * 0.02,
+    paddingHorizontal: Theme.ScreenWidth * 0.05,
+    paddingVertical: Theme.ScreenHeight * 0.015,
+    elevation: 5,
   },
 });

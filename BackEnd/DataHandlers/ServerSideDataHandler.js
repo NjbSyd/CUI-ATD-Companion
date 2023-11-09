@@ -11,12 +11,7 @@ import {
 } from "../../Redux/FreeslotsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
-import { fetchDataFromSQLite } from "./FrontEndDataHandler";
 
-// const Timetable_API_URL = "http://192.168.43.126:3000/timetable";
-// const Timetable_API_URL = "https://www.server.m-nawa-z-khan.rocks/timetable";
-// const FreeSlots_API_URL = "http://192.168.43.126:3000/freeslots";
-// const FreeSlots_API_URL = "https://www.server.m-nawa-z-khan.rocks/freeslots";
 const Timetable_API_URL =
   "http://cui.eastasia.cloudapp.azure.com:3000/timetable";
 const FreeSlots_API_URL =
@@ -127,16 +122,15 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     }
     const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
     const freeslots = RemoveLabData(res);
-    await fetchDataFromSQLite(StateDispatcher, ["timeslots"]);
+    console.log(freeslots);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));
-
     return true;
   } catch (error) {
     if (error.message.toUpperCase().includes("TIMEOUT")) {
       alert("Server is taking too long to respond.\nTry again later.");
     } else {
-      throw error;
+      console.error(error);
     }
   }
 }

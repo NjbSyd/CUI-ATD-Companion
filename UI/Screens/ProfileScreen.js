@@ -15,6 +15,7 @@ import nowTheme from "../Constants/Theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import Theme from "../Constants/Theme";
+
 const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -53,31 +54,11 @@ const ProfileScreen = ({ navigation }) => {
           <Block flex>
             <Block middle>
               <Text
-                style={{
-                  color: "#2c2c2c",
-                  marginTop: 15,
-                  zIndex: 2,
-                  fontFamily: "montserrat-bold",
-                  marginBottom: theme.SIZES.BASE / 2,
-                  fontWeight: "900",
-                  fontSize: 26,
-                  letterSpacing: 2,
-                }}
+                style={[styles.title, { color: Theme.COLORS.GRADIENT_END }]}
               >
                 About the App
               </Text>
-              <Text
-                size={16}
-                muted
-                style={{
-                  textAlign: "left",
-                  fontFamily: "montserrat-regular",
-                  zIndex: 2,
-                  lineHeight: 25,
-                  color: "#9A9A9A",
-                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
-                }}
-              >
+              <Text size={16} muted style={styles.titleDetails}>
                 The CUIATD Companion App provides a simple and efficient way to
                 manage your class schedules. Built with expertise in React
                 Native and Web technologies, it offers a user-friendly interface
@@ -95,33 +76,10 @@ const ProfileScreen = ({ navigation }) => {
           />
           <Block flex>
             <Block middle>
-              <Text
-                style={{
-                  color: "#2c2c2c",
-                  marginTop: 15,
-                  zIndex: 2,
-                  fontFamily: "montserrat-bold",
-                  marginBottom: theme.SIZES.BASE / 2,
-                  fontWeight: "900",
-                  fontSize: 26,
-                  letterSpacing: 2,
-                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
-                }}
-              >
+              <Text style={[styles.title, { color: Theme.COLORS.ACTIVE }]}>
                 Privacy Policy
               </Text>
-              <Text
-                size={16}
-                muted
-                style={{
-                  textAlign: "left",
-                  fontFamily: "montserrat-regular",
-                  zIndex: 2,
-                  lineHeight: 25,
-                  color: "#9A9A9A",
-                  paddingHorizontal: 15,
-                }}
-              >
+              <Text size={16} style={styles.titleDetails}>
                 This app does not collect, store, or share any personal
                 information. Any login credentials saved are stored locally on
                 your device for your convenience. This app doesn't integrate
@@ -139,32 +97,10 @@ const ProfileScreen = ({ navigation }) => {
           />
           <Block flex>
             <Block middle>
-              <Text
-                style={{
-                  color: "#2c2c2c",
-                  marginTop: 15,
-                  zIndex: 2,
-                  fontFamily: "montserrat-bold",
-                  marginBottom: theme.SIZES.BASE / 2,
-                  fontWeight: "900",
-                  fontSize: 26,
-                  letterSpacing: 2,
-                }}
-              >
+              <Text style={[styles.title, { color: Theme.COLORS.BEHANCE }]}>
                 Data Source
               </Text>
-              <Text
-                size={16}
-                muted
-                style={{
-                  textAlign: "left",
-                  fontFamily: "montserrat-regular",
-                  zIndex: 2,
-                  lineHeight: 25,
-                  color: "#9A9A9A",
-                  paddingHorizontal: Theme.SIZES.BASE * 0.8,
-                }}
-              >
+              <Text size={16} muted style={styles.titleDetails}>
                 The data used in this app is sourced from the official CUI
                 Administration website. Specifically, it is obtained from the
                 CUI Timetable page. Please note that this app is an independent
@@ -195,8 +131,8 @@ const ProfileScreen = ({ navigation }) => {
                   fontWeight: "900",
                   fontSize: 26,
                   letterSpacing: 2,
+                  color: "#000",
                 }}
-                color="#000"
               >
                 Contributors
               </Text>
@@ -253,7 +189,7 @@ const ProfileScreen = ({ navigation }) => {
                   fontSize: 20,
                   letterSpacing: 2,
                 }}
-                color="#000"
+                color="black"
               >
                 Get In Touch
               </Text>
@@ -397,6 +333,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 99,
     marginHorizontal: 5,
+  },
+  title: {
+    color: "#7c47d9",
+    marginTop: 15,
+    zIndex: 2,
+    fontFamily: "montserrat-bold",
+    marginBottom: theme.SIZES.BASE / 2,
+    fontWeight: "900",
+    fontSize: 26,
+    letterSpacing: 2,
+  },
+  titleDetails: {
+    textAlign: "left",
+    fontFamily: "montserrat-regular",
+    zIndex: 2,
+    lineHeight: 25,
+    color: "#000",
+    paddingHorizontal: Theme.SIZES.BASE * 0.8,
   },
 });
 

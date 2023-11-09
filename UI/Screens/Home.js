@@ -1,16 +1,12 @@
 import React, { useCallback, useEffect } from "react";
-import {
-  BackHandler,
-  Dimensions,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { BackHandler, ScrollView, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
 import BannerAds from "../../Ads/BannerAd";
 import useInterstitialAd from "../../Ads/InterstitialAd";
+import { HomeButtonsData } from "../Constants/HomeButtons";
+import Theme from "../Constants/Theme";
 
 const Main = ({ navigation }) => {
   const { loadedAd, displayAd } = useInterstitialAd();
@@ -32,81 +28,32 @@ const Main = ({ navigation }) => {
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }, [])
   );
-  const screenWidth = Dimensions.get("window").width;
-  const buttonsPerRow = 2;
-  const buttonWidth = screenWidth / buttonsPerRow - 20;
+
   return (
-    <View style={styles.container}>
-      <View style={styles.space} />
-      <ScrollView>
-        <View style={styles.buttonContainer}>
-          {RenderButton(
-            "chalkboard-teacher",
-            "Teachers",
-            "See a Teacher's schedule",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "university",
-            "Classrooms",
-            "Search details based on RoomNo & TimeSlot",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "book",
-            "Subjects",
-            "Check assigned Teachers for a Subject",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "calendar-alt",
-            "Timetable",
-            "Check a Class schedule",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "user",
-            "Login",
-            "Login to SIS.CUI.ATD",
-            false,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-          {RenderButton(
-            "calendar-plus",
-            "Freeslots",
-            "Find free-slots for arranging extra classes",
-            true,
-            false,
-            buttonWidth,
-            navigation,
-            loadedAd,
-            displayAd
-          )}
-        </View>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Theme.COLORS.WHITE,
+      }}
+    >
+      <ScrollView
+        style={{
+          height: Theme.ScreenHeight * 0.9,
+          flex: 1,
+        }}
+        contentContainerStyle={styles.buttonContainer}
+      >
+        {HomeButtonsData.map((button, index) => (
+          <RenderButton
+            key={(button.screenName + index).toString()}
+            iconName={button.iconName}
+            screenName={button.screenName}
+            screenDescription={button.screenDescription}
+            navigation={navigation}
+            loadedAd={loadedAd}
+            showAd={displayAd}
+          />
+        ))}
       </ScrollView>
       <BannerAds />
     </View>
@@ -114,14 +61,6 @@ const Main = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "white",
-  },
-  space: {
-    height: 10,
-  },
   buttonContainer: {
     flexDirection: "row",
     flexWrap: "wrap",

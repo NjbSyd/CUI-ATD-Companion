@@ -10,18 +10,18 @@ import { useDispatch, useSelector } from "react-redux";
 import React, { useEffect, useRef, useState } from "react";
 import {
   CalculateTotalFreeSlots,
-  fakeSleep,
   FilterFreeSlotsByTimeSlot,
 } from "../Functions/UIHelpers";
 import LoadingPopup from "../Components/Loading";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
 import { Dropdown } from "react-native-element-dropdown";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 import NoSelection from "../Components/NoSelection";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import Theme from "../Constants/Theme";
+import { FontAwesome } from "@expo/vector-icons";
+import { FreeSlotsDayButton } from "../Components/DayButton";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -38,17 +38,12 @@ export default function Freeslots({ navigation }) {
   const [selectedDayData, setSelectedDayData] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const dropdownRef = useRef(null);
-  useEffect(() => {}, [freeslots, freeslotsAvailable, timeSlots]);
   useEffect(() => {
     if (selectedTimeSlotData) {
       setSelection(0);
       setSelectedDayData(selectedTimeSlotData["Monday"]);
     }
-  }, [selectedTimeSlotData]);
-  const openDropDown = async () => {
-    await fakeSleep(100);
-    dropdownRef.current.open();
-  };
+  }, [selectedTimeSlotData, freeslots, freeslotsAvailable, timeSlots]);
 
   return (
     <View style={styles.container}>
@@ -58,96 +53,50 @@ export default function Freeslots({ navigation }) {
             flex: 1,
           }}
         >
-          {selectedTimeSlot === null ? (
-            <Dropdown
-              ref={dropdownRef}
-              style={styles.selectorView}
-              containerStyle={styles.slotOptionsContainer}
-              itemContainerStyle={styles.itemContainerStyle}
-              data={timeSlots}
-              labelField="label"
-              valueField="value"
-              onChange={(item) => {
-                setSelectedTimeSlot(item.value);
-                const timeslotData = FilterFreeSlotsByTimeSlot(
-                  freeslots,
-                  item.value
-                );
-                setSelectedTimeSlotData(timeslotData);
-              }}
-              value={selectedTimeSlot}
-              autoScroll={false}
-              placeholder={"Timeslot..."}
-              inputSearchStyle={{ backgroundColor: "#d1fff6" }}
-            />
-          ) : (
-            <View>
-              <TouchableOpacity
-                style={styles.slotSelectorPlaceholder}
-                onPress={() => {
-                  setSelectedTimeSlot(null);
-                  setSelectedTimeSlotData(null);
-                  setSelectedDayData(null);
-                  setSelection(-1);
-                  openDropDown()
-                    .then(() => {})
-                    .catch(() => {});
-                }}
-              >
-                <Text style={styles.selectedClassText}>
-                  Timeslot: {selectedTimeSlot}
-                </Text>
-                <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-              </TouchableOpacity>
-
-              <View style={styles.btnGroup}>
-                {daysOfWeek.map((day, index) => (
-                  <TouchableOpacity
-                    key={day}
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: selection === index ? "#000" : "#fff",
-                      },
-                    ]}
-                    onPress={() => {
-                      setSelection(index);
-                      setSelectedDayData(selectedTimeSlotData[day]);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.text,
-                        selection === index
-                          ? { color: "#fff" }
-                          : { color: "#000" },
-                      ]}
-                    >
-                      {day.substring(0, 3)}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.text,
-                        {
-                          color: "#d1d1d1",
-                        },
-                      ]}
-                    >
-                      {CalculateTotalFreeSlots(
-                        selectedTimeSlotData[day],
-                        selectedTimeSlot
-                      )}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+          <Dropdown
+            ref={dropdownRef}
+            style={styles.DropdownStyle}
+            containerStyle={styles.Dropdown_OptionsContainerStyle}
+            itemContainerStyle={styles.Dropdown_ItemContainerStyle}
+            data={timeSlots}
+            labelField="label"
+            valueField="value"
+            onChange={(item) => {
+              setSelectedTimeSlot(item.value);
+              const timeslotData = FilterFreeSlotsByTimeSlot(
+                freeslots,
+                item.value
+              );
+              setSelectedTimeSlotData(timeslotData);
+            }}
+            renderRightIcon={() => (
+              <FontAwesome name="caret-down" size={24} color="black" />
+            )}
+            value={selectedTimeSlot}
+            autoScroll={false}
+            placeholder={"Timeslot..."}
+            inputSearchStyle={{ backgroundColor: "#d1fff6" }}
+          />
+          {selectedTimeSlot && (
+            <View style={styles.btnGroup}>
+              {daysOfWeek.map((day, index) =>
+                FreeSlotsDayButton(
+                  day,
+                  index,
+                  selection,
+                  setSelection,
+                  setSelectedDayData,
+                  selectedTimeSlotData,
+                  selectedTimeSlot,
+                  styles
+                )
+              )}
             </View>
           )}
           {selection !== -1 ? (
             <ScrollView
               style={{
-                marginBottom: "10%",
-                marginTop: 10,
+                marginVertical: Theme.ScreenHeight * 0.01,
               }}
             >
               {CalculateTotalFreeSlots(selectedDayData, selectedTimeSlot) ===
@@ -175,10 +124,8 @@ export default function Freeslots({ navigation }) {
               try {
                 setLoading(true);
                 await fetchAndStoreFreeslotsData(StateDispatcher);
-                await fetchDataFromSQLite(StateDispatcher, ["timeSlots"]);
                 setLoading(false);
               } catch (e) {
-                // navigation.replace("Error", {message: {title: "Something Went Wrong!", message: e.message,},});
                 Alert.alert("Something Went Wrong!", e.message, [
                   {
                     text: "OK",
@@ -196,13 +143,7 @@ export default function Freeslots({ navigation }) {
         </View>
       )}
       <LoadingPopup visible={loading} text={"Loading..."} />
-      <View
-        style={{
-          alignSelf: "flex-end",
-        }}
-      >
-        <BannerAds />
-      </View>
+      <BannerAds />
     </View>
   );
 }
@@ -238,7 +179,7 @@ const styles = StyleSheet.create({
   fetchDataBtn: {
     width: "60%",
     height: 50,
-    backgroundColor: "#0ac0e8",
+    backgroundColor: Theme.COLORS.MAIN,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -253,57 +194,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
-  selectorView: {
-    width: "90%",
-    padding: 10,
-    height: 60,
-    alignSelf: "center",
-    marginVertical: 20,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-    marginRight: 10,
-  },
-  selectorList: {
-    width: "100%",
-    padding: 10,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-  },
-  slotSelectorPlaceholder: {
-    marginVertical: 10,
-    width: "auto",
-    alignSelf: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "#4a6cef",
-    borderStyle: "dashed",
-  },
-  selectedClassText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-    letterSpacing: 1,
-    marginRight: 10,
-  },
-  slotOptionsContainer: {
+  Dropdown_OptionsContainerStyle: {
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
     maxHeight: "90%",
   },
-  slotSearch: {
-    color: "#000",
-    letterSpacing: 1,
-    borderRadius: 5,
-    height: 60,
-    backgroundColor: "#eae7e7",
-  },
-  itemContainerStyle: {
+  Dropdown_ItemContainerStyle: {
     borderColor: "#d7d4d4",
     borderBottomWidth: 0.3,
+  },
+  DropdownStyle: {
+    alignSelf: "center",
+    marginVertical: 10,
+    width: Theme.ScreenWidth * 0.9,
+    borderWidth: 1,
+    borderColor: "#4a6cef",
+    borderStyle: "dashed",
+    backgroundColor: "#f0f0f0",
+    borderRadius: Theme.ScreenWidth * 0.02,
+    paddingHorizontal: Theme.ScreenWidth * 0.05,
+    paddingVertical: Theme.ScreenHeight * 0.015,
+    elevation: 5,
   },
 });

@@ -126,11 +126,9 @@ function CalculateTotalFreeSlots(daySchedule, timeslot) {
 
 function RemoveLabData(jsonData) {
   const result = {};
-
   for (const day in jsonData) {
     const dayData = jsonData[day];
     const cleanedDayData = {};
-
     for (const room in dayData) {
       const roomNameNormalized = room.toLowerCase();
       if (
@@ -169,6 +167,7 @@ async function fakeSleep(ms) {
     }, ms);
   });
 }
+
 export {
   LoginScript,
   handleBackPress,

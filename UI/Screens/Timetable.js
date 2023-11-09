@@ -1,23 +1,23 @@
 import {
   View,
-  Text,
-  TouchableOpacity,
   StyleSheet,
   ScrollView,
   RefreshControl,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import BannerAds from "../../Ads/BannerAd";
-import { fakeSleep } from "../Functions/UIHelpers";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Theme from "../Constants/Theme";
+import { TimetableDayButton } from "../Components/DayButton";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
@@ -29,6 +29,7 @@ export default function Timetable() {
   const [selectedClassData, setSelectedClassData] = useState([]);
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
@@ -37,19 +38,34 @@ export default function Timetable() {
       .then((item) => {
         if (item) {
           let itemJSON = JSON.parse(item);
-          handleOnClassChange(itemJSON, true).then((r) => null);
+          handleOnClassChange(itemJSON, true).then(() => null);
         }
       })
-      .catch((r) => {});
+      .catch(() => {});
+
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardOpen(true);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardOpen(false);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, []);
   useEffect(() => {
     setSelection(0);
     filterDayData("Monday");
   }, [selectedClassData]);
-  const openDropDown = async () => {
-    await fakeSleep(100);
-    dropdownRef.current.open();
-  };
 
   async function handleOnClassChange(item, selfCall = false) {
     try {
@@ -58,9 +74,7 @@ export default function Timetable() {
       const result = await GetTimetableByClassName(item.value);
       setSelectedClassData(result);
       if (!selfCall) {
-        AsyncStorage.setItem("className", JSON.stringify(item)).then(() => {
-          console.log(item, " is saved.");
-        });
+        AsyncStorage.setItem("className", JSON.stringify(item));
       }
     } catch (e) {
       console.error(e);
@@ -98,82 +112,43 @@ export default function Timetable() {
       }
       contentContainerStyle={styles.container}
     >
-      {isClassNameSelected ? (
-        <>
-          <TouchableOpacity
-            style={styles.slotSelectorPlaceholder}
-            onPress={() => {
-              setIsClassNameSelected(false);
-              setSelectedClassname(null);
-              setSelectedClassData([]);
-              setSelectedClassDayData([]);
-              setSelection(-1);
-              openDropDown()
-                .then(() => {})
-                .catch(() => {});
-            }}
-          >
-            <Text style={styles.selectedClassText}>
-              {selectedClassname.label} TimeTable
-            </Text>
-
-            <FontAwesome5 name="edit" size={15} color="#4a6cef" />
-          </TouchableOpacity>
-          <View style={styles.btnGroup} horizontal={true}>
-            {daysOfWeek.map((day, index) => (
-              <TouchableOpacity
-                key={day}
-                style={[
-                  styles.button,
-                  { backgroundColor: selection === index ? "#000" : "#fff" },
-                ]}
-                disabled={!isClassNameSelected}
-                onPress={() => {
-                  setSelection(index);
-                  filterDayData(day);
-                }}
-              >
-                <Text
-                  style={[
-                    styles.text,
-                    {
-                      color: isClassNameSelected
-                        ? selection === index
-                          ? "#fff"
-                          : "#000"
-                        : "#d1d1d1",
-                    },
-                  ]}
-                >
-                  {day.substring(0, 3)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </>
-      ) : (
-        <Dropdown
-          ref={dropdownRef}
-          style={styles.slotSelector}
-          inputSearchStyle={styles.slotSearch}
-          containerStyle={styles.slotOptionsContainer}
-          itemContainerStyle={styles.itemContainerStyle}
-          keyboardAvoiding={true}
-          data={classNames}
-          labelField="label"
-          valueField="value"
-          onChange={(item) => {
-            handleOnClassChange(item);
-          }}
-          placeholder={"Select a Class"}
-          value={selectedClassname}
-          search={true}
-          searchPlaceholder="Enter a Class name to search"
-          autoScroll={false}
-        />
+      <Dropdown
+        ref={dropdownRef}
+        style={styles.DropdownStyle}
+        inputSearchStyle={styles.Dropdown_InputSearchStyle}
+        containerStyle={styles.Dropdown_OptionsContainerStyle}
+        itemContainerStyle={styles.Dropdown_ItemContainerStyle}
+        keyboardAvoiding={true}
+        data={classNames}
+        labelField="label"
+        valueField="value"
+        onChange={handleOnClassChange}
+        placeholder={"Select a Class"}
+        renderRightIcon={() => (
+          <FontAwesome name="caret-down" size={24} color="black" />
+        )}
+        value={selectedClassname}
+        search={true}
+        searchPlaceholder="Enter a Class name to search"
+        autoScroll={false}
+      />
+      {isClassNameSelected && (
+        <View style={styles.DayButtonContainer} horizontal={true}>
+          {daysOfWeek.map((day, index) =>
+            TimetableDayButton(
+              day,
+              index,
+              setSelection,
+              filterDayData,
+              isClassNameSelected,
+              selection,
+              styles
+            )
+          )}
+        </View>
       )}
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.ResultScrollView}>
         {isClassNameSelected ? (
           selection <= -1 ? (
             <NoSelection message={"Select a day to view timetable"} />
@@ -186,28 +161,29 @@ export default function Timetable() {
           <NoSelection message={"Pick A Class"} />
         )}
       </ScrollView>
-      <BannerAds />
+      <View
+        style={{
+          display: isKeyboardOpen ? "none" : "flex",
+        }}
+      >
+        <BannerAds />
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignContent: "center",
-  },
-  btnGroup: {
+  DayButtonContainer: {
+    width: Theme.ScreenWidth,
     flexDirection: "row",
-    margin: 5,
-    maxHeight: 50,
+    marginVertical: Theme.ScreenHeight * 0.01,
     alignItems: "center",
     justifyContent: "space-evenly",
   },
-  button: {
-    width: 50,
-    height: 50,
-    borderRadius: 5,
+  DayButton: {
+    width: Theme.ScreenWidth * 0.13,
+    aspectRatio: 1,
+    borderRadius: Theme.ScreenWidth * 0.025,
     alignItems: "center",
     justifyContent: "center",
     elevation: 5,
@@ -220,62 +196,46 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#000",
   },
-  slotSelectorPlaceholder: {
-    marginVertical: 10,
-    width: "auto",
-    alignSelf: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderColor: "#4a6cef",
-    borderStyle: "dashed",
+    width: "100%",
   },
-  selectedClassText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-    letterSpacing: 1,
-    marginRight: 20,
-    flexWrap: "wrap",
+  ResultScrollView: {
+    width: "90%",
+    marginHorizontal: Theme.ScreenWidth * 0.05,
+    marginBottom: Theme.ScreenHeight * 0.01,
+    maxHeight: Theme.ScreenHeight * 0.9,
   },
-
-  scrollView: {
-    maxWidth: "90%",
-    margin: 20,
-    maxHeight: "80%",
-  },
-  slotSelector: {
-    alignSelf: "center",
-    width: "95%",
-    padding: 10,
-    marginTop: 10,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-  },
-  slotOptionsContainer: {
+  Dropdown_OptionsContainerStyle: {
     borderColor: "#000",
     borderWidth: 0.3,
     borderRadius: 5,
-    marginTop: -60,
+    marginTop: -Theme.ScreenWidth * 0.15,
     maxHeight: "90%",
   },
-  slotSearch: {
+  Dropdown_InputSearchStyle: {
     color: "#000",
     letterSpacing: 1,
     borderRadius: 5,
     height: 60,
     backgroundColor: "#eae7e7",
   },
-  itemContainerStyle: {
+  Dropdown_ItemContainerStyle: {
     borderColor: "#d7d4d4",
     borderBottomWidth: 0.3,
   },
-  requestText: {
-    textAlign: "center",
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
+  DropdownStyle: {
+    marginVertical: 10,
+    width: Theme.ScreenWidth * 0.9,
+    borderWidth: 1,
+    borderColor: "#4a6cef",
+    borderStyle: "dashed",
+    backgroundColor: "#f0f0f0",
+    borderRadius: Theme.ScreenWidth * 0.02,
+    paddingHorizontal: Theme.ScreenWidth * 0.05,
+    paddingVertical: Theme.ScreenHeight * 0.015,
+    elevation: 5,
   },
 });

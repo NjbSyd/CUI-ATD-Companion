@@ -1,20 +1,21 @@
-import { Image, Text, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import React from "react";
 import { useFonts } from "expo-font";
 import { BackgroundImage } from "@rneui/base";
+import Theme from "../Constants/Theme";
 
-const RenderButton = (
+const buttonWidth = Theme.HomeScreenButtonWidth;
+
+const RenderButton = ({
   iconName,
   screenName,
   screenDescription,
-  icon = true,
   disabled = false,
-  buttonWidth,
   navigation,
   loadedAd,
-  showAd
-) => {
+  showAd,
+}) => {
   const [fontLoaded] = useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
@@ -30,7 +31,7 @@ const RenderButton = (
         disabled={disabled}
         style={[
           styles.button,
-          { width: buttonWidth, height: buttonWidth + 20 },
+          { width: buttonWidth, height: buttonWidth + buttonWidth * 0.15 },
         ]}
         onPress={() => {
           if (loadedAd) {
@@ -48,36 +49,36 @@ const RenderButton = (
             width: "100%",
             height: "100%",
             resizeMode: "stretch",
-            justifyContent: "center",
             alignItems: "center",
           }}
           source={require("../../assets/Images/gradient.png")}
         >
-          {icon ? (
-            <FontAwesome5 name={iconName} size={50} color="white" />
-          ) : (
-            <Image
-              style={{
-                width: "35%",
-                height: "35%",
-                marginVertical: -5,
-                resizeMode: "contain",
-              }}
-              source={require("../../assets/Images/cui_logo_monochrome.png")}
-            />
-          )}
-          <Text style={styles.buttonText}>{screenName}</Text>
-          <Text
+          <View
             style={{
-              color: "white",
-              textAlign: "center",
-              fontSize: 12,
-              margin: 20,
-              fontFamily: "bricolage",
+              width: "100%",
+              height: "100%",
+              alignItems: "center",
+              padding: buttonWidth / 7,
             }}
           >
-            {screenDescription}
-          </Text>
+            <FontAwesome5
+              name={iconName}
+              size={buttonWidth / 4}
+              color="white"
+            />
+            <Text style={styles.buttonText}>{screenName}</Text>
+            <Text
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontSize: 12,
+                margin: buttonWidth / 20,
+                fontFamily: "bricolage",
+              }}
+            >
+              {screenDescription}
+            </Text>
+          </View>
         </BackgroundImage>
       </TouchableOpacity>
     </View>
@@ -87,14 +88,9 @@ const RenderButton = (
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    // paddingTop: 20,
-    // backgroundColor: "rgb(15, 44, 76)",
     marginVertical: 10,
     borderRadius: 10,
     overflow: "hidden",
-    height: "35%",
-    borderColor: "rgb(15, 44, 76)",
-    borderWidth: 1,
   },
   buttonText: {
     color: "white",
