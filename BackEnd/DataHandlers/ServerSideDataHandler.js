@@ -3,7 +3,6 @@ import {
   clearTimetableTable,
   insertOrUpdateTimetableDataInBatch,
 } from "../SQLiteFunctions";
-import axios from "axios";
 import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
 import {
   setFreeslots,
@@ -12,43 +11,89 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 
-const api = axios.create({
-  baseURL: "http://cui.eastasia.cloudapp.azure.com:3000",
-  timeout: 1000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const baseURL = "http://cui.eastasia.cloudapp.azure.com:3000";
+// const api = axios.create({
+//   baseURL: "http://cui.eastasia.cloudapp.azure.com:3000",
+//   timeout: 10000,
+//   headers: {
+//     "content-type": "application/json",
+//   },
+// });
 
-// Function to check if an update is needed
+// // Function to check if an update is needed
+// async function shouldUpdateDataFromServer() {
+//   try {
+//     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+//     if (!lastSyncDate) {
+//       return true;
+//     } else {
+//       if (!(await NetInfo.fetch()).isInternetReachable) {
+//         return false;
+//       }
+//       const { data } = await api.post(
+//         encodeURI(`timetable/shouldUpdate`),
+//         {
+//           lastSyncDate,
+//         },
+//         {
+//           timeout: 5000,
+//         }
+//       );
+//       if (data?.shouldUpdate) {
+//         return await askForDataUpdatePermission(data?.lastScrapDate);
+//       }
+//       return false;
+//     }
+//   } catch (error) {
+//     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+//     if (lastSyncDate) {
+//       return false;
+//     }
+//     throw error;
+//   }
+// }
+
 async function shouldUpdateDataFromServer() {
   try {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+
     if (!lastSyncDate) {
       return true;
     } else {
-      if (!(await NetInfo.fetch()).isInternetReachable) {
+      const isInternetReachable = (await NetInfo.fetch()).isInternetReachable;
+
+      if (!isInternetReachable) {
         return false;
       }
-      const { data } = await api.post(
-        encodeURI(`timetable/shouldUpdate`),
+
+      const response = await fetch(
+        encodeURI(`${baseURL}/timetable/shouldUpdate`),
         {
-          lastSyncDate,
-        },
-        {
-          timeout: 5000,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            lastSyncDate,
+          }),
         }
       );
+
+      const data = await response.json();
+
       if (data?.shouldUpdate) {
         return await askForDataUpdatePermission(data?.lastScrapDate);
       }
+
       return false;
     }
   } catch (error) {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
+
     if (lastSyncDate) {
       return false;
     }
+
     throw error;
   }
 }
@@ -59,8 +104,8 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    const updateNeeded = await shouldUpdateDataFromServer();
-    // const updateNeeded = true;
+    // const updateNeeded = await shouldUpdateDataFromServer();
+    const updateNeeded = true;
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
@@ -105,14 +150,29 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
   }
 }
 
+// async function fetchDataFromMongoDB(URL) {
+//   try {
+//     const res = await api.get(URL, {
+//       timeout: 10000,
+//     });
+//     return res.data;
+//   } catch (e) {
+//     throw e;
+//   }
+// }
+
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await api.get(URL, {
-      timeout: 10000,
+    const response = await fetch(`${baseURL}/${URL}`, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+      },
     });
-    return res.data;
-  } catch (e) {
-    throw e;
+
+    return await response.json();
+  } catch (error) {
+    throw error;
   }
 }
 
