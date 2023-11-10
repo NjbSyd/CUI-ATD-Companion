@@ -9,91 +9,58 @@ import {
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert } from "react-native";
+import { Alert, ToastAndroid } from "react-native";
+import axios from "axios";
 
-const baseURL = "http://cui.eastasia.cloudapp.azure.com:3000";
-// const api = axios.create({
-//   baseURL: "http://cui.eastasia.cloudapp.azure.com:3000",
-//   timeout: 10000,
-//   headers: {
-//     "content-type": "application/json",
-//   },
-// });
+const api = axios.create({
+  baseURL: "http://20.189.115.158:3000",
+  timeout: 10000,
+});
+api.interceptors.request.use(
+  (config) => {
+    ToastAndroid.show("Request Sent", ToastAndroid.SHORT);
+    return config;
+  },
+  (error) => {
+    ToastAndroid.show("Request Failed:" + error, ToastAndroid.SHORT);
+    return Promise.reject(error);
+  }
+);
 
-// // Function to check if an update is needed
-// async function shouldUpdateDataFromServer() {
-//   try {
-//     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-//     if (!lastSyncDate) {
-//       return true;
-//     } else {
-//       if (!(await NetInfo.fetch()).isInternetReachable) {
-//         return false;
-//       }
-//       const { data } = await api.post(
-//         encodeURI(`timetable/shouldUpdate`),
-//         {
-//           lastSyncDate,
-//         },
-//         {
-//           timeout: 5000,
-//         }
-//       );
-//       if (data?.shouldUpdate) {
-//         return await askForDataUpdatePermission(data?.lastScrapDate);
-//       }
-//       return false;
-//     }
-//   } catch (error) {
-//     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-//     if (lastSyncDate) {
-//       return false;
-//     }
-//     throw error;
-//   }
-// }
+api.interceptors.response.use(
+  (response) => {
+    ToastAndroid.show("Response Received", ToastAndroid.SHORT);
+    return response;
+  },
+  (error) => {
+    ToastAndroid.show("Response Failed:" + error, ToastAndroid.SHORT);
+    return Promise.reject(error);
+  }
+);
 
+// Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
   try {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-
     if (!lastSyncDate) {
       return true;
     } else {
-      const isInternetReachable = (await NetInfo.fetch()).isInternetReachable;
-
-      if (!isInternetReachable) {
+      if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-
-      const response = await fetch(
-        encodeURI(`${baseURL}/timetable/shouldUpdate`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            lastSyncDate,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
+      const { data } = await api.post(encodeURI(`timetable/shouldUpdate`), {
+        lastSyncDate,
+      });
       if (data?.shouldUpdate) {
         return await askForDataUpdatePermission(data?.lastScrapDate);
       }
-
       return false;
     }
   } catch (error) {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-
     if (lastSyncDate) {
       return false;
     }
-
     throw error;
   }
 }
@@ -150,29 +117,12 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
   }
 }
 
-// async function fetchDataFromMongoDB(URL) {
-//   try {
-//     const res = await api.get(URL, {
-//       timeout: 10000,
-//     });
-//     return res.data;
-//   } catch (e) {
-//     throw e;
-//   }
-// }
-
 async function fetchDataFromMongoDB(URL) {
   try {
-    const response = await fetch(`${baseURL}/${URL}`, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-      },
-    });
-
-    return await response.json();
-  } catch (error) {
-    throw error;
+    const res = await api.get(URL);
+    return res.data;
+  } catch (e) {
+    throw e;
   }
 }
 
