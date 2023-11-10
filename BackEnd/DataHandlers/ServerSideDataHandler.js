@@ -104,8 +104,8 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    // const updateNeeded = await shouldUpdateDataFromServer();
-    const updateNeeded = true;
+    const updateNeeded = await shouldUpdateDataFromServer();
+    // const updateNeeded = true;
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
