@@ -13,7 +13,7 @@ import { Alert, ToastAndroid } from "react-native";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://cui.eastasia.cloudapp.azure.com:3000/",
+  baseURL: "https://cui.eastasia.cloudapp.azure.com",
   timeout: 10000,
 });
 api.interceptors.request.use(
@@ -48,7 +48,7 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      const { data } = await api.post(encodeURI(`timetable/shouldUpdate`), {
+      const { data } = await api.post(`timetable/shouldUpdate`, {
         lastSyncDate,
       });
       if (data?.shouldUpdate) {
