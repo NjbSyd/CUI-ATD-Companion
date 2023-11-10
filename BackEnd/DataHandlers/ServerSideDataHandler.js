@@ -12,10 +12,13 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "react-native";
 
-const Timetable_API_URL =
-  "http://cui.eastasia.cloudapp.azure.com:3000/timetable";
-const FreeSlots_API_URL =
-  "http://cui.eastasia.cloudapp.azure.com:3000/freeslots";
+const api = axios.create({
+  baseURL: "http://cui.eastasia.cloudapp.azure.com:3000",
+  timeout: 1000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -27,8 +30,8 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      const { data } = await axios.post(
-        encodeURI(`${Timetable_API_URL}/shouldUpdate`),
+      const { data } = await api.post(
+        encodeURI(`timetable/shouldUpdate`),
         {
           lastSyncDate,
         },
@@ -66,7 +69,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
         );
       }
       setLoadingText("Fetching Data ...");
-      const timetableData = await fetchDataFromMongoDB(Timetable_API_URL);
+      const timetableData = await fetchDataFromMongoDB("timetable");
       if (
         timetableData.title &&
         timetableData?.title.toUpperCase().includes("UPDATE")
@@ -104,7 +107,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await axios.get(URL, {
+    const res = await api.get(URL, {
       timeout: 10000,
     });
     return res.data;
@@ -120,7 +123,7 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
       alert("No internet connection.");
       return;
     }
-    const res = await fetchDataFromMongoDB(FreeSlots_API_URL);
+    const res = await fetchDataFromMongoDB("freeslots");
     const freeslots = RemoveLabData(res);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));
