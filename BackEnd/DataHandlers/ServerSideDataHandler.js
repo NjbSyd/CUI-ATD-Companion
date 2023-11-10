@@ -13,7 +13,7 @@ import { Alert, ToastAndroid } from "react-native";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://www.server.m-nawa-z-khan.rocks/",
+  baseURL: "http://cui.eastasia.cloudapp.azure.com:3000/",
   timeout: 10000,
 });
 api.interceptors.request.use(
