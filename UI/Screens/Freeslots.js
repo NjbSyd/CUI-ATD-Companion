@@ -14,7 +14,6 @@ import {
 } from "../Functions/UIHelpers";
 import LoadingPopup from "../Components/Loading";
 import NoResults from "../Components/NoResults";
-import BannerAds from "../../Ads/BannerAd";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
@@ -123,8 +122,14 @@ export default function Freeslots({ navigation }) {
             onPress={async () => {
               try {
                 setLoading(true);
-                await fetchAndStoreFreeslotsData(StateDispatcher);
+                const res = await fetchAndStoreFreeslotsData(StateDispatcher);
                 setLoading(false);
+                if (typeof res === "object") {
+                  console.log(res);
+                  navigation.navigate("Error", {
+                    message: res,
+                  });
+                }
               } catch (e) {
                 Alert.alert("Something Went Wrong!", e.message, [
                   {
@@ -143,7 +148,7 @@ export default function Freeslots({ navigation }) {
         </View>
       )}
       <LoadingPopup visible={loading} text={"Loading..."} />
-      <BannerAds />
+      {/*<BannerAds />*/}
     </View>
   );
 }

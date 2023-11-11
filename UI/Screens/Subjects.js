@@ -1,17 +1,10 @@
-import {
-  Keyboard,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Keyboard, RefreshControl, ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { Dropdown } from "react-native-element-dropdown";
 import { List } from "../Components/List";
 import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
 import { useDispatch, useSelector } from "react-redux";
-import BannerAds from "../../Ads/BannerAd";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
 import Theme from "../Constants/Theme";
@@ -107,13 +100,13 @@ export function Subjects() {
           <List data={selectedSubjectData} type={"Subject"} />
         )}
       </ScrollView>
-      <View
-        style={{
-          display: isKeyboardOpen ? "none" : "flex",
-        }}
-      >
-        <BannerAds />
-      </View>
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    display: isKeyboardOpen ? "none" : "flex",*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <BannerAds />*/}
+      {/*</View>*/}
     </ScrollView>
   );
 }

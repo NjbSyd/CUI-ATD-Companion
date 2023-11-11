@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { FontAwesome } from "@expo/vector-icons";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
-import BannerAds from "../../Ads/BannerAd";
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -161,13 +160,13 @@ export default function Timetable() {
           <NoSelection message={"Pick A Class"} />
         )}
       </ScrollView>
-      <View
-        style={{
-          display: isKeyboardOpen ? "none" : "flex",
-        }}
-      >
-        <BannerAds />
-      </View>
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    display: isKeyboardOpen ? "none" : "flex",*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <BannerAds />*/}
+      {/*</View>*/}
     </ScrollView>
   );
 }

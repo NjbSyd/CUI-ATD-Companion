@@ -3,7 +3,6 @@ import { BackHandler, ScrollView, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { RenderButton } from "../Components/MainScreenButton";
 import { handleBackPress } from "../Functions/UIHelpers";
-import BannerAds from "../../Ads/BannerAd";
 import useInterstitialAd from "../../Ads/InterstitialAd";
 import { HomeButtonsData } from "../Constants/HomeButtons";
 import Theme from "../Constants/Theme";
@@ -55,7 +54,7 @@ const Main = ({ navigation }) => {
           />
         ))}
       </ScrollView>
-      <BannerAds />
+      {/*<BannerAds />*/}
     </View>
   );
 };

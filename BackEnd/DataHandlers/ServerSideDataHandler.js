@@ -1,4 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
+import * as Application from "expo-application";
 import {
   clearTimetableTable,
   insertOrUpdateTimetableDataInBatch,
@@ -9,34 +10,18 @@ import {
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, ToastAndroid } from "react-native";
+import { Alert } from "react-native";
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://cui.eastasia.cloudapp.azure.com",
+const api1 = axios.create({
+  baseURL: "https://timetable-scrapper.onrender.com/",
+  timeout: 30000,
+});
+const api2 = axios.create({
+  baseURL: "https://www.server.m-nawa-z-khan.rocks/",
   timeout: 10000,
 });
-api.interceptors.request.use(
-  (config) => {
-    ToastAndroid.show("Request Sent", ToastAndroid.SHORT);
-    return config;
-  },
-  (error) => {
-    ToastAndroid.show("Request Failed:" + error, ToastAndroid.SHORT);
-    return Promise.reject(error);
-  }
-);
-
-api.interceptors.response.use(
-  (response) => {
-    ToastAndroid.show("Response Received", ToastAndroid.SHORT);
-    return response;
-  },
-  (error) => {
-    ToastAndroid.show("Response Failed:" + error, ToastAndroid.SHORT);
-    return Promise.reject(error);
-  }
-);
+const API = [api2, api1];
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -48,11 +33,29 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      const { data } = await api.post(`timetable/shouldUpdate`, {
-        lastSyncDate,
-      });
+      let res;
+      for (let i = 0; i < API.length; i++) {
+        try {
+          res = await API[i].post(`timetable/shouldUpdate`, {
+            lastSyncDate,
+            version: Application.nativeApplicationVersion,
+          });
+          if (res) {
+            break;
+          }
+        } catch (e) {
+          if (i === API.length - 1) {
+            throw e;
+          }
+        }
+      }
+      const data = res?.data;
+
       if (data?.shouldUpdate) {
         return await askForDataUpdatePermission(data?.lastScrapDate);
+      }
+      if (data?.title?.toUpperCase().includes("UPDATE")) {
+        return data;
       }
       return false;
     }
@@ -73,6 +76,9 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
   try {
     const updateNeeded = await shouldUpdateDataFromServer();
     // const updateNeeded = true;
+    if (updateNeeded?.title?.toUpperCase().includes("UPDATE")) {
+      return updateNeeded;
+    }
     if (updateNeeded) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
@@ -119,7 +125,17 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await api.get(URL);
+    let res;
+    for (let i = 0; i < API.length; i++) {
+      res = await API[i].get(URL, {
+        params: {
+          version: Application.nativeApplicationVersion,
+        },
+      });
+      if (res) {
+        break;
+      }
+    }
     return res.data;
   } catch (e) {
     throw e;
@@ -134,6 +150,10 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
       return;
     }
     const res = await fetchDataFromMongoDB("freeslots");
+    if (res.title && res.title.toUpperCase().includes("UPDATE")) {
+      console.log(res);
+      return res;
+    }
     const freeslots = RemoveLabData(res);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));

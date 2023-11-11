@@ -173,13 +173,13 @@ export function Classroom() {
         )}
       </ScrollView>
       <LoadingPopup text={"Searching..."} visible={isSearching} />
-      <View
-        style={{
-          display: isKeyboardOpen ? "none" : "flex",
-        }}
-      >
-        <BannerAds />
-      </View>
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    display: isKeyboardOpen ? "none" : "flex",*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  <BannerAds />*/}
+      {/*</View>*/}
     </ScrollView>
   );
 }

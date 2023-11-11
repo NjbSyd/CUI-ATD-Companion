@@ -49,7 +49,7 @@ const ErrorScreen = ({ route, navigation }) => {
             },
           ]}
           onPress={() => {
-            if (title === "Update Needed") {
+            if (updateNeeded) {
               Linking.openURL(
                 "https://play.google.com/store/apps/details?id=com.njbsyd.cui.unofficial"
               )
