@@ -1,97 +1,89 @@
-[![Android Build](https://github.com/NjbSyd/Unofficial-CUI/actions/workflows/main.yml/badge.svg)](https://github.com/NjbSyd/Unofficial-CUI/actions/workflows/main.yml)
-# Welcome to the CUI Unofficial Timetable App! 🚀📅
+# CUI ATD Companion
 
-Introducing our cutting-edge CUI Unofficial Timetable App, your ultimate companion for hassle-free schedule management. Powered by the latest tech wizardry, this app brings you a smooth and intuitive experience that'll have you soaring through your classes like a pro! 🚀💻
+Welcome to the CUI ATD Companion, your comprehensive solution for effective schedule management. Our CUI Unofficial Timetable App is designed with state-of-the-art technology to provide a seamless and intuitive experience for your academic journey.
 
-## Features 🌟
+## Features
 
-- **Classroom-based Timetables:** Choose your classroom from the dropdown and behold your personalized schedule. Your classes, your way! 📚🚀
+- **Classroom-based Timetables:** Personalize your schedule by selecting your classroom from the dropdown menu.
 
-- **Teacher-based Timetables:** Curious about your favorite teacher's classes? Pick their name from the list and discover their timetable. It's like a secret map to success! 👨‍🏫🗺️
+- **Teacher-based Timetables:** Explore class schedules for specific teachers.
 
-- **Subject-based Timetables:** Wondering when you'll be studying your favorite subjects? Our app shows you the full picture, complete with class names and teachers. Knowledge is power! 💡🔍
+- **Subject-based Timetables:** Access comprehensive subject schedules with class and teacher details.
 
-- **Filter by Day:** Navigate the week like a pro by filtering your timetable by days. Stay ahead of the game, one day at a time! ⏳📅
+- **Free Slots Search:** Easily find available time slots in your timetable.
 
-- **Offline Support:** Lost in a Wi-Fi black hole? Fear not! Our app caches data locally, ensuring you can access your timetable even in offline mode. Learning never stops! 📶🚫
+- **Filter by Day:** Efficiently navigate the weekly schedule by filtering classes based on days.
 
-- **Real-time Data Updates:** We've got your back with real-time data synchronization. Your timetable stays up-to-date, no cosmic delays! 🔄🚀
+- **Offline Support:** Access your timetable without an internet connection.
 
-- **Intuitive UI:** Our user-friendly interface makes time management a breeze. Get ready to rock your classes with ease! 🌟💻
+- **Real-time Data Updates:** Stay up-to-date with synchronized real-time data.
 
-## Requirements 📜🚀
+- **Portal Login Integration:** Seamlessly log in to the CUI portal for a unified experience.
 
-- Android/iOS Device or Emulator. (Sorry, no spaceships or time machines required! 🚀🕰️)
+- **Intuitive UI:** User-friendly interface for straightforward time management.
+
+## Requirements
+
+- Android/iOS Device or Emulator.
 - Node.js (LTS version) and Yarn.
 
-## Installation 🚀🔧
+## Installation
 
-1. Clone this repository to your local machine using:
+1. Clone this repository to your local machine:
 
-```
-git clone https://github.com/NjbSyd/Unofficial-CUI.git
-```
+    ```
+    git clone https://github.com/NjbSyd/CUI-ATD-Companion.git
+    ```
 
 2. Navigate to the project directory:
 
-```
-cd cui-unofficial-timetable
-```
+    ```
+    cd <directory-name>
+    ```
 
 3. Install the required dependencies using Yarn:
 
-```
-yarn install
-```
+    ```
+    yarn install
+    ```
 
-## Usage 🚀🚀
+## Usage
 
 1. Start the Expo development server:
 
-```
-yarn start
-```
+    ```
+    npx expo start
+    ```
 
 2. Use the Expo Go app on your Android/iOS device to scan the QR code shown in the console.
 
-3. Don't have a device handy? No problem! Run the app on an Android/iOS emulator through the Expo development server. Time-saving tech, at your service! 📱💨
+3. Alternatively, run the app on an Android/iOS emulator through the Expo development server.
 
-## Technologies Used 👩‍💻🚀
+## Technologies Used
 
-- **React Native:** The backbone of our app, allowing us to build smooth and efficient interfaces for all CUI space explorers! 🚀🌌
+- React Native
+- Expo
+- Redux Toolkit
+- Expo SQLite
+- Axios
+- Lottie
 
-- **Expo:** The cosmic toolkit that streamlines React Native development and deployment. Say goodbye to tedious setups! ⚙️📦
+## Contributing
 
-- **Redux Toolkit:** Empowering our app with state-of-the-art state management, keeping everything running like clockwork! 🕰️💼
+Contributions and ideas are welcome. Report bugs or propose changes by opening an issue or creating a pull request.
 
-- **Expo SQLite:** A stellar local database that ensures seamless offline support for all your class schedules. No black holes here! 📚🌠
+## License
 
-- **Axios:** Our trusty companion for handling data retrieval and ensuring smooth cosmic connections. ⚡️🔗
+This project is licensed under the MIT License.
 
-- **Lottie:** Adding a touch of cosmic magic with stunning animations that'll leave you starstruck! ✨🌟
+## Acknowledgements
 
-## Contributing 🌌🌟
+We express our gratitude to the CUI Administration for providing the data used in the app. It's important to note that this app is an independent project, not officially supported or endorsed by the university. We adhere to ethical practices and respect intellectual property rights.
 
-Calling all cosmic contributors and intergalactic idea-generators! We welcome your help in making this app even more amazing. Found a bug or have a stellar idea? Don't be shy, open an issue or create a pull request! 🌠💬
+## Releases
 
-## License 📜🚀
+Stay updated on the latest changes, bug fixes, and features in the [GitHub Releases](https://github.com/NjbSyd/Unofficial-CUI/releases) page.
 
-This project is licensed under the MIT License, making it a universe-wide gift to all CUI time-travelers and knowledge-seekers! 🎁🚀
+## Contact
 
-## Acknowledgements 🙏🌌
-
-We want to give a special shout-out to the **CUI Administration** for providing the cosmic data we scrape from their official website! 🌟🌌 The raw data can be found at [CUI Timetable](https://cuonline.cuiatd.edu.pk/Timetable/Timetable.aspx). The cosmos of knowledge awaits! 🚀💡
-
-Please note that this app is an independent project created by enthusiastic developers and is not officially supported or endorsed by the university. We adhere to ethical practices in software development and respect intellectual property rights. Time-traveling ethics are important to us! ⏳🌌
-
-We extend our cosmic appreciation to all the contributors and users who find value in using this app to efficiently manage their timetables. Your support and feedback are highly valued. 🙌🌟
-
-## Releases 🚀🌌
-
-Time-travelers love updates! Discover the latest cosmic changes, bug fixes, and new features in the [GitHub Releases](https://github.com/NjbSyd/Unofficial-CUI/releases) page. The cosmos is ever-changing, and so is our app! 🌌📰
-
-## Contact 🚀🌟
-
-Have questions or feedback about the app? Reach out to us at [tcanjb@gmail.com](mailto:tcanjb@gmail.com). We'll respond at warp speed! 🚀📨
-
-Thank you for joining us on this cosmic journey! We hope our app proves to be your trusty companion in navigating the vast universe of timetables. Get ready to rock your classes like never before! 🚀🌟📅
+For questions or feedback, please contact us at [tcanjb@gmail.com](mailto:tcanjb@gmail.com).
