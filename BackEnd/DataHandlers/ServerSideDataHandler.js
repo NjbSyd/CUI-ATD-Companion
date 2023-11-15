@@ -15,8 +15,11 @@ import {
 } from "../SQLiteFunctions";
 
 const API = axios.create({
-  baseURL: "https://timetable-scrapper.onrender.com/",
+  baseURL: "https://cui-atd-companion-scrapper-production.up.railway.app/",
 });
+// const API = axios.create({
+//   baseURL: "https://timetable-scrapper.onrender.com/",
+// });
 // const API = axios.create({
 //   baseURL: "http://192.168.43.126:3000/",
 // });
