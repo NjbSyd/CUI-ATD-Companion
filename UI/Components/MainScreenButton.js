@@ -12,84 +12,67 @@ const RenderButton = ({
   iconName,
   screenName,
   screenDescription,
-  disabled = false,
   navigation,
-  loadedAd,
-  showAd,
 }) => {
   useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   return (
-    <View
-      style={
-        disabled && {
-          opacity: 0.5,
-        }
-      }
+    <TouchableOpacity
+      style={[
+        styles.button,
+        {
+          width: buttonWidth,
+          height: buttonWidth + buttonWidth * 0.15,
+          flexWrap: "wrap",
+        },
+      ]}
+      onPress={() => {
+        navigation.navigate(screenName);
+      }}
     >
-      <TouchableOpacity
-        disabled={disabled}
-        style={[
-          styles.button,
-          { width: buttonWidth, height: buttonWidth + buttonWidth * 0.15 },
-        ]}
-        onPress={() => {
-          if (loadedAd) {
-            try {
-              showAd();
-            } catch (e) {
-              console.log(e);
-            }
-          }
-          navigation.navigate(screenName);
+      <BackgroundImage
+        style={{
+          width: "100%",
+          height: "100%",
+          resizeMode: "stretch",
+          alignItems: "center",
         }}
+        source={require("../../assets/Images/gradient.png")}
       >
-        <BackgroundImage
+        <View
           style={{
             width: "100%",
             height: "100%",
-            resizeMode: "stretch",
             alignItems: "center",
+            paddingVertical: Theme.ScreenWidth * 0.1,
           }}
-          source={require("../../assets/Images/gradient.png")}
         >
-          <View
+          <FontAwesome5 name={iconName} size={buttonWidth / 4} color="white" />
+          <Text style={styles.buttonText}>{screenName}</Text>
+          <Text
             style={{
-              width: "100%",
-              height: "100%",
-              alignItems: "center",
-              padding: buttonWidth / 7,
+              color: "white",
+              textAlign: "center",
+              fontSize: 12,
+              margin: Theme.ScreenWidth * 0.01,
+              fontFamily: "bricolage",
+              height: "auto",
             }}
           >
-            <FontAwesome5
-              name={iconName}
-              size={buttonWidth / 4}
-              color="white"
-            />
-            <Text style={styles.buttonText}>{screenName}</Text>
-            <Text
-              style={{
-                color: "white",
-                textAlign: "center",
-                fontSize: 12,
-                margin: buttonWidth / 20,
-                fontFamily: "bricolage",
-              }}
-            >
-              {screenDescription}
-            </Text>
-          </View>
-        </BackgroundImage>
-      </TouchableOpacity>
-    </View>
+            {screenDescription}
+          </Text>
+        </View>
+      </BackgroundImage>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
     alignItems: "center",
-    marginVertical: 10,
+    marginHorizontal: Theme.ScreenWidth * 0.01,
+    marginTop: Theme.ScreenWidth * 0.05,
     borderRadius: 10,
     overflow: "hidden",
   },

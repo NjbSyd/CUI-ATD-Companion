@@ -227,13 +227,6 @@ const LoginScreen = ({ navigation }) => {
           ))}
         </ScrollView>
       )}
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    display: isKeyboardOpen ? "none" : "flex",*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  <BannerAds />*/}
-      {/*</View>*/}
     </View>
   );
 };

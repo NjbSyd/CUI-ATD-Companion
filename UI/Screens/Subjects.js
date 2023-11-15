@@ -18,27 +18,6 @@ export function Subjects() {
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  // const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  // useEffect(() => {
-  //   const keyboardDidShowListener = Keyboard.addListener(
-  //     "keyboardDidShow",
-  //     () => {
-  //       setIsKeyboardOpen(true);
-  //     },
-  //   );
-  //
-  //   const keyboardDidHideListener = Keyboard.addListener(
-  //     "keyboardDidHide",
-  //     () => {
-  //       setIsKeyboardOpen(false);
-  //     },
-  //   );
-  //
-  //   return () => {
-  //     keyboardDidShowListener.remove();
-  //     keyboardDidHideListener.remove();
-  //   };
-  // }, []);
   return (
     <ScrollView
       scrollEnabled={false}
@@ -101,13 +80,6 @@ export function Subjects() {
           <List data={selectedSubjectData} type="Subject" />
         )}
       </ScrollView>
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    display: isKeyboardOpen ? "none" : "flex",*/}
-      {/*  }}*/}
-      {/*>*/}
-      {/*  <BannerAds />*/}
-      {/*</View>*/}
     </ScrollView>
   );
 }

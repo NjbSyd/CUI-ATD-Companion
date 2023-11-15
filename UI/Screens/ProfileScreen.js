@@ -1,10 +1,7 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
-import { Block, Text, theme, Button as GaButton } from "galio-framework";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   StyleSheet,
-  Dimensions,
   ScrollView,
   Image,
   Linking,
@@ -12,344 +9,260 @@ import {
   BackHandler,
   TouchableOpacity,
   View,
+  Text,
 } from "react-native";
 
 import Theme from "../Constants/Theme";
 
-const { width, height } = Dimensions.get("screen");
-
-const thumbMeasure = (width - 48 - 32) / 3;
-
 const ProfileScreen = ({ navigation }) => {
-  useFocusEffect(
-    useCallback(() => {
-      BackHandler.addEventListener("hardwareBackPress", () => {
-        navigation.navigate("Home");
-        return true;
-      });
-      return () =>
-        BackHandler.removeEventListener("hardwareBackPress", () => {
-          navigation.navigate("Home");
-          return true;
-        });
-    }, []),
-  );
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => <></>,
+      headerTitleStyle: [styles.title, { color: "#7c47d9" }],
+      headerTitle: "About the App",
+    });
+  }, []);
+  const handleBackPress = () => {
+    navigation.navigate("Home");
+    return true;
+  };
+
+  useCallback(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+    return () =>
+      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+  }, []);
+
   return (
-    <Block
-      style={{
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}
-    >
-      <Block
-        flex
-        style={{
-          padding: theme.SIZES.BASE,
-          marginTop: height * 0.05,
-          marginBottom: height * 0.005,
-        }}
-      >
-        <ScrollView showsVerticalScrollIndicator>
-          <Block flex>
-            <Block middle>
-              <Text
-                style={[styles.title, { color: Theme.COLORS.GRADIENT_END }]}
-              >
-                About the App
-              </Text>
-              <Text size={16} muted style={styles.titleDetails}>
-                The CUIATD Companion App provides a simple and efficient way to
-                manage your class schedules. Built with expertise in React
-                Native and Web technologies, it offers a user-friendly interface
-                for navigating timetables, browsing university portal, exploring
-                classroom, teacher, and subject-based schedules with ease.
-              </Text>
-            </Block>
-          </Block>
-          <View
-            style={{
-              marginTop: Theme.SIZES.BASE,
-              borderBottomColor: "#000",
-              borderBottomWidth: 0.5,
-            }}
-          />
-          <Block flex>
-            <Block middle>
-              <Text style={[styles.title, { color: Theme.COLORS.ACTIVE }]}>
-                Privacy Policy
-              </Text>
-              <Text size={16} style={styles.titleDetails}>
-                This app does not collect, store, or share any personal
-                information. Any login credentials saved are stored locally on
-                your device for your convenience. This app doesn't integrate
-                with third-party services which might collect your data. Your
-                data security is the priority. For any inquiries, contact us.
-              </Text>
-            </Block>
-          </Block>
-          <View
-            style={{
-              marginTop: Theme.SIZES.BASE,
-              borderBottomColor: "#000",
-              borderBottomWidth: 0.5,
-            }}
-          />
-          <Block flex>
-            <Block middle>
-              <Text style={[styles.title, { color: Theme.COLORS.BEHANCE }]}>
-                Data Source
-              </Text>
-              <Text size={16} muted style={styles.titleDetails}>
-                The data used in this app is sourced from the official CUI
-                Administration website. Specifically, it is obtained from the
-                CUI Timetable page. Please note that this app is an independent
-                project and is not officially supported or endorsed by the
-                university. We adhere to ethical practices in software
-                development and respect intellectual property rights.
-              </Text>
-            </Block>
-          </Block>
-          <View
-            style={{
-              marginTop: Theme.SIZES.BASE,
-              borderBottomColor: "#000",
-              borderBottomWidth: 0.5,
-            }}
-          />
-          <Block
-            flex
-            style={{
-              marginTop: theme.SIZES.BASE / 2,
-            }}
-          >
-            <Block middle>
-              <Text
-                style={{
-                  fontFamily: "montserrat-bold",
-                  marginBottom: theme.SIZES.BASE / 2,
-                  fontWeight: "900",
-                  fontSize: 26,
-                  letterSpacing: 2,
-                  color: "#000",
-                }}
-              >
-                Contributors
-              </Text>
-            </Block>
-            <Block row style={{ justifyContent: "center", marginBottom: 5 }}>
-              <TouchableOpacity
-                onPress={() => {
-                  try {
-                    Linking.openURL("https://github.com/NjbSyd").then(() => {});
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              >
-                <Image
-                  source={{
-                    uri: "https://avatars.githubusercontent.com/u/95611072?v=4",
-                  }}
-                  style={styles.avatar}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  try {
-                    Linking.openURL("https://github.com/Nawaz393").then(
-                      () => {},
-                    );
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
-              >
-                <Image
-                  source={{
-                    uri: "https://avatars.githubusercontent.com/u/91367891?v=4",
-                  }}
-                  style={styles.avatar}
-                />
-              </TouchableOpacity>
-            </Block>
-          </Block>
-          <Block
-            flex
-            style={{
-              marginTop: theme.SIZES.BASE / 2,
-            }}
-          >
-            <Block middle>
-              <Text
-                style={{
-                  fontFamily: "montserrat-bold",
-                  fontWeight: "900",
-                  fontSize: 20,
-                  letterSpacing: 2,
-                }}
-                color="black"
-              >
-                Get In Touch
-              </Text>
-            </Block>
-            <Block
-              row
-              style={{
-                justifyContent: "center",
-                marginBottom: 5,
+    <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.section}>
+          <Text style={styles.text}>
+            The CUIATD Companion App provides a simple and efficient way to
+            manage your class schedules. Built with expertise in React Native
+            and Web technologies, it offers a user-friendly interface for
+            navigating timetables, browsing university portal, exploring
+            classroom, teacher, and subject-based schedules with ease.
+          </Text>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.section}>
+          <Text style={[styles.title, { color: "#00a7ff" }]}>
+            Privacy Policy
+          </Text>
+          <Text style={styles.text}>
+            This app does not collect, store, or share any personal information.
+            Any login credentials saved are stored locally on your device for
+            your convenience.{" "}
+            <Text
+              style={styles.linkText}
+              onPress={() => {
+                Linking.openURL(
+                  "https://njbsyd.github.io/CUI-ATD-Companion/",
+                ).then(() => {});
               }}
             >
-              <GaButton
-                round
-                onlyIcon
-                shadowless
-                icon="linkedin"
-                iconFamily="Entypo"
-                iconColor={Theme.COLORS.WHITE}
-                iconSize={Theme.SIZES.BASE * 1.375}
-                color="#00a7ff"
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL(
-                      "https://www.linkedin.com/in/najeeb-said-170477234/",
-                    ).then(() => {});
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
+              Read more
+            </Text>{" "}
+          </Text>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.section}>
+          <Text style={[styles.title, { color: "#EA4335" }]}>Data Source</Text>
+          <Text style={styles.text}>
+            The data used in this app is sourced from the official CUI
+            Administration website . Specifically, it is obtained from the{" "}
+            <Text
+              style={styles.linkText}
+              onPress={() => {
+                Linking.openURL(
+                  "https://cuonline.cuiatd.edu.pk/Timetable/Timetable.aspx",
+                ).then(() => {});
+              }}
+            >
+              CUI Timetable
+            </Text>{" "}
+            page. Please note that this app is an independent project and is not
+            officially supported or endorsed by the university. We adhere to
+            ethical practices in software development and respect intellectual
+            property rights.
+          </Text>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.section}>
+          <Text style={styles.title}>Contributors</Text>
+          <View style={styles.avatarContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  Linking.openURL("https://github.com/NjbSyd").then(() => {});
+                } catch (e) {
+                  ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                }
+              }}
+            >
+              <Image
+                source={{
+                  uri: "https://avatars.githubusercontent.com/u/95611072?v=4",
                 }}
+                style={[
+                  styles.avatar,
+                  {
+                    width: Theme.SIZES.BASE * 3.5,
+                    aspectRatio: 1,
+                    borderRadius: Theme.SIZES.BASE * 1.75,
+                  },
+                ]}
               />
-              <GaButton
-                round
-                shadowless
-                iconColor={Theme.COLORS.WHITE}
-                iconSize={Theme.SIZES.BASE * 1.375}
-                color="#ea4335"
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL("mailto:tcanjb@gmail.com").then(() => {});
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                try {
+                  Linking.openURL("https://github.com/Nawaz393").then(() => {});
+                } catch (e) {
+                  ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                }
+              }}
+            >
+              <Image
+                source={{
+                  uri: "https://avatars.githubusercontent.com/u/91367891?v=4",
                 }}
-              >
-                <MaterialCommunityIcons
-                  name="gmail"
-                  size={Theme.SIZES.BASE * 1.375}
-                  color="#fff"
-                />
-              </GaButton>
-              <GaButton
-                round
-                onlyIcon
-                shadowless
-                icon="google-play"
-                iconFamily="Entypo"
-                iconColor={Theme.COLORS.WHITE}
-                iconSize={Theme.SIZES.BASE * 1.375}
-                color="#4285f4"
-                style={[styles.social, styles.shadow]}
-                onPress={() => {
-                  try {
-                    Linking.openURL(
-                      "https://play.google.com/store/apps/dev?id=5430143247484849184",
-                    ).then(() => {});
-                  } catch (e) {
-                    ToastAndroid.show(e.message, ToastAndroid.SHORT);
-                  }
-                }}
+                style={[
+                  styles.avatar,
+                  {
+                    width: Theme.SIZES.BASE * 3.5,
+                    aspectRatio: 1,
+                    borderRadius: Theme.SIZES.BASE * 1.75,
+                  },
+                ]}
               />
-            </Block>
-          </Block>
-        </ScrollView>
-      </Block>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.separator} />
+        <View style={styles.section}>
+          <Text style={styles.title}>Get In Touch</Text>
+          <View style={styles.socialContainer}>
+            <TouchableOpacity
+              style={[
+                styles.avatar,
+                { backgroundColor: "#00a7ff", borderColor: "#00a7ff" },
+              ]}
+              onPress={() => {
+                try {
+                  Linking.openURL(
+                    "https://www.linkedin.com/in/najeeb-said-170477234/",
+                  ).then(() => {});
+                } catch (e) {
+                  ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                }
+              }}
+            >
+              <MaterialCommunityIcons
+                name="linkedin"
+                size={Theme.SIZES.BASE * 2}
+                color="#fff"
+              />
+            </TouchableOpacity>
 
-      <GaButton
-        round
-        onlyIcon
-        shadowless
-        icon="back"
-        iconFamily="AntDesign"
-        iconColor={Theme.COLORS.WHITE}
-        iconSize={Theme.SIZES.BASE * 1.375}
-        color="#4c5054"
-        style={{
-          position: "absolute",
-          marginTop: height * 0.05,
-          height: "5%",
-          width: "15%",
-        }}
-        onPress={() => {
-          navigation.navigate("Home");
-        }}
-      />
-    </Block>
+            <TouchableOpacity
+              style={[
+                styles.avatar,
+                { backgroundColor: "#ea4335", borderColor: "#ea4335" },
+              ]}
+              onPress={() => {
+                try {
+                  Linking.openURL("mailto:tcanjb@gmail.com").then(() => {});
+                } catch (e) {
+                  ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                }
+              }}
+            >
+              <MaterialCommunityIcons
+                name="gmail"
+                size={Theme.SIZES.BASE * 2}
+                color="#fff"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.avatar,
+                { backgroundColor: "#4285f4", borderColor: "#4285f4" },
+              ]}
+              onPress={() => {
+                try {
+                  Linking.openURL(
+                    "https://play.google.com/store/apps/dev?id=5430143247484849184",
+                  ).then(() => {});
+                } catch (e) {
+                  ToastAndroid.show(e.message, ToastAndroid.SHORT);
+                }
+              }}
+            >
+              <MaterialCommunityIcons
+                name="google-play"
+                size={Theme.SIZES.BASE * 2}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  profileContainer: {
-    width,
-    height,
-    padding: 0,
-    zIndex: 1,
+  container: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    backgroundColor: Theme.COLORS.WHITE,
   },
-  profileBackground: {
-    width,
-    height: height * 0.43,
-    backgroundColor: "#000",
-    opacity: 0.7,
-  },
-  info: {
-    marginTop: 30,
-    paddingHorizontal: 10,
-    height: height * 0.8,
-  },
-  avatar: {
-    width: thumbMeasure * 0.6,
-    height: thumbMeasure * 0.6,
-    borderRadius: 50,
-    borderWidth: 1.5,
-    borderColor: "#000",
-    marginHorizontal: 10,
-  },
-  nameInfo: {
-    marginTop: 35,
-  },
-  thumb: {
-    borderRadius: 4,
-    marginVertical: 4,
-    alignSelf: "center",
-    width: thumbMeasure,
-    height: thumbMeasure,
-  },
-  social: {
-    width: Theme.SIZES.BASE * 3,
-    height: Theme.SIZES.BASE * 3,
-    borderRadius: Theme.SIZES.BASE * 1.5,
-    justifyContent: "center",
-    zIndex: 99,
-    marginHorizontal: 5,
+  section: {
+    padding: Theme.ScreenWidth * 0.05,
   },
   title: {
-    color: "#7c47d9",
-    marginTop: 15,
-    zIndex: 2,
     fontFamily: "montserrat-bold",
-    marginBottom: theme.SIZES.BASE / 2,
-    fontWeight: "900",
     fontSize: 26,
     letterSpacing: 2,
+    marginBottom: Theme.ScreenWidth * 0.025,
   },
-  titleDetails: {
-    textAlign: "left",
+  text: {
     fontFamily: "montserrat-regular",
-    zIndex: 2,
     lineHeight: 25,
     color: "#000",
-    paddingHorizontal: Theme.SIZES.BASE * 0.8,
+  },
+  separator: {
+    borderBottomColor: Theme.COLORS.GITHUB,
+    borderBottomWidth: 0.5,
+  },
+
+  avatarContainer: {
+    flexDirection: "row",
+    marginBottom: 5,
+  },
+  avatar: {
+    width: Theme.SIZES.BASE * 3,
+    aspectRatio: 1,
+    borderRadius: Theme.SIZES.BASE * 1.5,
+    borderWidth: 1.5,
+    borderColor: "#000",
+    marginHorizontal: Theme.SIZES.BASE * 0.6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  socialContainer: {
+    flexDirection: "row",
+    marginBottom: 5,
+  },
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    textDecorationColor: "blue",
+    fontWeight: "bold",
   },
 });
 

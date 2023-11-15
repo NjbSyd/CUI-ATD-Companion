@@ -149,7 +149,6 @@ export default function Freeslots({ navigation }) {
         </View>
       )}
       <LoadingPopup visible={loading} text="Loading..." />
-      {/*<BannerAds />*/}
     </View>
   );
 }

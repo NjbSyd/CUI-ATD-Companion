@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
-import * as Application from "expo-application";
 import { Alert } from "react-native";
 
 import {
@@ -36,7 +35,6 @@ async function shouldUpdateDataFromServer() {
       }
       const res = await API.post(`timetable/shouldUpdate`, {
         lastSyncDate,
-        version: Application.nativeApplicationVersion,
       });
       const data = {
         shouldUpdate: undefined,
@@ -120,11 +118,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await API.get(URL, {
-      params: {
-        version: Application.nativeApplicationVersion,
-      },
-    });
+    const res = await API.get(URL);
     return res.data;
   } catch (e) {
     throw e;

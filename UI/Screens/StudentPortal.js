@@ -112,7 +112,6 @@ export default function StudentPortal({ route, navigation }) {
         onNavigationStateChange={onNavigationStateChange}
         onMessage={handleOnMessageEvent}
       />
-      {/*<BannerAds />*/}
     </View>
   );
 }

@@ -1,16 +1,13 @@
 import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
-import { BackHandler, ScrollView, StyleSheet, View } from "react-native";
+import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 
-import useInterstitialAd from "../../Ads/InterstitialAd";
 import { RenderButton } from "../Components/MainScreenButton";
-import { HomeButtonsData } from "../Constants/HomeButtons";
+import { HomeButtonsData } from "../Constants/HomeButtonsData";
 import Theme from "../Constants/Theme";
 import { handleBackPress } from "../Functions/UIHelpers";
 
 const Main = ({ navigation }) => {
-  const { loadedAd, displayAd } = useInterstitialAd();
-
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => <></>,
@@ -19,9 +16,6 @@ const Main = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      if (loadedAd) {
-        displayAd();
-      }
       const onBackPress = handleBackPress;
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
@@ -36,34 +30,30 @@ const Main = ({ navigation }) => {
         backgroundColor: Theme.COLORS.WHITE,
       }}
     >
-      <ScrollView
+      <FlatList
         style={{
           height: Theme.ScreenHeight * 0.9,
           flex: 1,
         }}
+        numColumns={2}
         contentContainerStyle={styles.buttonContainer}
-      >
-        {HomeButtonsData.map((button, index) => (
+        data={HomeButtonsData}
+        keyExtractor={(item, index) => `${item.screenName}${index}`}
+        renderItem={({ item }) => (
           <RenderButton
-            key={(button.screenName + index).toString()}
-            iconName={button.iconName}
-            screenName={button.screenName}
-            screenDescription={button.screenDescription}
+            iconName={item.iconName}
+            screenName={item.screenName}
+            screenDescription={item.screenDescription}
             navigation={navigation}
-            loadedAd={loadedAd}
-            showAd={displayAd}
           />
-        ))}
-      </ScrollView>
-      {/*<BannerAds />*/}
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-between",
     maxWidth: "100%",
     marginTop: 0,

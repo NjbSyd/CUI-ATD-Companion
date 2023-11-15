@@ -30,13 +30,7 @@ export default function ApplicationEntry() {
         headerStyle: headerStyles.container,
       }}
     >
-      <Stack.Screen
-        name="AboutMe"
-        component={ProfileScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
+      <Stack.Screen name="AboutMe" component={ProfileScreen} />
       <Stack.Screen name="Home" component={Main} />
       <Stack.Screen name="Teachers" component={Teachers} />
       <Stack.Screen name="Classrooms" component={Classroom} />
