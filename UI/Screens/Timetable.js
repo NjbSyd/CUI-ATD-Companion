@@ -1,3 +1,6 @@
+import { FontAwesome } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -5,30 +8,29 @@ import {
   RefreshControl,
   Keyboard,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
 import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesome } from "@expo/vector-icons";
+
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
+import { TimetableDayButton } from "../Components/DayButton";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import Theme from "../Constants/Theme";
-import { TimetableDayButton } from "../Components/DayButton";
 
 export default function Timetable() {
   const classNames = useSelector((state) => state.SectionSlice.class_name);
   const [selection, setSelection] = useState(-1);
   const [selectedClassname, setSelectedClassname] = useState(null);
   const [isClassNameSelected, setIsClassNameSelected] = useState(
-    selectedClassname !== null
+    selectedClassname !== null,
   );
   const [selectedClassData, setSelectedClassData] = useState([]);
   const [selectedClassDayData, setSelectedClassDayData] = useState([]);
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars
+  const [_, setIsKeyboardOpen] = useState(false);
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
@@ -36,7 +38,7 @@ export default function Timetable() {
     AsyncStorage.getItem("className")
       .then((item) => {
         if (item) {
-          let itemJSON = JSON.parse(item);
+          const itemJSON = JSON.parse(item);
           handleOnClassChange(itemJSON, true).then(() => null);
         }
       })
@@ -46,14 +48,14 @@ export default function Timetable() {
       "keyboardDidShow",
       () => {
         setIsKeyboardOpen(true);
-      }
+      },
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setIsKeyboardOpen(false);
-      }
+      },
     );
 
     return () => {
@@ -73,7 +75,7 @@ export default function Timetable() {
       const result = await GetTimetableByClassName(item.value);
       setSelectedClassData(result);
       if (!selfCall) {
-        AsyncStorage.setItem("className", JSON.stringify(item));
+        await AsyncStorage.setItem("className", JSON.stringify(item));
       }
     } catch (e) {
       console.error(e);
@@ -92,7 +94,7 @@ export default function Timetable() {
         <RefreshControl
           refreshing={refreshing}
           enabled={selectedClassData.length <= 0}
-          progressBackgroundColor={"#5a6e98"}
+          progressBackgroundColor="#5a6e98"
           progressViewOffset={10}
           colors={["#fff"]}
           onRefresh={() => {
@@ -103,7 +105,7 @@ export default function Timetable() {
               .catch((err) => {
                 console.log(
                   "Classroom.js: Error fetching data from SQLite:",
-                  err
+                  err,
                 );
               });
           }}
@@ -117,22 +119,22 @@ export default function Timetable() {
         inputSearchStyle={styles.Dropdown_InputSearchStyle}
         containerStyle={styles.Dropdown_OptionsContainerStyle}
         itemContainerStyle={styles.Dropdown_ItemContainerStyle}
-        keyboardAvoiding={true}
+        keyboardAvoiding
         data={classNames}
         labelField="label"
         valueField="value"
         onChange={handleOnClassChange}
-        placeholder={"Select a Class"}
+        placeholder="Select a Class"
         renderRightIcon={() => (
           <FontAwesome name="caret-down" size={24} color="black" />
         )}
         value={selectedClassname}
-        search={true}
+        search
         searchPlaceholder="Enter a Class name to search"
         autoScroll={false}
       />
       {isClassNameSelected && (
-        <View style={styles.DayButtonContainer} horizontal={true}>
+        <View style={styles.DayButtonContainer} horizontal>
           {daysOfWeek.map((day, index) =>
             TimetableDayButton(
               day,
@@ -141,8 +143,8 @@ export default function Timetable() {
               filterDayData,
               isClassNameSelected,
               selection,
-              styles
-            )
+              styles,
+            ),
           )}
         </View>
       )}
@@ -150,14 +152,14 @@ export default function Timetable() {
       <ScrollView style={styles.ResultScrollView}>
         {isClassNameSelected ? (
           selection <= -1 ? (
-            <NoSelection message={"Select a day to view timetable"} />
+            <NoSelection message="Select a day to view timetable" />
           ) : selectedClassDayData.length > 0 ? (
-            <List data={selectedClassDayData} type={"Classroom"} />
+            <List data={selectedClassDayData} type="Classroom" />
           ) : (
             <NoResults message={`No Classes On ${daysOfWeek[selection]}`} />
           )
         ) : (
-          <NoSelection message={"Pick A Class"} />
+          <NoSelection message="Pick A Class" />
         )}
       </ScrollView>
       {/*<View*/}

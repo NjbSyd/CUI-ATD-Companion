@@ -1,5 +1,4 @@
 import * as Updates from "expo-updates";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function updateApp() {
   try {

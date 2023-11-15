@@ -1,15 +1,15 @@
 import "react-native-gesture-handler";
-import { LogBox } from "react-native";
-import { useEffect } from "react";
-import ApplicationEntry from "./UI/Screens/ApplicationEntry";
 import { NavigationContainer } from "@react-navigation/native";
-import SplashScreen from "./UI/Screens/SplashScreen";
-import { StatusBar } from "expo-status-bar";
-import { Provider } from "react-redux";
-import { MyStore } from "./Redux/Store";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { LogBox } from "react-native";
+import { Provider } from "react-redux";
+
+import { MyStore } from "./Redux/Store";
+import ApplicationEntry from "./UI/Screens/ApplicationEntry";
 import ErrorScreen from "./UI/Screens/ErrorScreen";
-import ProfileScreen from "./UI/Screens/ProfileScreen";
+import SplashScreen from "./UI/Screens/SplashScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -21,16 +21,16 @@ export default function App() {
     <Provider store={MyStore}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName={"Splash"}
+          initialRouteName="Splash"
           screenOptions={{
             headerShown: false,
             headerLeft: () => null,
             animation: "slide_from_bottom",
           }}
         >
-          <Stack.Screen name={"Splash"} component={SplashScreen} />
+          <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen
-            name={"ApplicationEntry"}
+            name="ApplicationEntry"
             component={ApplicationEntry}
             options={{
               gestureEnabled: false,
@@ -38,7 +38,7 @@ export default function App() {
             getId={() => "ApplicationEntry"}
           />
           <Stack.Screen
-            name={"Error"}
+            name="Error"
             component={ErrorScreen}
             options={{
               headerShown: false,

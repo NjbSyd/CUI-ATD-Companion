@@ -1,13 +1,16 @@
+import { View } from "react-native";
 import {
   BannerAd,
   BannerAdSize,
   TestIds,
 } from "react-native-google-mobile-ads";
+
 import { adKeywords } from "./Keywords";
-import { View } from "react-native";
 import Theme from "../UI/Constants/Theme";
 
-let adId = __DEV__ ? TestIds.BANNER : "ca-app-pub-2067708103851582/4227446312";
+const adId = __DEV__
+  ? TestIds.BANNER
+  : "ca-app-pub-2067708103851582/4227446312";
 
 function BannerAds() {
   return (

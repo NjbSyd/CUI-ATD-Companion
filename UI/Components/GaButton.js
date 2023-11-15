@@ -1,7 +1,7 @@
+import { Button } from "galio-framework";
+import PropTypes from "prop-types";
 import React from "react";
 import { StyleSheet } from "react-native";
-import PropTypes from "prop-types";
-import { Button } from "galio-framework";
 
 import nowTheme from "../Constants/Theme";
 

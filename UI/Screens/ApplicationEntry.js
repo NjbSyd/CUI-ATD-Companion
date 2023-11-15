@@ -1,22 +1,23 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Teachers } from "./Teachers";
-import { Classroom } from "./Classroom";
-import { Subjects } from "./Subjects";
-import Main from "./Home";
-import Timetable from "./Timetable";
-import StudentPortal from "./StudentPortal";
-import LoginScreen from "./Login";
 import { useFonts } from "expo-font";
-import Freeslots from "./Freeslots";
-import ProfileScreen from "./ProfileScreen";
-import InfoButton from "../Components/InfoButton";
 import React from "react";
 import { StyleSheet } from "react-native";
+
+import { Classroom } from "./Classroom";
+import Freeslots from "./Freeslots";
+import Main from "./Home";
+import LoginScreen from "./Login";
+import ProfileScreen from "./ProfileScreen";
+import StudentPortal from "./StudentPortal";
+import { Subjects } from "./Subjects";
+import { Teachers } from "./Teachers";
+import Timetable from "./Timetable";
+import InfoButton from "../Components/InfoButton";
 
 const Stack = createNativeStackNavigator();
 
 export default function ApplicationEntry() {
-  const [fontLoaded] = useFonts({
+  useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   return (
@@ -30,20 +31,20 @@ export default function ApplicationEntry() {
       }}
     >
       <Stack.Screen
-        name={"AboutMe"}
+        name="AboutMe"
         component={ProfileScreen}
         options={{
           headerShown: false,
         }}
       />
-      <Stack.Screen name={"Home"} component={Main} />
-      <Stack.Screen name={"Teachers"} component={Teachers} />
-      <Stack.Screen name={"Classrooms"} component={Classroom} />
-      <Stack.Screen name={"Subjects"} component={Subjects} />
-      <Stack.Screen name={"Timetable"} component={Timetable} />
-      <Stack.Screen name={"Portal"} component={StudentPortal} />
-      <Stack.Screen name={"Login"} component={LoginScreen} />
-      <Stack.Screen name={"Freeslots"} component={Freeslots} />
+      <Stack.Screen name="Home" component={Main} />
+      <Stack.Screen name="Teachers" component={Teachers} />
+      <Stack.Screen name="Classrooms" component={Classroom} />
+      <Stack.Screen name="Subjects" component={Subjects} />
+      <Stack.Screen name="Timetable" component={Timetable} />
+      <Stack.Screen name="Portal" component={StudentPortal} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Freeslots" component={Freeslots} />
     </Stack.Navigator>
   );
 }

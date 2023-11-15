@@ -1,27 +1,25 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
+import axios from "axios";
 import * as Application from "expo-application";
-import {
-  clearTimetableTable,
-  insertOrUpdateTimetableDataInBatch,
-} from "../SQLiteFunctions";
-import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
+import { Alert } from "react-native";
+
 import {
   setFreeslots,
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert } from "react-native";
-import axios from "axios";
+import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
+import {
+  clearTimetableTable,
+  insertOrUpdateTimetableDataInBatch,
+} from "../SQLiteFunctions";
 
-const api1 = axios.create({
+const API = axios.create({
   baseURL: "https://timetable-scrapper.onrender.com/",
-  timeout: 30000,
 });
-const api2 = axios.create({
-  baseURL: "https://www.server.m-nawa-z-khan.rocks/",
-  timeout: 10000,
-});
-const API = [api2, api1];
+// const API = axios.create({
+//   baseURL: "http://192.168.43.126:3000/",
+// });
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -33,24 +31,18 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      let res;
-      for (let i = 0; i < API.length; i++) {
-        try {
-          res = await API[i].post(`timetable/shouldUpdate`, {
-            lastSyncDate,
-            version: Application.nativeApplicationVersion,
-          });
-          if (res) {
-            break;
-          }
-        } catch (e) {
-          if (i === API.length - 1) {
-            throw e;
-          }
-        }
-      }
-      const data = res?.data;
-
+      const res = await API.post(`timetable/shouldUpdate`, {
+        lastSyncDate,
+        version: Application.nativeApplicationVersion,
+      });
+      const data = {
+        shouldUpdate: undefined,
+        lastScrapDate: undefined,
+        title: undefined,
+      };
+      data.shouldUpdate = res.data.shouldUpdate;
+      data.lastScrapDate = res.data.lastScrapDate;
+      data.title = res.data.title;
       if (data?.shouldUpdate) {
         return await askForDataUpdatePermission(data?.lastScrapDate);
       }
@@ -83,7 +75,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
       const isConnected = (await NetInfo.fetch()).isInternetReachable;
       if (!isConnected) {
         throw new Error(
-          "Please! Check your internet connection and try again."
+          "Please! Check your internet connection and try again.",
         );
       }
       setLoadingText("Fetching Data ...");
@@ -114,7 +106,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
       lastSyncDate
     ) {
       setLoadingText(
-        "Server Connection Timeout...⛔\nProceeding with existing data..."
+        "Server Connection Timeout...⛔\nProceeding with existing data...",
       );
       return "NoError";
     } else {
@@ -125,17 +117,11 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    let res;
-    for (let i = 0; i < API.length; i++) {
-      res = await API[i].get(URL, {
-        params: {
-          version: Application.nativeApplicationVersion,
-        },
-      });
-      if (res) {
-        break;
-      }
-    }
+    const res = await API.get(URL, {
+      params: {
+        version: Application.nativeApplicationVersion,
+      },
+    });
     return res.data;
   } catch (e) {
     throw e;
@@ -174,7 +160,7 @@ async function askForDataUpdatePermission(date) {
       `Data from ${new Date(date)
         .toString()
         .split("G")[0]
-        .trim()} has some changes ,Do you want to update it?`,
+        .trim()} has some changes,\nDo you want to update it?`,
       [
         {
           text: "Yes",
@@ -185,7 +171,7 @@ async function askForDataUpdatePermission(date) {
           onPress: () => resolve(false), // User declines permission
         },
       ],
-      { cancelable: false }
+      { cancelable: false },
     );
   });
 }

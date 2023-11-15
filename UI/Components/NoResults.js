@@ -1,7 +1,7 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 
 const NoResults = ({ message }) => {
-  let imageSource = require("../../assets/Images/nodata.png");
+  const imageSource = require("../../assets/Images/nodata.png");
   return (
     <View style={styles.view}>
       <Text style={styles.txt}>{message || "No Results"}</Text>

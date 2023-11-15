@@ -1,3 +1,9 @@
+import { setClassRoom } from "../../Redux/ClassRoomSlice";
+import { setClassNames } from "../../Redux/SectionSlice";
+import { setRegistration } from "../../Redux/StudentCredentialsSlice";
+import { setSubjectNames } from "../../Redux/SubjectSlice";
+import { setTeacherNames } from "../../Redux/TeacherSlice";
+import { setTimeslot } from "../../Redux/TimeslotSlice";
 import {
   GetClassNames,
   GetClassRooms,
@@ -6,12 +12,6 @@ import {
   GetTimeSlots,
   GetUsers,
 } from "../SQLiteSearchFunctions";
-import { setClassRoom } from "../../Redux/ClassRoomSlice";
-import { setTimeslot } from "../../Redux/TimeslotSlice";
-import { setTeacherNames } from "../../Redux/TeacherSlice";
-import { setSubjectNames } from "../../Redux/SubjectSlice";
-import { setClassNames } from "../../Redux/SectionSlice";
-import { setRegistration } from "../../Redux/StudentCredentialsSlice";
 
 async function fetchDataFromSQLite(StateDispatcher, type) {
   try {
@@ -67,15 +67,15 @@ async function fetchDataFromSQLite(StateDispatcher, type) {
 
 async function updateUserCredentialsState(StateDispatcher) {
   try {
-    let users = await GetUsers();
+    const users = await GetUsers();
     if (users.length === 0) {
       StateDispatcher(setRegistration([{ label: "null", image: "null" }]));
       return;
     }
-    let usernames = [];
+    const usernames = [];
 
     for (let i = 0; i < users.length; i++) {
-      let singleUserModel = {
+      const singleUserModel = {
         label: users[i].label,
         image: users[i].image,
       };

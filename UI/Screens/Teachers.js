@@ -1,14 +1,15 @@
-import { Keyboard, RefreshControl, ScrollView, StyleSheet } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
+import { RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { List } from "../Components/List";
-import { GetTeachersSchedule } from "../../BackEnd/SQLiteSearchFunctions";
-import NoResults from "../Components/NoResults";
 import { useDispatch, useSelector } from "react-redux";
+
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { GetTeachersSchedule } from "../../BackEnd/SQLiteSearchFunctions";
+import { List } from "../Components/List";
+import NoResults from "../Components/NoResults";
 import NoSelection from "../Components/NoSelection";
 import Theme from "../Constants/Theme";
-import { FontAwesome } from "@expo/vector-icons";
 
 export function Teachers() {
   const teachersNames = useSelector((state) => state.TeacherSlice.teacher);
@@ -17,28 +18,27 @@ export function Teachers() {
   const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef(null);
   const StateDispatcher = useDispatch();
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setIsKeyboardOpen(true);
-      }
-    );
-
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setIsKeyboardOpen(false);
-      }
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
+  // const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       setIsKeyboardOpen(true);
+  //     },
+  //   );
+  //
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     "keyboardDidHide",
+  //     () => {
+  //       setIsKeyboardOpen(false);
+  //     },
+  //   );
+  //
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //     keyboardDidHideListener.remove();
+  //   };
+  // }, []);
   useEffect(() => {}, [teachersNames]);
 
   function handleOnChange(item) {
@@ -55,7 +55,7 @@ export function Teachers() {
         <RefreshControl
           refreshing={refreshing}
           enabled={selectedTeacherData.length <= 0}
-          progressBackgroundColor={"#5a6e98"}
+          progressBackgroundColor="#5a6e98"
           colors={["#fff"]}
           progressViewOffset={10}
           onRefresh={() => {
@@ -67,7 +67,7 @@ export function Teachers() {
               .catch((err) => {
                 console.log(
                   "Teachers.js: Error fetching data from SQLite:",
-                  err
+                  err,
                 );
               });
           }}
@@ -81,17 +81,17 @@ export function Teachers() {
         inputSearchStyle={styles.Dropdown_InputSearchStyle}
         containerStyle={styles.Dropdown_OptionsContainerStyle}
         itemContainerStyle={styles.Dropdown_ItemContainerStyle}
-        keyboardAvoiding={true}
+        keyboardAvoiding
         data={teachersNames}
         labelField="label"
         valueField="value"
         onChange={handleOnChange}
-        placeholder={"Select a teacher"}
+        placeholder="Select a teacher"
         value={selectedTeacher}
         renderRightIcon={() => (
           <FontAwesome name="caret-down" size={24} color="black" />
         )}
-        search={true}
+        search
         searchPlaceholder="Enter a Teacher's name to search"
         autoScroll={false}
       />
@@ -100,10 +100,10 @@ export function Teachers() {
           selectedTeacher !== null ? (
             <NoResults />
           ) : (
-            <NoSelection message={"Select a Teacher to view Schedule"} />
+            <NoSelection message="Select a Teacher to view Schedule" />
           )
         ) : (
-          <List data={selectedTeacherData} type={"Teacher"} />
+          <List data={selectedTeacherData} type="Teacher" />
         )}
       </ScrollView>
       {/*<View*/}

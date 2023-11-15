@@ -1,7 +1,7 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 
 const NoSelection = ({ message }) => {
-  let imageSource = require("../../assets/Images/noselection.png");
+  const imageSource = require("../../assets/Images/noselection.png");
   return (
     <View style={styles.view}>
       <Text style={styles.txt}>{message || "Choose Something To View"}</Text>

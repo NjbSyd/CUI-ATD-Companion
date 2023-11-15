@@ -1,7 +1,8 @@
-import { Alert, BackHandler } from "react-native";
 import * as FileSystem from "expo-file-system";
-import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
 import { useFonts } from "expo-font";
+import { Alert, BackHandler } from "react-native";
+
+import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
 
 function LoginScript(id, pass) {
   return `
@@ -77,7 +78,7 @@ const handleBackPress = () => {
       { text: "Cancel", style: "cancel" },
       { text: "Exit", onPress: () => BackHandler.exitApp() },
     ],
-    { cancelable: false }
+    { cancelable: false },
   );
   return true;
 };
@@ -92,7 +93,7 @@ async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
     imageUrl,
-    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`
+    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`,
   );
   await updateImagePath(regNo, imagePath.uri);
 }
@@ -119,7 +120,7 @@ function CalculateTotalFreeSlots(daySchedule, timeslot) {
     }
 
     return totalFreeSlots;
-  } catch (e) {
+  } catch (_) {
     return 0;
   }
 }

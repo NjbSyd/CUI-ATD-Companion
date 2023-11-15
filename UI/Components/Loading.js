@@ -1,20 +1,19 @@
+import { useFonts } from "expo-font";
 import React from "react";
 import { View, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
-import AnimatedLottieView from "lottie-react-native";
-import { useFonts } from "expo-font";
 
 const LoadingPopup = ({ visible, text }) => {
-  const [fontLoaded] = useFonts({
+  useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   return (
-    <Modal animationType="fade" transparent={true} visible={visible}>
+    <Modal animationType="fade" transparent visible={visible}>
       <View style={styles.container}>
         <View style={styles.popup}>
           <ActivityIndicator
             style={styles.animation}
-            size={"large"}
-            color={"black"}
+            size="large"
+            color="black"
           />
           {text && (
             <Text

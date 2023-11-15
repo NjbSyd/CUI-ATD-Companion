@@ -1,3 +1,5 @@
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -6,28 +8,27 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import React, { useEffect, useRef, useState } from "react";
+
+import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
+import { FreeSlotsDayButton } from "../Components/DayButton";
+import { List } from "../Components/List";
+import LoadingPopup from "../Components/Loading";
+import NoResults from "../Components/NoResults";
+import NoSelection from "../Components/NoSelection";
+import Theme from "../Constants/Theme";
 import {
   CalculateTotalFreeSlots,
   FilterFreeSlotsByTimeSlot,
 } from "../Functions/UIHelpers";
-import LoadingPopup from "../Components/Loading";
-import NoResults from "../Components/NoResults";
-import { Dropdown } from "react-native-element-dropdown";
-import { List } from "../Components/List";
-import { fetchAndStoreFreeslotsData } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
-import NoSelection from "../Components/NoSelection";
-import Theme from "../Constants/Theme";
-import { FontAwesome } from "@expo/vector-icons";
-import { FreeSlotsDayButton } from "../Components/DayButton";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 export default function Freeslots({ navigation }) {
   const StateDispatcher = useDispatch();
   const freeslotsAvailable = useSelector(
-    (state) => state.FreeslotsSlice.available
+    (state) => state.FreeslotsSlice.available,
   );
   const timeSlots = useSelector((state) => state.TimeslotSlice.timeSlot);
   const freeslots = useSelector((state) => state.FreeslotsSlice.freeslots);
@@ -64,7 +65,7 @@ export default function Freeslots({ navigation }) {
               setSelectedTimeSlot(item.value);
               const timeslotData = FilterFreeSlotsByTimeSlot(
                 freeslots,
-                item.value
+                item.value,
               );
               setSelectedTimeSlotData(timeslotData);
             }}
@@ -73,7 +74,7 @@ export default function Freeslots({ navigation }) {
             )}
             value={selectedTimeSlot}
             autoScroll={false}
-            placeholder={"Timeslot..."}
+            placeholder="Timeslot..."
             inputSearchStyle={{ backgroundColor: "#d1fff6" }}
           />
           {selectedTimeSlot && (
@@ -87,8 +88,8 @@ export default function Freeslots({ navigation }) {
                   setSelectedDayData,
                   selectedTimeSlotData,
                   selectedTimeSlot,
-                  styles
-                )
+                  styles,
+                ),
               )}
             </View>
           )}
@@ -144,10 +145,10 @@ export default function Freeslots({ navigation }) {
           >
             <Text style={styles.buttonText}>Load Freeslots</Text>
           </TouchableOpacity>
-          <NoSelection message={"Press the button above to load FreeSlots"} />
+          <NoSelection message="Press the button above to load FreeSlots" />
         </View>
       )}
-      <LoadingPopup visible={loading} text={"Loading..."} />
+      <LoadingPopup visible={loading} text="Loading..." />
       {/*<BannerAds />*/}
     </View>
   );

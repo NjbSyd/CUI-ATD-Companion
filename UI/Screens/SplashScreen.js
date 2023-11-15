@@ -1,14 +1,15 @@
-import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import AnimatedLottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
+import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
 import { useDispatch } from "react-redux";
-import { useFonts } from "expo-font";
+
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
+import { updateApp } from "../../BackEnd/OTAUpdates";
 import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
 import { fakeSleep } from "../Functions/UIHelpers";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { useIsFocused } from "@react-navigation/native";
-import { updateApp } from "../../BackEnd/OTAUpdates";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -30,11 +31,11 @@ export default function SplashScreen({ navigation }) {
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
-  const [loadingText, setLoadingText] = useState("Loading...");
+  const [loadingText, setLoadingText] = useState("Checking for Updates...");
   const StateDispatcher = useDispatch();
   const fetchDataAndSetupAppEnvironment = async () => {
     try {
-      updateApp();
+      await updateApp();
       setLoadingText("Loading...");
       await fakeSleep(100);
       await initializeAllDatabasesAndTables();
@@ -44,7 +45,8 @@ export default function SplashScreen({ navigation }) {
         navigation.navigate("Error", {
           message: {
             title: "Server Connection Error",
-            message: "Please check your internet connection and try again.",
+            message:
+              "Please check your internet connection and try again after a while.",
           },
         });
         return;

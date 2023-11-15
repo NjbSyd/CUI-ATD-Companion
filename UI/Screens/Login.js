@@ -1,3 +1,6 @@
+import { FontAwesome5 } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { CheckBox } from "@rneui/themed";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
@@ -10,18 +13,15 @@ import {
   ScrollView,
   Keyboard,
 } from "react-native";
-import { CheckBox } from "@rneui/themed";
-import { insertOrUpdateUserCredentials } from "../../BackEnd/SQLiteFunctions";
+import { Avatar } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
+
+import { updateUserCredentialsState } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { insertOrUpdateUserCredentials } from "../../BackEnd/SQLiteFunctions";
 import {
   DeleteUserCredentialsFromDB,
   GetUserCredentialsByRegistrationNumber,
 } from "../../BackEnd/SQLiteSearchFunctions";
-import { useFocusEffect } from "@react-navigation/native";
-import { Avatar } from "react-native-paper";
-import BannerAds from "../../Ads/BannerAd";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { updateUserCredentialsState } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 
 const LoginScreen = ({ navigation }) => {
   const StateDispatcher = useDispatch();
@@ -30,14 +30,14 @@ const LoginScreen = ({ navigation }) => {
       "keyboardDidShow",
       () => {
         setIsKeyboardOpen(true);
-      }
+      },
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setIsKeyboardOpen(false);
-      }
+      },
     );
 
     return () => {
@@ -52,9 +52,9 @@ const LoginScreen = ({ navigation }) => {
         .catch((error) => {
           console.error("Error occurred:", error);
         });
-    }, [])
+    }, []),
   );
-  let users = useSelector((state) => state.StudentCredentialsSlice.users);
+  const users = useSelector((state) => state.StudentCredentialsSlice.users);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   let [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -78,11 +78,11 @@ const LoginScreen = ({ navigation }) => {
       Alert.alert(
         "Credentials Not Saved⛔",
         "You opted to NOT save credentials, But it is recommended for ease of use in the future.",
-        ["OK"],
-        { cancelable: true }
+        ["Ok"],
+        { cancelable: true },
       );
     }
-    let id = username,
+    const id = username,
       pass = password;
     setUsername("");
     setPassword("");
@@ -199,7 +199,7 @@ const LoginScreen = ({ navigation }) => {
                 <Avatar.Text
                   size={50}
                   label={user.label.split("-")[2]}
-                  color={"white"}
+                  color="white"
                   style={{
                     backgroundColor: "#3e7fbd",
                   }}

@@ -1,8 +1,9 @@
-import { Text, StyleSheet, TouchableOpacity, View } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
-import React from "react";
-import { useFonts } from "expo-font";
 import { BackgroundImage } from "@rneui/base";
+import { useFonts } from "expo-font";
+import React from "react";
+import { Text, StyleSheet, TouchableOpacity, View } from "react-native";
+
 import Theme from "../Constants/Theme";
 
 const buttonWidth = Theme.HomeScreenButtonWidth;
@@ -16,7 +17,7 @@ const RenderButton = ({
   loadedAd,
   showAd,
 }) => {
-  const [fontLoaded] = useFonts({
+  useFonts({
     bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
   });
   return (

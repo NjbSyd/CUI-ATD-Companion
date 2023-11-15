@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "CUI ATD Companion",
-    "version": "8.0.0",
-    "runtimeVersion": "3.0.0",
+    "version": "8.5.0",
+    "runtimeVersion": "3.1.0",
     "slug": "cui_unofficial",
     "owner": "njbsyd",
     "orientation": "portrait",

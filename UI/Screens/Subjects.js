@@ -1,43 +1,44 @@
-import { Keyboard, RefreshControl, ScrollView, StyleSheet } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import React, { useRef, useState } from "react";
+import { RefreshControl, ScrollView, StyleSheet } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { List } from "../Components/List";
-import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
-import NoResults from "../Components/NoResults";
 import { useDispatch, useSelector } from "react-redux";
+
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
+import { List } from "../Components/List";
+import NoResults from "../Components/NoResults";
 import NoSelection from "../Components/NoSelection";
 import Theme from "../Constants/Theme";
-import { FontAwesome } from "@expo/vector-icons";
 
 export function Subjects() {
   const subjectNames = useSelector((state) => state.SubjectSlice.subject);
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [selectedSubjectData, setSelectedSubjectData] = useState([]);
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const dropdownRef = useRef(null);
   const Dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setIsKeyboardOpen(true);
-      }
-    );
-
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setIsKeyboardOpen(false);
-      }
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
+  // const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       setIsKeyboardOpen(true);
+  //     },
+  //   );
+  //
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     "keyboardDidHide",
+  //     () => {
+  //       setIsKeyboardOpen(false);
+  //     },
+  //   );
+  //
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //     keyboardDidHideListener.remove();
+  //   };
+  // }, []);
   return (
     <ScrollView
       scrollEnabled={false}
@@ -45,7 +46,7 @@ export function Subjects() {
         <RefreshControl
           refreshing={refreshing}
           enabled={selectedSubjectData.length <= 0}
-          progressBackgroundColor={"#5a6e98"}
+          progressBackgroundColor="#5a6e98"
           colors={["#fff"]}
           progressViewOffset={10}
           onRefresh={() => {
@@ -56,7 +57,7 @@ export function Subjects() {
               .catch((err) => {
                 console.log(
                   "Subjects.js: Error fetching data from SQLite:",
-                  err
+                  err,
                 );
               });
           }}
@@ -70,7 +71,7 @@ export function Subjects() {
         inputSearchStyle={styles.Dropdown_InputSearchStyle}
         containerStyle={styles.Dropdown_OptionsContainerStyle}
         itemContainerStyle={styles.Dropdown_ItemContainerStyle}
-        keyboardAvoiding={true}
+        keyboardAvoiding
         data={subjectNames}
         labelField="label"
         valueField="value"
@@ -83,9 +84,9 @@ export function Subjects() {
             setSelectedSubjectData(res);
           });
         }}
-        placeholder={"Select a Subject"}
+        placeholder="Select a Subject"
         value={selectedSubject}
-        search={true}
+        search
         searchPlaceholder="Enter a Subject name to search"
         autoScroll={false}
       />
@@ -94,10 +95,10 @@ export function Subjects() {
           selectedSubject !== null ? (
             <NoResults />
           ) : (
-            <NoSelection message={"Select a Subject"} />
+            <NoSelection message="Select a Subject" />
           )
         ) : (
-          <List data={selectedSubjectData} type={"Subject"} />
+          <List data={selectedSubjectData} type="Subject" />
         )}
       </ScrollView>
       {/*<View*/}

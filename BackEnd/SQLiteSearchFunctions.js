@@ -8,7 +8,7 @@ async function executeSqlAsync(sqlStatement, params = []) {
         sqlStatement,
         params,
         (_, resultSet) => resolve(resultSet),
-        (_, error) => reject(error)
+        (_, error) => reject(error),
       );
     });
   });
@@ -18,7 +18,7 @@ async function GetDistinctValues(columnName, tableName, orderBy = "") {
   try {
     const orderByClause = orderBy ? `ORDER BY ${orderBy}` : "";
     const resultSet = await executeSqlAsync(
-      `SELECT DISTINCT ${columnName} FROM ${tableName} ${orderByClause}`
+      `SELECT DISTINCT ${columnName} FROM ${tableName} ${orderByClause}`,
     );
 
     const results = resultSet.rows._array.map((item) => ({
@@ -29,7 +29,7 @@ async function GetDistinctValues(columnName, tableName, orderBy = "") {
   } catch (error) {
     console.error(
       `Error occurred during GetDistinctValues for ${columnName}:`,
-      error
+      error,
     );
     throw error;
   }
@@ -60,21 +60,21 @@ async function GetUsers() {
     const distinctRegistrationNumbers = await GetDistinctValues(
       "RegistrationNumber",
       "UserCredentials",
-      "RegistrationNumber ASC"
+      "RegistrationNumber ASC",
     );
 
     const usersWithImages = await Promise.all(
       distinctRegistrationNumbers.map(async (user) => {
         const imagePath = await executeSqlAsync(
           `SELECT Image FROM UserCredentials WHERE RegistrationNumber = ?`,
-          [user.value]
+          [user.value],
         );
         const image = imagePath.rows._array[0]?.Image;
         return {
           label: user.label,
-          image: image,
+          image,
         };
-      })
+      }),
     );
 
     return usersWithImages;
@@ -90,9 +90,9 @@ async function GetUserCredentialsByRegistrationNumber(RegistrationNumber) {
   try {
     const userCredentials = await executeSqlAsync(
       `SELECT * FROM ${tableName} WHERE RegistrationNumber = ?`,
-      [RegistrationNumber]
+      [RegistrationNumber],
     );
-    let oneUser = userCredentials.rows._array;
+    const oneUser = userCredentials.rows._array;
     return oneUser.length > 0 ? oneUser[0] : null;
   } catch (error) {
     console.error("Error occurred:", error);
@@ -104,7 +104,7 @@ async function GetTeachersSchedule(teacher) {
   try {
     const resultSet = await executeSqlAsync(
       `SELECT * FROM timetables WHERE teacher = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END`,
-      [teacher]
+      [teacher],
     );
     return resultSet.rows._array;
   } catch (error) {
@@ -117,7 +117,7 @@ async function GetSubjectsSchedule(subject) {
   try {
     const resultSet = await executeSqlAsync(
       `SELECT _id, subject, teacher, class_name FROM timetables WHERE subject = ? GROUP BY class_name, teacher ORDER BY teacher`,
-      [subject]
+      [subject],
     );
 
     return resultSet.rows._array;
@@ -131,14 +131,14 @@ async function GetTimeslotBasedClassRoomTimetable(class_room, time_slot) {
   try {
     const resultSet = await executeSqlAsync(
       `SELECT * FROM timetables WHERE class_room = ? AND time_slot = ? ORDER BY CASE day WHEN 'Monday' THEN 1 WHEN 'Tuesday' THEN 2 WHEN 'Wednesday' THEN 3 WHEN 'Thursday' THEN 4 WHEN 'Friday' THEN 5 WHEN 'Saturday' THEN 6 WHEN 'Sunday' THEN 7 END`,
-      [class_room, time_slot]
+      [class_room, time_slot],
     );
 
     return resultSet.rows._array;
   } catch (error) {
     console.error(
       "Error occurred during GetTimeslotBasedClassRoomTimetable:",
-      error
+      error,
     );
     throw error;
   }
@@ -152,7 +152,7 @@ async function GetDataSyncDate(orderBy = "") {
     const DataSyncDate = await GetDistinctValues(
       columnName,
       tableName,
-      orderBy
+      orderBy,
     );
     return DataSyncDate.length > 0 ? DataSyncDate[0].value : null;
   } catch (error) {
@@ -176,7 +176,7 @@ async function GetTimetableByClassName(class_name) {
           ELSE 8
         END,
         time_slot`,
-      [class_name]
+      [class_name],
     );
 
     return resultSet.rows._array;
@@ -194,7 +194,7 @@ async function DeleteUserCredentialsFromDB(registrationNumber) {
     await db.transaction(async (tx) => {
       await tx.executeSql(
         `DELETE FROM ${tableName} WHERE RegistrationNumber = ?`,
-        [registrationNumber]
+        [registrationNumber],
       );
     });
   } catch (error) {

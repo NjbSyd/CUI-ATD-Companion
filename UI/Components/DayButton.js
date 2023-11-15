@@ -1,6 +1,7 @@
-import { Text, TouchableOpacity } from "react-native";
-import { CalculateTotalFreeSlots } from "../Functions/UIHelpers";
 import React from "react";
+import { Text, TouchableOpacity } from "react-native";
+
+import { CalculateTotalFreeSlots } from "../Functions/UIHelpers";
 
 export function FreeSlotsDayButton(
   day,
@@ -10,7 +11,7 @@ export function FreeSlotsDayButton(
   setSelectedDayData,
   selectedTimeSlotData,
   selectedTimeSlot,
-  styles
+  styles,
 ) {
   return (
     <TouchableOpacity
@@ -55,7 +56,7 @@ export function TimetableDayButton(
   filterDayData,
   isClassNameSelected,
   selection,
-  styles
+  styles,
 ) {
   return (
     <TouchableOpacity

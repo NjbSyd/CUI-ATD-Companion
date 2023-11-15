@@ -18,7 +18,7 @@ const createTimetableDataTable = async () => {
       () => {},
       (error) => {
         console.error("Error creating table:", error);
-      }
+      },
     );
   });
 };
@@ -49,7 +49,7 @@ const insertOrUpdateTimetableDataInBatch = async (inputDataArray) => {
                   (error) => {
                     console.error("Error occurred during insert:", error);
                     reject(error);
-                  }
+                  },
                 );
               } else {
                 tx.executeSql(
@@ -67,14 +67,14 @@ const insertOrUpdateTimetableDataInBatch = async (inputDataArray) => {
                   (error) => {
                     console.error("Error occurred during update:", error);
                     reject(error);
-                  }
+                  },
                 );
               }
             },
             (error) => {
               console.error("Error occurred during SELECT:", error);
               reject(error);
-            }
+            },
           );
         });
         resolve();
@@ -94,7 +94,7 @@ const createUserCredentialsTable = async () => {
           RegistrationNumber TEXT,
           Password TEXT,
           Image TEXT
-        );`
+        );`,
       );
     });
   } catch (error) {
@@ -104,7 +104,7 @@ const createUserCredentialsTable = async () => {
 
 const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
   await createUserCredentialsTable();
-  let nothing = "null";
+  const nothing = "null";
   try {
     TimetableDB.transaction((tx) => {
       tx.executeSql(
@@ -120,10 +120,10 @@ const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
               (error) => {
                 console.error(
                   "Error occurred during user credentials insert:",
-                  error
+                  error,
                 );
                 throw error;
-              }
+              },
             );
           } else {
             tx.executeSql(
@@ -133,17 +133,17 @@ const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
               (error) => {
                 console.error(
                   "Error occurred during user credentials update:",
-                  error
+                  error,
                 );
                 throw error;
-              }
+              },
             );
           }
         },
         (error) => {
           console.error("Error occurred during SELECT:", error);
           throw error;
-        }
+        },
       );
     });
   } catch (error) {
@@ -161,7 +161,7 @@ const updateImagePath = async (registrationNumber, imagePath) => {
         (error) => {
           console.error("Error occurred during image path update:", error);
           throw error;
-        }
+        },
       );
     });
   } catch (error) {
@@ -179,7 +179,7 @@ const clearTimetableTable = async () => {
       },
       (error) => {
         console.error("Error clearing data:", error);
-      }
+      },
     );
   });
 };

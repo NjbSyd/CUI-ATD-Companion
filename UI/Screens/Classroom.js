@@ -1,23 +1,17 @@
-import { Dropdown } from "react-native-element-dropdown";
-import {
-  Keyboard,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 import React, { useEffect, useRef, useState } from "react";
+import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { useDispatch, useSelector } from "react-redux";
+
+import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
+import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 import { List } from "../Components/List";
 import LoadingPopup from "../Components/Loading";
-import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
 import NoResults from "../Components/NoResults";
-import { useDispatch, useSelector } from "react-redux";
-import BannerAds from "../../Ads/BannerAd";
-import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import NoSelection from "../Components/NoSelection";
 import Theme from "../Constants/Theme";
 import { fakeSleep } from "../Functions/UIHelpers";
-import { FontAwesome } from "@expo/vector-icons";
 
 export function Classroom() {
   const rooms = useSelector((state) => state.ClassRoomSlice.classRoom);
@@ -29,27 +23,27 @@ export function Classroom() {
   const [refreshing, setRefreshing] = useState(false);
   const dropdownRef = useRef(null);
   const StateDispatcher = useDispatch();
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      "keyboardDidShow",
-      () => {
-        setIsKeyboardOpen(true);
-      }
-    );
-
-    const keyboardDidHideListener = Keyboard.addListener(
-      "keyboardDidHide",
-      () => {
-        setIsKeyboardOpen(false);
-      }
-    );
-
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  }, []);
+  // const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  // useEffect(() => {
+  //   const keyboardDidShowListener = Keyboard.addListener(
+  //     "keyboardDidShow",
+  //     () => {
+  //       setIsKeyboardOpen(true);
+  //     },
+  //   );
+  //
+  //   const keyboardDidHideListener = Keyboard.addListener(
+  //     "keyboardDidHide",
+  //     () => {
+  //       setIsKeyboardOpen(false);
+  //     },
+  //   );
+  //
+  //   return () => {
+  //     keyboardDidShowListener.remove();
+  //     keyboardDidHideListener.remove();
+  //   };
+  // }, []);
   useEffect(() => {}, [rooms, timeslots, resultingData]);
   useEffect(() => {
     trySearch();
@@ -82,7 +76,7 @@ export function Classroom() {
         <RefreshControl
           refreshing={refreshing}
           enabled={resultingData.length <= 0}
-          progressBackgroundColor={"#5a6e98"}
+          progressBackgroundColor="#5a6e98"
           colors={["#fff"]}
           progressViewOffset={10}
           onRefresh={() => {
@@ -93,7 +87,7 @@ export function Classroom() {
               .catch((err) => {
                 console.log(
                   "Classroom.js: Error fetching data from SQLite:",
-                  err
+                  err,
                 );
               });
           }}
@@ -111,9 +105,9 @@ export function Classroom() {
           labelField="label"
           valueField="value"
           onChange={(item) => {
-            const previoslySelectedTimeSlot = selectedTimeSlot;
+            const previouslySelectedTimeSlot = selectedTimeSlot;
             setSelectedTimeSlot(item.value);
-            if (item.value === previoslySelectedTimeSlot) {
+            if (item.value === previouslySelectedTimeSlot) {
               trySearch();
             }
           }}
@@ -121,9 +115,9 @@ export function Classroom() {
             <FontAwesome name="caret-down" size={24} color="black" />
           )}
           value={selectedTimeSlot}
-          mode={"modal"}
+          mode="modal"
           autoScroll={false}
-          placeholder={"Timeslot..."}
+          placeholder="Timeslot..."
           inputSearchStyle={{ backgroundColor: "#d1fff6" }}
         />
         <Dropdown
@@ -131,15 +125,15 @@ export function Classroom() {
           containerStyle={styles.selectorList}
           inputSearchStyle={styles.slotSearch}
           itemContainerStyle={styles.itemContainerStyle}
-          keyboardAvoiding={true}
+          keyboardAvoiding
           data={rooms}
-          mode={"modal"}
+          mode="modal"
           labelField="label"
           valueField="value"
           onChange={(item) => {
-            const previoslySelectedRoom = selectedRoom;
+            const previouslySelectedRoom = selectedRoom;
             setSelectedRoom(item.value);
-            if (item.value === previoslySelectedRoom) {
+            if (item.value === previouslySelectedRoom) {
               trySearch();
             }
           }}
@@ -147,10 +141,10 @@ export function Classroom() {
             <FontAwesome name="caret-down" size={24} color="black" />
           )}
           value={selectedRoom}
-          search={true}
+          search
           autoScroll={false}
-          placeholder={"Room#..."}
-          searchPlaceholder={"Enter a room number to search"}
+          placeholder="Room#..."
+          searchPlaceholder="Enter a room number to search"
         />
       </View>
       <ScrollView style={styles.ResultScrollView}>
@@ -169,10 +163,10 @@ export function Classroom() {
             )
           )
         ) : (
-          <List data={resultingData} type={"Classroom"} />
+          <List data={resultingData} type="Classroom" />
         )}
       </ScrollView>
-      <LoadingPopup text={"Searching..."} visible={isSearching} />
+      <LoadingPopup text="Searching..." visible={isSearching} />
       {/*<View*/}
       {/*  style={{*/}
       {/*    display: isKeyboardOpen ? "none" : "flex",*/}

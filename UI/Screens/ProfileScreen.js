@@ -1,3 +1,6 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import { Block, Text, theme, Button as GaButton } from "galio-framework";
 import React, { useCallback } from "react";
 import {
   StyleSheet,
@@ -10,10 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Block, Text, theme, Button as GaButton } from "galio-framework";
-import nowTheme from "../Constants/Theme";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
+
 import Theme from "../Constants/Theme";
 
 const { width, height } = Dimensions.get("screen");
@@ -32,7 +32,7 @@ const ProfileScreen = ({ navigation }) => {
           navigation.navigate("Home");
           return true;
         });
-    }, [])
+    }, []),
   );
   return (
     <Block
@@ -50,7 +50,7 @@ const ProfileScreen = ({ navigation }) => {
           marginBottom: height * 0.005,
         }}
       >
-        <ScrollView showsVerticalScrollIndicator={true}>
+        <ScrollView showsVerticalScrollIndicator>
           <Block flex>
             <Block middle>
               <Text
@@ -137,14 +137,11 @@ const ProfileScreen = ({ navigation }) => {
                 Contributors
               </Text>
             </Block>
-            <Block
-              row={true}
-              style={{ justifyContent: "center", marginBottom: 5 }}
-            >
+            <Block row style={{ justifyContent: "center", marginBottom: 5 }}>
               <TouchableOpacity
                 onPress={() => {
                   try {
-                    Linking.openURL("https://github.com/NjbSyd");
+                    Linking.openURL("https://github.com/NjbSyd").then(() => {});
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
                   }
@@ -160,7 +157,9 @@ const ProfileScreen = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   try {
-                    Linking.openURL("https://github.com/Nawaz393");
+                    Linking.openURL("https://github.com/Nawaz393").then(
+                      () => {},
+                    );
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
                   }
@@ -195,7 +194,7 @@ const ProfileScreen = ({ navigation }) => {
               </Text>
             </Block>
             <Block
-              row={true}
+              row
               style={{
                 justifyContent: "center",
                 marginBottom: 5,
@@ -207,15 +206,15 @@ const ProfileScreen = ({ navigation }) => {
                 shadowless
                 icon="linkedin"
                 iconFamily="Entypo"
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#00a7ff"}
+                iconColor={Theme.COLORS.WHITE}
+                iconSize={Theme.SIZES.BASE * 1.375}
+                color="#00a7ff"
                 style={[styles.social, styles.shadow]}
                 onPress={() => {
                   try {
                     Linking.openURL(
-                      "https://www.linkedin.com/in/najeeb-said-170477234/"
-                    );
+                      "https://www.linkedin.com/in/najeeb-said-170477234/",
+                    ).then(() => {});
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
                   }
@@ -224,22 +223,22 @@ const ProfileScreen = ({ navigation }) => {
               <GaButton
                 round
                 shadowless
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#ea4335"}
+                iconColor={Theme.COLORS.WHITE}
+                iconSize={Theme.SIZES.BASE * 1.375}
+                color="#ea4335"
                 style={[styles.social, styles.shadow]}
                 onPress={() => {
                   try {
-                    Linking.openURL("mailto:tcanjb@gmail.com");
+                    Linking.openURL("mailto:tcanjb@gmail.com").then(() => {});
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
                   }
                 }}
               >
                 <MaterialCommunityIcons
-                  name={"gmail"}
-                  size={nowTheme.SIZES.BASE * 1.375}
-                  color={"#fff"}
+                  name="gmail"
+                  size={Theme.SIZES.BASE * 1.375}
+                  color="#fff"
                 />
               </GaButton>
               <GaButton
@@ -248,15 +247,15 @@ const ProfileScreen = ({ navigation }) => {
                 shadowless
                 icon="google-play"
                 iconFamily="Entypo"
-                iconColor={nowTheme.COLORS.WHITE}
-                iconSize={nowTheme.SIZES.BASE * 1.375}
-                color={"#4285f4"}
+                iconColor={Theme.COLORS.WHITE}
+                iconSize={Theme.SIZES.BASE * 1.375}
+                color="#4285f4"
                 style={[styles.social, styles.shadow]}
                 onPress={() => {
                   try {
                     Linking.openURL(
-                      "https://play.google.com/store/apps/dev?id=5430143247484849184"
-                    );
+                      "https://play.google.com/store/apps/dev?id=5430143247484849184",
+                    ).then(() => {});
                   } catch (e) {
                     ToastAndroid.show(e.message, ToastAndroid.SHORT);
                   }
@@ -273,9 +272,9 @@ const ProfileScreen = ({ navigation }) => {
         shadowless
         icon="back"
         iconFamily="AntDesign"
-        iconColor={nowTheme.COLORS.WHITE}
-        iconSize={nowTheme.SIZES.BASE * 1.375}
-        color={"#4c5054"}
+        iconColor={Theme.COLORS.WHITE}
+        iconSize={Theme.SIZES.BASE * 1.375}
+        color="#4c5054"
         style={{
           position: "absolute",
           marginTop: height * 0.05,
@@ -327,9 +326,9 @@ const styles = StyleSheet.create({
     height: thumbMeasure,
   },
   social: {
-    width: nowTheme.SIZES.BASE * 3,
-    height: nowTheme.SIZES.BASE * 3,
-    borderRadius: nowTheme.SIZES.BASE * 1.5,
+    width: Theme.SIZES.BASE * 3,
+    height: Theme.SIZES.BASE * 3,
+    borderRadius: Theme.SIZES.BASE * 1.5,
     justifyContent: "center",
     zIndex: 99,
     marginHorizontal: 5,

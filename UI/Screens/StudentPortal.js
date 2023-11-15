@@ -1,6 +1,10 @@
+import { Entypo } from "@expo/vector-icons";
+import { LinearProgress } from "@rneui/themed";
+import React, { useRef, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
-import React, { useRef, useState } from "react";
+
+import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
 import {
   CheckCurrentPageScript,
   CheckImageExists,
@@ -8,9 +12,6 @@ import {
   DownloadProfileImage,
   LoginScript,
 } from "../Functions/UIHelpers";
-import { LinearProgress } from "@rneui/themed";
-import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
-import { Entypo } from "@expo/vector-icons";
 
 export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
@@ -22,7 +23,7 @@ export default function StudentPortal({ route, navigation }) {
   id = id.split("-");
 
   const onNavigationStateChange = (navState) => {
-    let url = navState.url;
+    const url = navState.url;
     if (url !== "https://sis.cuiatd.edu.pk/login.aspx") {
       setEvent("auto");
     }
@@ -42,7 +43,7 @@ export default function StudentPortal({ route, navigation }) {
             marginLeft: -5,
           }}
         >
-          <Entypo size={28} name={"cross"} />
+          <Entypo size={28} name="cross" />
         </TouchableOpacity>
       ),
     });
@@ -70,7 +71,7 @@ export default function StudentPortal({ route, navigation }) {
             "Login Failed",
             "Please check your Registration No. and Password!",
             ["OK"],
-            { cancelable: true }
+            { cancelable: true },
           );
           navigation.navigate("Login");
           return;

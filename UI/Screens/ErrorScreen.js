@@ -1,3 +1,5 @@
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { BackgroundImage } from "@rneui/base";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -7,8 +9,6 @@ import {
   StyleSheet,
   Linking,
 } from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { BackgroundImage } from "@rneui/base";
 
 const ErrorScreen = ({ route, navigation }) => {
   useEffect(() => {
@@ -16,7 +16,7 @@ const ErrorScreen = ({ route, navigation }) => {
       setTitle(route.params?.message?.title);
       setMessage(route.params?.message?.message);
       setUpdateNeeded(
-        route.params?.message?.title.toUpperCase().includes("UPDATE")
+        route.params?.message?.title.toUpperCase().includes("UPDATE"),
       );
     }
   }, []);
@@ -51,7 +51,7 @@ const ErrorScreen = ({ route, navigation }) => {
           onPress={() => {
             if (updateNeeded) {
               Linking.openURL(
-                "https://play.google.com/store/apps/details?id=com.njbsyd.cui.unofficial"
+                "https://play.google.com/store/apps/details?id=com.njbsyd.cui.unofficial",
               )
                 .then(() => {
                   navigation.popToTop();
@@ -68,7 +68,7 @@ const ErrorScreen = ({ route, navigation }) => {
           {updateNeeded ? (
             <Ionicons name="logo-google-playstore" size={20} color="white" />
           ) : (
-            <Feather name={"refresh-cw"} size={20} color={"white"} />
+            <Feather name="refresh-cw" size={20} color="white" />
           )}
         </TouchableOpacity>
         <TouchableOpacity
@@ -80,16 +80,16 @@ const ErrorScreen = ({ route, navigation }) => {
           }}
           onPress={async () => {
             try {
-              let supportEmail = "tcanjb@gmail.com";
+              const supportEmail = "tcanjb@gmail.com";
               if (await Linking.canOpenURL(`mailto:${supportEmail}`)) {
                 // Open the email app
                 await Linking.openURL(`mailto:${supportEmail}`);
               } else {
                 await Linking.openURL(
-                  `https://mail.google.com/compose?to=${supportEmail}`
+                  `https://mail.google.com/compose?to=${supportEmail}`,
                 );
               }
-            } catch (e) {}
+            } catch (_) {}
           }}
         >
           <Text
@@ -100,11 +100,11 @@ const ErrorScreen = ({ route, navigation }) => {
               textAlign: "left",
               marginLeft: 10,
             }}
-            selectable={true}
+            selectable
           >
             If the issue persists, Please! Email at : tcanjb@gmail.com
           </Text>
-          <Feather name={"external-link"} size={20} color={"white"} />
+          <Feather name="external-link" size={20} color="white" />
         </TouchableOpacity>
       </View>
     </BackgroundImage>

@@ -1,11 +1,12 @@
+import { useFocusEffect } from "@react-navigation/native";
 import React, { useCallback, useEffect } from "react";
 import { BackHandler, ScrollView, StyleSheet, View } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { RenderButton } from "../Components/MainScreenButton";
-import { handleBackPress } from "../Functions/UIHelpers";
+
 import useInterstitialAd from "../../Ads/InterstitialAd";
+import { RenderButton } from "../Components/MainScreenButton";
 import { HomeButtonsData } from "../Constants/HomeButtons";
 import Theme from "../Constants/Theme";
+import { handleBackPress } from "../Functions/UIHelpers";
 
 const Main = ({ navigation }) => {
   const { loadedAd, displayAd } = useInterstitialAd();
@@ -25,7 +26,7 @@ const Main = ({ navigation }) => {
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-    }, [])
+    }, []),
   );
 
   return (
