@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import axios from "axios";
 import { Alert } from "react-native";
 
+import { RailwayAPI } from "./APIs";
 import {
   setFreeslots,
   setFreeslotsAvailable,
@@ -12,16 +12,6 @@ import {
   clearTimetableTable,
   insertOrUpdateTimetableDataInBatch,
 } from "../SQLiteFunctions";
-
-const API = axios.create({
-  baseURL: "https://cui-atd-companion-scrapper-production.up.railway.app/",
-});
-// const API = axios.create({
-//   baseURL: "https://timetable-scrapper.onrender.com/",
-// });
-// const API = axios.create({
-//   baseURL: "http://192.168.43.126:3000/",
-// });
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -33,7 +23,7 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      const res = await API.post(`timetable/shouldUpdate`, {
+      const res = await RailwayAPI.post(`timetable/shouldUpdate`, {
         lastSyncDate,
       });
       const data = {
@@ -118,7 +108,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await API.get(URL);
+    const res = await RailwayAPI.get(URL);
     return res.data;
   } catch (e) {
     throw e;

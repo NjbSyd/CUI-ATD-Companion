@@ -35,7 +35,7 @@ export default function SplashScreen({ navigation }) {
   const StateDispatcher = useDispatch();
   const fetchDataAndSetupAppEnvironment = async () => {
     try {
-      await updateApp();
+      updateApp();
       setLoadingText("Loading...");
       await fakeSleep(100);
       await initializeAllDatabasesAndTables();
