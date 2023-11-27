@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { Alert } from "react-native";
 
-import { RailwayAPI } from "./APIs";
+import { DigitalOceanAPI, RailwayAPI } from "./APIs";
 import {
   setFreeslots,
   setFreeslotsAvailable,
@@ -23,7 +23,7 @@ async function shouldUpdateDataFromServer() {
       if (!(await NetInfo.fetch()).isInternetReachable) {
         return false;
       }
-      const res = await RailwayAPI.post(`timetable/shouldUpdate`, {
+      const res = await DigitalOceanAPI.post(`timetable/shouldUpdate`, {
         lastSyncDate,
       });
       const data = {
