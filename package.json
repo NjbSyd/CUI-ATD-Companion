@@ -21,7 +21,7 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@rneui/base": "^4.0.0-rc.8",
     "@rneui/themed": "^4.0.0-rc.8",
-    "axios": "^1.6.0",
+    "axios": "^1.6.7",
     "expo": "~49.0.0",
     "expo-dev-client": "~2.4.12",
     "expo-file-system": "~15.4.4",
