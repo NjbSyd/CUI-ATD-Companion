@@ -5,18 +5,18 @@
       "distribution": "internal",
       "channel": "development",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk","image": "latest"
       }
     },
     "testing": {
       "channel": "testing",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk","image": "latest"
       }
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle","image": "latest"
       },
       "autoIncrement": true,
       "channel": "production"
