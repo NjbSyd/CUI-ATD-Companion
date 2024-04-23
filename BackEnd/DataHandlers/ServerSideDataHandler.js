@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
 import { Alert } from "react-native";
 
-import { DigitalOceanAPI, RailwayAPI } from "./APIs";
+import { DigitalOceanAPI } from "./APIs";
 import {
   setFreeslots,
   setFreeslotsAvailable,
@@ -108,7 +108,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
 
 async function fetchDataFromMongoDB(URL) {
   try {
-    const res = await RailwayAPI.get(URL);
+    const res = await DigitalOceanAPI.get(URL);
     return res.data;
   } catch (e) {
     throw e;

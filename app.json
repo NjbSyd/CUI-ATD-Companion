@@ -1,9 +1,8 @@
 {
   "expo": {
     "name": "CUI ATD Companion",
-    "version": "9.0.0",
-    "runtimeVersion": "3.1.0",
-    "slug": "cui_unofficial",
+    "version": "0.0.7",
+    "slug": "cui_atd_companion",
     "owner": "njbsyd",
     "orientation": "portrait",
     "icon": "./assets/Images/icon.png",
@@ -18,15 +17,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.njbsyd.cui.unofficial"
+      "bundleIdentifier": "com.companion.cui"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.njbsyd.cui.unofficial",
-      "versionCode": 11
+      "package": "com.companion.cui"
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"
@@ -36,11 +34,8 @@
         "projectId": "f45b966a-2ad8-472a-9ba9-d266061b7883"
       }
     },
-    "updates": {
-      "url": "https://u.expo.dev/f45b966a-2ad8-472a-9ba9-d266061b7883",
-      "enabled": true,
-      "checkAutomatically": "ON_ERROR_RECOVERY",
-      "fallbackToCacheTimeout": 5000
-    }
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
