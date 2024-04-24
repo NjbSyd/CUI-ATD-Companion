@@ -6,14 +6,13 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
   TouchableOpacity,
   ToastAndroid,
   Alert,
   ScrollView,
   Keyboard,
 } from "react-native";
-import { Avatar } from "react-native-paper";
+import { Avatar, Button, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { updateUserCredentialsState } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
@@ -22,6 +21,7 @@ import {
   DeleteUserCredentialsFromDB,
   GetUserCredentialsByRegistrationNumber,
 } from "../../BackEnd/SQLiteSearchFunctions";
+import Theme from "../Constants/Theme";
 
 const LoginScreen = ({ navigation }) => {
   const StateDispatcher = useDispatch();
@@ -30,14 +30,14 @@ const LoginScreen = ({ navigation }) => {
       "keyboardDidShow",
       () => {
         setIsKeyboardOpen(true);
-      },
+      }
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setIsKeyboardOpen(false);
-      },
+      }
     );
 
     return () => {
@@ -52,7 +52,7 @@ const LoginScreen = ({ navigation }) => {
         .catch((error) => {
           console.error("Error occurred:", error);
         });
-    }, []),
+    }, [])
   );
   const users = useSelector((state) => state.StudentCredentialsSlice.users);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
@@ -61,7 +61,6 @@ const LoginScreen = ({ navigation }) => {
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [editSavedUsers, setEditSavedUsers] = useState(false);
-
   const handleLogin = async () => {
     if (username === "" || password === "") {
       ToastAndroid.show("Please fill all the fields!", ToastAndroid.SHORT);
@@ -79,7 +78,7 @@ const LoginScreen = ({ navigation }) => {
         "Credentials Not Saved⛔",
         "You opted to NOT save credentials, But it is recommended for ease of use in the future.",
         ["Ok"],
-        { cancelable: true },
+        { cancelable: true }
       );
     }
     const id = username,
@@ -90,6 +89,18 @@ const LoginScreen = ({ navigation }) => {
     setShowPassword(false);
     setEditSavedUsers(false);
     navigation.navigate("Portal", { id, pass });
+  };
+
+  const handleUsernameChange = (text) => {
+    if (text.length > 12) {
+      return;
+    }
+    text = text.toUpperCase();
+    if (text.length === 5 || text.length === 9) {
+      if (text[text.length - 1] !== "-")
+        text = text.slice(0, -1) + "-" + text.slice(-1);
+    }
+    setUsername(text.toUpperCase());
   };
 
   const handleSavedUserLogin = async (user) => {
@@ -125,39 +136,53 @@ const LoginScreen = ({ navigation }) => {
       <View style={styles.loginContainer}>
         <Text style={styles.title}>Welcome Back!</Text>
         <TextInput
-          placeholder="Registration No: FA20-BSE-023"
+          label={"Registration No"}
+          placeholder="FA20-BSE-023"
+          placeholderTextColor={"lightgrey"}
+          cursorColor="#000"
           value={username}
-          onChangeText={setUsername}
+          onChangeText={handleUsernameChange}
           style={styles.input}
+          mode="outlined"
         />
-        <View style={styles.passwordContainer}>
-          <TextInput
-            placeholder="Your Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-            style={styles.input}
-          />
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.showPasswordButton}
-          >
-            <Text style={styles.showPasswordButtonText}>
-              {showPassword ? "Hide" : "Show"}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TextInput
+          label="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          style={styles.input}
+          mode="outlined"
+          right={
+            <TextInput.Icon
+              name="eye"
+              size={24}
+              style={{
+                marginTop: 10,
+              }}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+        />
         <CheckBox
           checked={rememberMe}
           center
           onPress={() => setRememberMe(!rememberMe)}
           title="Remember Me"
-          checkedTitle="You're Remembered!"
+          checkedColor="#674FA3"
           style={styles.rememberMe}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        <Button
+          mode="elevated"
+          contentStyle={{ height: 50 }}
+          labelStyle={{ fontWeight: "bold", fontSize: 20 }}
+          style={{
+            width: "60%",
+          }}
+          onPress={handleLogin}
+          width="60%"
+        >
+          Login
+        </Button>
       </View>
       {users.length !== 0 && users[0].label !== "null" && !isKeyboardOpen && (
         <ScrollView
@@ -235,7 +260,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: "#f8f8f8",
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: 32,
@@ -244,19 +269,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    width: "80%",
-    height: 40,
-    borderRadius: 8,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    padding: 10,
-    marginBottom: 15,
-  },
-  passwordContainer: {
-    width: "80%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    width: Theme.ScreenWidth * 0.85,
+    height: Theme.ScreenWidth / 8,
+    marginBottom: Theme.SIZES.BASE,
   },
   showPasswordButton: {
     marginLeft: 5,
@@ -317,7 +332,6 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "20%",
   },
   savedUsersLabel: {
     fontSize: 24,

@@ -1,6 +1,6 @@
 import { Entypo } from "@expo/vector-icons";
 import { LinearProgress } from "@rneui/themed";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
 import WebView from "react-native-webview";
 
@@ -12,6 +12,7 @@ import {
   DownloadProfileImage,
   LoginScript,
 } from "../Functions/UIHelpers";
+import { IconButton } from "react-native-paper";
 
 export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
@@ -33,19 +34,6 @@ export default function StudentPortal({ route, navigation }) {
         fontSize: 14,
       },
       headerRight: () => null,
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => {
-            navigation.navigate("Login");
-          }}
-          style={{
-            marginRight: 20,
-            marginLeft: -5,
-          }}
-        >
-          <Entypo size={28} name="cross" />
-        </TouchableOpacity>
-      ),
     });
   };
 
@@ -71,7 +59,7 @@ export default function StudentPortal({ route, navigation }) {
             "Login Failed",
             "Please check your Registration No. and Password!",
             ["OK"],
-            { cancelable: true },
+            { cancelable: true }
           );
           navigation.navigate("Login");
           return;
