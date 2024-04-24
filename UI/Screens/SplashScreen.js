@@ -1,5 +1,5 @@
 import { useIsFocused } from "@react-navigation/native";
-import { useFonts } from "expo-font";
+
 import AnimatedLottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
@@ -27,9 +27,6 @@ export default function SplashScreen({ navigation }) {
     };
   }, [focused]);
   const animationRef = useRef(null);
-  const [fontLoaded] = useFonts({
-    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-  });
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Checking for Updates...");
   const StateDispatcher = useDispatch();

@@ -1,7 +1,6 @@
 import * as FileSystem from "expo-file-system";
-import { useFonts } from "expo-font";
 import { Alert, BackHandler } from "react-native";
-
+import * as Font from "expo-font";
 import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
 
 function LoginScript(id, pass) {
@@ -78,7 +77,7 @@ const handleBackPress = () => {
       { text: "Cancel", style: "cancel" },
       { text: "Exit", onPress: () => BackHandler.exitApp() },
     ],
-    { cancelable: false },
+    { cancelable: false }
   );
   return true;
 };
@@ -93,18 +92,22 @@ async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
     imageUrl,
-    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`,
+    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`
   );
   await updateImagePath(regNo, imagePath.uri);
 }
 
-function useCustomFonts() {
-  const [fontLoaded] = useFonts({
-    "yatra-one": require("../../assets/Fonts/YatraOne-Regular.ttf"),
-    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-    pilow: require("../../assets/Fonts/Pilowlava-Regular.otf"),
-  });
-  return fontLoaded;
+async function loadFonts() {
+  try {
+    await Font.loadAsync({
+      "yatra-one": require("../../assets/Fonts/YatraOne-Regular.ttf"),
+      bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
+      pilow: require("../../assets/Fonts/Pilowlava-Regular.otf"),
+    });
+    console.log("Loaded Fonts");
+  } catch (error) {
+    console.log("Error loading fonts", error);
+  }
 }
 
 function CalculateTotalFreeSlots(daySchedule, timeslot) {
@@ -174,7 +177,7 @@ export {
   handleBackPress,
   CheckCurrentPageScript,
   DownloadProfileImage,
-  useCustomFonts,
+  loadFonts,
   DisablePrintResultLink,
   CheckImageExists,
   CalculateTotalFreeSlots,

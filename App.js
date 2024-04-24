@@ -10,12 +10,14 @@ import { MyStore } from "./Redux/Store";
 import ApplicationEntry from "./UI/Screens/ApplicationEntry";
 import ErrorScreen from "./UI/Screens/ErrorScreen";
 import SplashScreen from "./UI/Screens/SplashScreen";
+import { loadFonts } from "./UI/Functions/UIHelpers";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   useEffect(() => {
     LogBox.ignoreAllLogs(true);
+    loadFonts().then(null);
   }, []);
   return (
     <Provider store={MyStore}>

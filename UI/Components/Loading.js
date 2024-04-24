@@ -1,11 +1,7 @@
-import { useFonts } from "expo-font";
 import React from "react";
 import { View, Modal, StyleSheet, Text, ActivityIndicator } from "react-native";
 
 const LoadingPopup = ({ visible, text }) => {
-  useFonts({
-    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-  });
   return (
     <Modal animationType="fade" transparent visible={visible}>
       <View style={styles.container}>

@@ -1,6 +1,5 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { BackgroundImage } from "@rneui/base";
-import { useFonts } from "expo-font";
 import React from "react";
 import { Text, StyleSheet, TouchableOpacity, View } from "react-native";
 
@@ -14,9 +13,6 @@ const RenderButton = ({
   screenDescription,
   navigation,
 }) => {
-  useFonts({
-    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-  });
   return (
     <TouchableOpacity
       style={[

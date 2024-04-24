@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useFonts } from "expo-font";
 import React from "react";
 import { StyleSheet } from "react-native";
 
@@ -17,9 +16,6 @@ import InfoButton from "../Components/InfoButton";
 const Stack = createNativeStackNavigator();
 
 export default function ApplicationEntry() {
-  useFonts({
-    bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-  });
   return (
     <Stack.Navigator
       initialRouteName="Home"

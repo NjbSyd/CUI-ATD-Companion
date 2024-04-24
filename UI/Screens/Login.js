@@ -11,6 +11,7 @@ import {
   Alert,
   ScrollView,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { Avatar, Button, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +22,7 @@ import {
   DeleteUserCredentialsFromDB,
   GetUserCredentialsByRegistrationNumber,
 } from "../../BackEnd/SQLiteSearchFunctions";
-import Theme from "../Constants/Theme";
+const ScreenWidth = Dimensions.get("window").width;
 
 const LoginScreen = ({ navigation }) => {
   const StateDispatcher = useDispatch();
@@ -269,9 +270,9 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   input: {
-    width: Theme.ScreenWidth * 0.85,
-    height: Theme.ScreenWidth / 8,
-    marginBottom: Theme.SIZES.BASE,
+    width: ScreenWidth * 0.85,
+    height: ScreenWidth / 8,
+    marginBottom: 16,
   },
   showPasswordButton: {
     marginLeft: 5,

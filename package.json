@@ -34,7 +34,6 @@
     "expo-updates": "~0.24.12",
     "lottie-ios": "^3.4.0",
     "lottie-react-native": "6.5.1",
-    "prop-types": "^15.8.1",
     "react": "18.2.0",
     "react-native": "0.73.6",
     "react-native-element-dropdown": "^2.9.0",
