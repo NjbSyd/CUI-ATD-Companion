@@ -5799,10 +5799,10 @@ lottie-ios@^3.4.0:
   resolved "https://registry.yarnpkg.com/lottie-ios/-/lottie-ios-3.5.0.tgz#ed909dffbf1125a180df1614cf02aadee43b7840"
   integrity sha512-DM6BYLhHTzvUsK89AjY+K9RwVGkOBwbH/iytjyZUmFbXz8DVsoPEyy+c7L5NZmVouZHvLnOQp6NaYTkwMo+iOg==
 
-lottie-react-native@6.5.1:
-  version "6.5.1"
-  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-6.5.1.tgz#7986078648d1ff274a704ae3bd979a4c3aa235c6"
-  integrity sha512-pjih71P6qX6Ax5ucUBA+YJO7+fnveI581Bd8LmYeARm3spq3AnoGzEkrWaieM8odnK6WI4d5dwEJsxge/QjFPw==
+lottie-react-native@6.7.0:
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/lottie-react-native/-/lottie-react-native-6.7.0.tgz#ef783af4224dcb4bc88a96de688e13d41104f511"
+  integrity sha512-doiF/36LaKkzo0XkgUIK8egxALNY6jGjCI4szpRuwop15LTW3DFtIA2L3pusNdaH7oM797aSH5UylIJw2k+Hgw==
 
 lru-cache@^5.1.1:
   version "5.1.1"
