@@ -33,7 +33,7 @@
     "expo-system-ui": "~2.9.4",
     "expo-updates": "~0.24.12",
     "lottie-ios": "^3.4.0",
-    "lottie-react-native": "6.5.1",
+    "lottie-react-native": "6.7.2",
     "react": "18.2.0",
     "react-native": "0.73.6",
     "react-native-element-dropdown": "^2.9.0",
