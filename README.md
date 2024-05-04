@@ -1,5 +1,7 @@
 # CUI ATD Companion
 
+Goto [Back-End](https://github.com/NjbSyd/CUI-ATD-Companion-Scrapper) of this project.
+
 Welcome to the CUI ATD Companion, your comprehensive solution for effective schedule management. Our CUI Unofficial Timetable App is designed with state-of-the-art technology to provide a seamless and intuitive experience for your academic journey.
 
 ## Features
