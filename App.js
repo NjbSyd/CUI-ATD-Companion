@@ -39,13 +39,7 @@ export default function App() {
             }}
             getId={() => "ApplicationEntry"}
           />
-          <Stack.Screen
-            name="Error"
-            component={ErrorScreen}
-            options={{
-              headerShown: false,
-            }}
-          />
+          <Stack.Screen name="Error" component={ErrorScreen} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

@@ -1,7 +1,8 @@
 import * as FileSystem from "expo-file-system";
-import { Alert, BackHandler } from "react-native";
 import * as Font from "expo-font";
-import { updateImagePath } from "../../BackEnd/SQLiteFunctions";
+import { Alert, BackHandler } from "react-native";
+
+import { updateImagePath } from "../../BackEnd/KnexDB";
 
 function LoginScript(id, pass) {
   return `
@@ -77,7 +78,7 @@ const handleBackPress = () => {
       { text: "Cancel", style: "cancel" },
       { text: "Exit", onPress: () => BackHandler.exitApp() },
     ],
-    { cancelable: false }
+    { cancelable: false },
   );
   return true;
 };
@@ -92,7 +93,7 @@ async function DownloadProfileImage(regNo) {
   const imageUrl = `https://sis.cuiatd.edu.pk/PictureHandler.ashx?reg_no=CIIT/${regNo.toUpperCase()}/ATD`;
   const imagePath = await FileSystem.downloadAsync(
     imageUrl,
-    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`
+    `${FileSystem.documentDirectory}/${regNo.toUpperCase()}.jpg`,
   );
   await updateImagePath(regNo, imagePath.uri);
 }
@@ -100,13 +101,10 @@ async function DownloadProfileImage(regNo) {
 async function loadFonts() {
   try {
     await Font.loadAsync({
-      "yatra-one": require("../../assets/Fonts/YatraOne-Regular.ttf"),
       bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
-      pilow: require("../../assets/Fonts/Pilowlava-Regular.otf"),
     });
-    console.log("Loaded Fonts");
   } catch (error) {
-    console.log("Error loading fonts", error);
+    console.error("Error loading fonts", error);
   }
 }
 

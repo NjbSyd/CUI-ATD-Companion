@@ -5,7 +5,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { GetSubjectsSchedule } from "../../BackEnd/SQLiteSearchFunctions";
+import { GetSubjectsSchedule } from "../../BackEnd/KnexDB_Search";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import NoSelection from "../Components/NoSelection";
@@ -34,7 +34,7 @@ export function Subjects() {
                 setRefreshing(false);
               })
               .catch((err) => {
-                console.log(
+                console.error(
                   "Subjects.js: Error fetching data from SQLite:",
                   err,
                 );

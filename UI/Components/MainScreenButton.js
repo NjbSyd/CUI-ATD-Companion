@@ -45,16 +45,24 @@ const RenderButton = ({
           }}
         >
           <FontAwesome5 name={iconName} size={buttonWidth / 4} color="white" />
-          <Text style={styles.buttonText}>{screenName}</Text>
+          <Text
+            style={styles.buttonText}
+            adjustsFontSizeToFit
+            numberOfLines={1}
+          >
+            {screenName}
+          </Text>
           <Text
             style={{
               color: "white",
               textAlign: "center",
-              fontSize: 12,
+              fontSize: 14,
               margin: Theme.ScreenWidth * 0.01,
               fontFamily: "bricolage",
-              height: "auto",
+              width: "85%",
             }}
+            adjustsFontSizeToFit
+            numberOfLines={2}
           >
             {screenDescription}
           </Text>
@@ -71,12 +79,16 @@ const styles = StyleSheet.create({
     marginTop: Theme.ScreenWidth * 0.05,
     borderRadius: 10,
     overflow: "hidden",
+    elevation: 5,
   },
   buttonText: {
     color: "white",
     marginTop: 10,
     fontSize: 20,
     fontWeight: "bold",
+    width: "70%",
+    textAlign: "center",
+    borderRadius: 10,
     letterSpacing: 1,
   },
 });

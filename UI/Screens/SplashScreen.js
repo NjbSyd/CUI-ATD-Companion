@@ -1,5 +1,4 @@
 import { useIsFocused } from "@react-navigation/native";
-
 import AnimatedLottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
@@ -7,8 +6,7 @@ import { useDispatch } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
-import { updateApp } from "../../BackEnd/OTAUpdates";
-import { initializeAllDatabasesAndTables } from "../../BackEnd/SQLiteFunctions";
+import { initializeAllDatabasesAndTables } from "../../BackEnd/KnexDB";
 import { fakeSleep } from "../Functions/UIHelpers";
 
 const windowWidth = Dimensions.get("window").width;
@@ -19,7 +17,6 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     if (focused) {
       animationRef.current?.play();
-      fetchDataAndSetupAppEnvironment().then(() => {});
     }
     return () => {
       setInitialAnimationDone(false);
@@ -32,7 +29,6 @@ export default function SplashScreen({ navigation }) {
   const StateDispatcher = useDispatch();
   const fetchDataAndSetupAppEnvironment = async () => {
     try {
-      updateApp();
       setLoadingText("Loading...");
       await fakeSleep(100);
       await initializeAllDatabasesAndTables();
@@ -76,14 +72,13 @@ export default function SplashScreen({ navigation }) {
         <AnimatedLottieView
           ref={animationRef}
           style={styles.splashContainer}
-          source={require("../../assets/Images/SplashScreen.json")}
-          resizeMode="center"
+          source={require("../../assets/Animations/SplashScreen.json")}
+          resizeMode="cover"
           speed={1.25}
           loop={false}
           onAnimationFinish={() => {
             setInitialAnimationDone(true);
           }}
-          autoSize
         />
       )}
       {initialAnimationDone && (
@@ -94,19 +89,23 @@ export default function SplashScreen({ navigation }) {
           />
           <AnimatedLottieView
             style={styles.progressContainer}
-            source={require("../../assets/Images/Progress.json")}
-            resizeMode="center"
+            source={require("../../assets/Animations/Progress.json")}
+            resizeMode="cover"
             autoPlay
             loop
-            autoSize
+            onAnimationLoaded={() => {
+              fetchDataAndSetupAppEnvironment().then(null);
+            }}
           />
           <Text
             style={[
               styles.progressText,
               {
-                fontFamily: fontLoaded ? "bricolage" : null,
+                fontFamily: "bricolage",
               },
             ]}
+            adjustsFontSizeToFit
+            numberOfLines={1}
           >
             {loadingText}
           </Text>
@@ -121,14 +120,12 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: windowWidth,
     aspectRatio: 4.5,
-    marginBottom: -windowWidth * 0.1,
-    marginTop: -windowWidth * 0.05,
     zIndex: 2,
   },
   splashContainer: {
     width: windowWidth,
-    height: windowHeight,
-    alignSelf: "center",
+    aspectRatio: 1.5,
+    transform: [{ scale: 2 }],
   },
   image: {
     maxWidth: windowWidth * 0.8,
@@ -143,7 +140,7 @@ const styles = StyleSheet.create({
     color: "red",
   },
   progressText: {
-    fontSize: 16,
+    fontSize: 18,
     color: "black",
     alignSelf: "center",
     textAlign: "center",
@@ -155,6 +152,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     backgroundColor: "#fff",
-    paddingTop: windowWidth * 0.4,
+    paddingTop: windowWidth * 0.35,
   },
 });

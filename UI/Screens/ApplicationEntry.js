@@ -5,7 +5,7 @@ import { StyleSheet } from "react-native";
 import { Classroom } from "./Classroom";
 import Freeslots from "./Freeslots";
 import Main from "./Home";
-import LoginScreen from "./Login";
+import LoginScreen from "./PortalLoginScreen";
 import ProfileScreen from "./ProfileScreen";
 import StudentPortal from "./StudentPortal";
 import { Subjects } from "./Subjects";
@@ -21,7 +21,7 @@ export default function ApplicationEntry() {
       initialRouteName="Home"
       screenOptions={{
         headerRight: () => <InfoButton />,
-        headerTitleStyle: [{ fontFamily: "bricolage" }, headerStyles.title],
+        headerTitleStyle: headerStyles.title,
         animation: "slide_from_right",
         headerStyle: headerStyles.container,
       }}
@@ -51,7 +51,6 @@ const headerStyles = StyleSheet.create({
   title: {
     fontSize: 28,
     color: "black",
-    backgroundColor: "transparent",
   },
   image: {
     width: 50,

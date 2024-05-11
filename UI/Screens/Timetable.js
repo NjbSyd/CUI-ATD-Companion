@@ -12,7 +12,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { GetTimetableByClassName } from "../../BackEnd/SQLiteSearchFunctions";
+import { GetTimetableByClassName } from "../../BackEnd/KnexDB_Search";
 import { TimetableDayButton } from "../Components/DayButton";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
@@ -64,8 +64,17 @@ export default function Timetable() {
     };
   }, []);
   useEffect(() => {
-    setSelection(0);
-    filterDayData("Monday");
+    const date = new Date();
+    const day = date.getDay();
+    let dayToFilter;
+    if (day === 0 || day === 6) {
+      dayToFilter = 0;
+    } else {
+      dayToFilter = day - 1;
+    }
+
+    setSelection(dayToFilter);
+    filterDayData(daysOfWeek[dayToFilter]);
   }, [selectedClassData]);
 
   async function handleOnClassChange(item, selfCall = false) {
@@ -103,7 +112,7 @@ export default function Timetable() {
                 setRefreshing(false);
               })
               .catch((err) => {
-                console.log(
+                console.error(
                   "Classroom.js: Error fetching data from SQLite:",
                   err,
                 );

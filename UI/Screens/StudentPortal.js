@@ -1,10 +1,9 @@
-import { Entypo } from "@expo/vector-icons";
 import { LinearProgress } from "@rneui/themed";
-import React, { useEffect, useRef, useState } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Alert, View } from "react-native";
 import WebView from "react-native-webview";
 
-import { DeleteUserCredentialsFromDB } from "../../BackEnd/SQLiteSearchFunctions";
+import { DeleteUserCredentialsFromDB } from "../../BackEnd/KnexDB_Search";
 import {
   CheckCurrentPageScript,
   CheckImageExists,
@@ -12,7 +11,6 @@ import {
   DownloadProfileImage,
   LoginScript,
 } from "../Functions/UIHelpers";
-import { IconButton } from "react-native-paper";
 
 export default function StudentPortal({ route, navigation }) {
   const [progress, setProgress] = useState(0);
@@ -59,7 +57,7 @@ export default function StudentPortal({ route, navigation }) {
             "Login Failed",
             "Please check your Registration No. and Password!",
             ["OK"],
-            { cancelable: true }
+            { cancelable: true },
           );
           navigation.navigate("Login");
           return;

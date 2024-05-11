@@ -1,6 +1,6 @@
 {
   "name": "cuiatd_companion",
-  "version": "8.5.0",
+  "version": "0.0.7",
   "author": "njbsyd",
   "scripts": {
     "start": "expo start --dev-client",
@@ -14,6 +14,7 @@
     "build-prod": "npx expo prebuild --clean && eas build -p android --profile production"
   },
   "dependencies": {
+    "@expo/knex-expo-sqlite-dialect": "^0.0.1",
     "@expo/vector-icons": "^14.0.0",
     "@react-native-async-storage/async-storage": "1.21.0",
     "@react-native-community/netinfo": "11.1.0",
@@ -27,11 +28,11 @@
     "expo-dev-client": "~3.3.11",
     "expo-file-system": "~16.0.9",
     "expo-font": "~11.10.3",
-    "expo-splash-screen": "~0.26.4",
+    "expo-splash-screen": "~0.26.5",
     "expo-sqlite": "~13.4.0",
     "expo-status-bar": "~1.11.1",
     "expo-system-ui": "~2.9.4",
-    "expo-updates": "~0.24.12",
+    "knex": "^3.1.0",
     "lottie-ios": "^3.4.0",
     "lottie-react-native": "6.5.1",
     "react": "18.2.0",

@@ -1,6 +1,7 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { CheckBox } from "@rneui/themed";
+import AnimatedLottieView from "lottie-react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
@@ -9,19 +10,23 @@ import {
   TouchableOpacity,
   ToastAndroid,
   Alert,
-  ScrollView,
+  FlatList,
   Keyboard,
   Dimensions,
 } from "react-native";
-import { Avatar, Button, TextInput } from "react-native-paper";
+import { Avatar, Button, IconButton, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 
 import { updateUserCredentialsState } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { insertOrUpdateUserCredentials } from "../../BackEnd/SQLiteFunctions";
+import { insertOrUpdateUserCredentials } from "../../BackEnd/KnexDB";
 import {
   DeleteUserCredentialsFromDB,
   GetUserCredentialsByRegistrationNumber,
-} from "../../BackEnd/SQLiteSearchFunctions";
+} from "../../BackEnd/KnexDB_Search";
+import { SelectDistintDepartmentNames } from "../../Redux/Selectors";
+import Theme from "../Constants/Theme";
+import { formatInput } from "../Functions/PortalLoginHelpers";
+
 const ScreenWidth = Dimensions.get("window").width;
 
 const LoginScreen = ({ navigation }) => {
@@ -31,14 +36,14 @@ const LoginScreen = ({ navigation }) => {
       "keyboardDidShow",
       () => {
         setIsKeyboardOpen(true);
-      }
+      },
     );
 
     const keyboardDidHideListener = Keyboard.addListener(
       "keyboardDidHide",
       () => {
         setIsKeyboardOpen(false);
-      }
+      },
     );
 
     return () => {
@@ -53,15 +58,17 @@ const LoginScreen = ({ navigation }) => {
         .catch((error) => {
           console.error("Error occurred:", error);
         });
-    }, [])
+    }, []),
   );
   const users = useSelector((state) => state.StudentCredentialsSlice.users);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  let [username, setUsername] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [editSavedUsers, setEditSavedUsers] = useState(false);
+  const departments = useSelector(SelectDistintDepartmentNames);
+
   const handleLogin = async () => {
     if (username === "" || password === "") {
       ToastAndroid.show("Please fill all the fields!", ToastAndroid.SHORT);
@@ -71,7 +78,10 @@ const LoginScreen = ({ navigation }) => {
       ToastAndroid.show("Invalid Registration No!", ToastAndroid.SHORT);
       return;
     }
-    username = username.toUpperCase().trim();
+    if (departments.indexOf(username.split("-")[1]) === -1) {
+      ToastAndroid.show("Invalid Department!", ToastAndroid.SHORT);
+      return;
+    }
     if (rememberMe) {
       await insertOrUpdateUserCredentials(username, password);
     } else {
@@ -79,7 +89,7 @@ const LoginScreen = ({ navigation }) => {
         "Credentials Not Saved⛔",
         "You opted to NOT save credentials, But it is recommended for ease of use in the future.",
         ["Ok"],
-        { cancelable: true }
+        { cancelable: true },
       );
     }
     const id = username,
@@ -93,15 +103,8 @@ const LoginScreen = ({ navigation }) => {
   };
 
   const handleUsernameChange = (text) => {
-    if (text.length > 12) {
-      return;
-    }
-    text = text.toUpperCase();
-    if (text.length === 5 || text.length === 9) {
-      if (text[text.length - 1] !== "-")
-        text = text.slice(0, -1) + "-" + text.slice(-1);
-    }
-    setUsername(text.toUpperCase());
+    const formattedText = formatInput(text, username, departments);
+    setUsername(formattedText);
   };
 
   const handleSavedUserLogin = async (user) => {
@@ -123,7 +126,7 @@ const LoginScreen = ({ navigation }) => {
         setPassword(res.Password);
         setRememberMe(true);
         setShowPassword(false);
-        console.log(res);
+
         navigation.navigate("Portal", {
           id: res.RegistrationNumber,
           pass: res.Password,
@@ -135,11 +138,13 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.loginContainer}>
-        <Text style={styles.title}>Welcome Back!</Text>
+        <Text style={styles.title} allowFontScaling numberOfLines={1}>
+          Welcome Back!
+        </Text>
         <TextInput
-          label={"Registration No"}
+          label="Registration No"
           placeholder="FA20-BSE-023"
-          placeholderTextColor={"lightgrey"}
+          placeholderTextColor="lightgrey"
           cursorColor="#000"
           value={username}
           onChangeText={handleUsernameChange}
@@ -155,14 +160,16 @@ const LoginScreen = ({ navigation }) => {
           mode="outlined"
           right={
             <TextInput.Icon
-              name="eye"
               size={24}
               style={{
                 marginTop: 10,
               }}
+              animated
               onPress={() => setShowPassword(!showPassword)}
+              icon={showPassword ? "eye-off" : "eye"}
             />
           }
+          autoComplete="password"
         />
         <CheckBox
           checked={rememberMe}
@@ -186,72 +193,69 @@ const LoginScreen = ({ navigation }) => {
         </Button>
       </View>
       {users.length !== 0 && users[0].label !== "null" && !isKeyboardOpen && (
-        <ScrollView
-          style={{
-            flex: 1,
-          }}
-          contentContainerStyle={styles.savedUsersOuterContainer}
-        >
+        <View style={styles.savedUsersOuterContainer}>
           <View
             style={{
               width: "100%",
+              height: Theme.SIZES.BASE * 3,
               flexDirection: "row",
-              justifyContent: "space-between",
+              justifyContent: "space-around",
+              alignItems: "center",
+              backgroundColor: "#f0f0f0",
+              marginBottom: Theme.SIZES.BASE,
+              borderRadius: Theme.SIZES.BASE,
+              elevation: 1,
             }}
           >
-            <Text style={styles.savedUsersLabel}>Saved Users:</Text>
-            <TouchableOpacity
+            <Text
+              style={styles.savedUsersLabel}
+              allowFontScaling
+              numberOfLines={1}
+            >
+              Saved Users:
+            </Text>
+            <IconButton
+              icon={editSavedUsers ? "close" : "pencil"}
+              size={24}
               onPress={() => setEditSavedUsers(!editSavedUsers)}
-            >
-              <FontAwesome5
-                name={editSavedUsers ? "check" : "edit"}
-                size={24}
-                color="#4CAF50"
-              />
-            </TouchableOpacity>
+              animated
+            />
           </View>
-          {users.map((user, i) => (
-            <TouchableOpacity
-              key={i}
-              style={{
-                margin: 5,
-                alignItems: "center",
-              }}
-              onPress={() => handleSavedUserLogin(user)}
-            >
-              {user.image !== "null" ? (
-                <Avatar.Image size={50} source={{ uri: user.image }} />
-              ) : (
-                <Avatar.Text
-                  size={50}
-                  label={user.label.split("-")[2]}
-                  color="white"
-                  style={{
-                    backgroundColor: "#3e7fbd",
-                  }}
-                />
-              )}
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 12,
-                  fontWeight: "bold",
-                  color: "#333",
-                }}
+          <FlatList
+            data={users}
+            numColumns={4}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity
+                style={styles.userContainer}
+                onPress={() => handleSavedUserLogin(item)}
               >
-                {user.label}
-              </Text>
-              {editSavedUsers && (
-                <FontAwesome5
-                  name="trash"
-                  size={24}
-                  color="red"
-                  style={styles.deleteSavedUserBtn}
-                />
-              )}
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+                {item.image !== "null" ? (
+                  <Avatar.Image
+                    size={Theme.SIZES.BASE * 3}
+                    source={{ uri: item.image }}
+                  />
+                ) : (
+                  <Avatar.Text
+                    size={Theme.SIZES.BASE * 3}
+                    label={item.label.split("-")[2]}
+                    color="white"
+                    style={styles.avatarTextStyle}
+                  />
+                )}
+                <Text style={styles.userLabel}>{item.label}</Text>
+                {editSavedUsers && (
+                  <FontAwesome5
+                    name="trash"
+                    size={Theme.SIZES.BASE * 1.2}
+                    color="white"
+                    style={styles.deleteSavedUserBtn}
+                  />
+                )}
+              </TouchableOpacity>
+            )}
+          />
+        </View>
       )}
     </View>
   );
@@ -264,10 +268,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   title: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
+    fontVariant: ["small-caps"],
+    letterSpacing: 1,
   },
   input: {
     width: ScreenWidth * 0.85,
@@ -321,12 +327,10 @@ const styles = StyleSheet.create({
   },
   savedUsersOuterContainer: {
     flex: 1,
-    height: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "center",
-    width: "80%",
+    width: "90%",
     alignItems: "center",
+    padding: Theme.SIZES.BASE * 0.5,
   },
   loginContainer: {
     flex: 1.5,
@@ -337,14 +341,29 @@ const styles = StyleSheet.create({
   savedUsersLabel: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
     color: "#333",
     width: "60%",
   },
   deleteSavedUserBtn: {
     position: "absolute",
-    top: 0,
-    left: 0,
+    textAlign: "center",
+    textAlignVertical: "center",
+    backgroundColor: "red",
+    padding: Theme.SIZES.BASE,
+    borderRadius: Theme.SIZES.BASE * 2,
+    height: Theme.SIZES.BASE * 3,
+    width: Theme.SIZES.BASE * 3,
+  },
+  userContainer: {
+    marginRight: Theme.SIZES.BASE,
+    alignItems: "center",
+  },
+  avatarTextStyle: { backgroundColor: "#3e7fbd" },
+  userLabel: {
+    fontSize: Theme.SIZES.FONT * 0.8,
+    color: "#333",
+    fontFamily: "bricolage",
+    textAlign: "center",
   },
 });
 

@@ -11,7 +11,7 @@ import {
   GetTeacherNames,
   GetTimeSlots,
   GetUsers,
-} from "../SQLiteSearchFunctions";
+} from "../KnexDB_Search";
 
 async function fetchDataFromSQLite(StateDispatcher, type) {
   try {

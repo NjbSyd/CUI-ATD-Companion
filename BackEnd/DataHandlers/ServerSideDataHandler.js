@@ -11,7 +11,7 @@ import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
 import {
   clearTimetableTable,
   insertOrUpdateTimetableDataInBatch,
-} from "../SQLiteFunctions";
+} from "../KnexDB";
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -81,7 +81,7 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
       await fakeSleep(100);
       await clearTimetableTable();
       setLoadingText("Removing Old Data...✅");
-      await fakeSleep(500);
+      await fakeSleep(100);
       await insertOrUpdateTimetableDataInBatch(timetableData);
       await AsyncStorage.setItem("lastSyncDate", new Date().toJSON());
     } else {
@@ -124,7 +124,6 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
     }
     const res = await fetchDataFromMongoDB("freeslots");
     if (res.title && res.title.toUpperCase().includes("UPDATE")) {
-      console.log(res);
       return res;
     }
     const freeslots = RemoveLabData(res);

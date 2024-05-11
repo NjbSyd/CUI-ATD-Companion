@@ -3,14 +3,12 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development",
       "android": {
         "buildType": "apk",
         "image": "latest"
       }
     },
     "testing": {
-      "channel": "testing",
       "android": {
         "buildType": "apk",
         "image": "latest"
@@ -21,8 +19,7 @@
         "buildType": "app-bundle",
         "image": "latest"
       },
-      "autoIncrement": true,
-      "channel": "production"
+      "autoIncrement": true
     }
   }
 }

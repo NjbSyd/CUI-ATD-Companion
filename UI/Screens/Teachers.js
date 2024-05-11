@@ -5,7 +5,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { GetTeachersSchedule } from "../../BackEnd/SQLiteSearchFunctions";
+import { GetTeachersSchedule } from "../../BackEnd/KnexDB_Search";
 import { List } from "../Components/List";
 import NoResults from "../Components/NoResults";
 import NoSelection from "../Components/NoSelection";
@@ -61,11 +61,10 @@ export function Teachers() {
           onRefresh={() => {
             fetchDataFromSQLite(StateDispatcher, ["teachers"])
               .then(() => {
-                console.log("Teachers.js: Data fetched from SQLite");
                 setRefreshing(false);
               })
               .catch((err) => {
-                console.log(
+                console.error(
                   "Teachers.js: Error fetching data from SQLite:",
                   err,
                 );

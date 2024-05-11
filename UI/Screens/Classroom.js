@@ -5,7 +5,7 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
-import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/SQLiteSearchFunctions";
+import { GetTimeslotBasedClassRoomTimetable } from "../../BackEnd/KnexDB_Search";
 import { List } from "../Components/List";
 import LoadingPopup from "../Components/Loading";
 import NoResults from "../Components/NoResults";
@@ -85,7 +85,7 @@ export function Classroom() {
                 setRefreshing(false);
               })
               .catch((err) => {
-                console.log(
+                console.error(
                   "Classroom.js: Error fetching data from SQLite:",
                   err,
                 );
@@ -205,10 +205,9 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   selectorList: {
-    width: "200%",
+    width: Theme.ScreenWidth * 0.75,
+    maxHeight: Theme.ScreenHeight * 0.6,
     padding: 10,
-    marginTop: "65%",
-    marginBottom: "65%",
     borderWidth: 0.3,
     borderColor: "#000",
     borderRadius: 5,

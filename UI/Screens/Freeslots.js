@@ -126,7 +126,6 @@ export default function Freeslots({ navigation }) {
                 const res = await fetchAndStoreFreeslotsData(StateDispatcher);
                 setLoading(false);
                 if (typeof res === "object") {
-                  console.log(res);
                   navigation.navigate("Error", {
                     message: res,
                   });
