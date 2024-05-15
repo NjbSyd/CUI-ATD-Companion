@@ -61,9 +61,7 @@ export function Classroom() {
         await fakeSleep(200);
         setResultingData(res);
       })
-      .catch((err) => {
-        console.error(err);
-      })
+      .catch(null)
       .finally(() => {
         setIsSearching(false);
       });
@@ -84,12 +82,7 @@ export function Classroom() {
               .then(() => {
                 setRefreshing(false);
               })
-              .catch((err) => {
-                console.error(
-                  "Classroom.js: Error fetching data from SQLite:",
-                  err,
-                );
-              });
+              .catch(null);
           }}
         />
       }

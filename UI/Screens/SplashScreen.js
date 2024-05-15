@@ -1,13 +1,12 @@
 import { useIsFocused } from "@react-navigation/native";
 import AnimatedLottieView from "lottie-react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
+import { Dimensions, Image, StyleSheet, Text, View } from "react-native";
 import { useDispatch } from "react-redux";
 
 import { fetchDataFromSQLite } from "../../BackEnd/DataHandlers/FrontEndDataHandler";
 import { updateDataFromServerIfNeeded } from "../../BackEnd/DataHandlers/ServerSideDataHandler";
 import { initializeAllDatabasesAndTables } from "../../BackEnd/KnexDB";
-import { fakeSleep } from "../Functions/UIHelpers";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -27,34 +26,14 @@ export default function SplashScreen({ navigation }) {
   const [initialAnimationDone, setInitialAnimationDone] = useState(false);
   const [loadingText, setLoadingText] = useState("Checking for Updates...");
   const StateDispatcher = useDispatch();
+
   const fetchDataAndSetupAppEnvironment = async () => {
     try {
       setLoadingText("Loading...");
-      await fakeSleep(100);
       await initializeAllDatabasesAndTables();
-      await fakeSleep(100);
-      const response = await updateDataFromServerIfNeeded(setLoadingText);
-      if (response === "Error") {
-        navigation.navigate("Error", {
-          message: {
-            title: "Server Connection Error",
-            message:
-              "Please check your internet connection and try again after a while.",
-          },
-        });
-        return;
-      } else if (
-        typeof response === "object" &&
-        response?.title.toUpperCase().includes("UPDATE")
-      ) {
-        navigation.navigate("Error", { message: response });
-        return;
-      }
-      await fakeSleep(1000);
+      await updateDataFromServerIfNeeded(setLoadingText);
       setLoadingText("Setting up the environment...");
-      await fakeSleep(100);
       await fetchDataFromSQLite(StateDispatcher, "all");
-      await fakeSleep(100);
       navigation.navigate("ApplicationEntry");
     } catch (error) {
       navigation.navigate("Error", {
@@ -78,6 +57,7 @@ export default function SplashScreen({ navigation }) {
           loop={false}
           onAnimationFinish={() => {
             setInitialAnimationDone(true);
+            fetchDataAndSetupAppEnvironment().then(null);
           }}
         />
       )}
@@ -93,9 +73,6 @@ export default function SplashScreen({ navigation }) {
             resizeMode="cover"
             autoPlay
             loop
-            onAnimationLoaded={() => {
-              fetchDataAndSetupAppEnvironment().then(null);
-            }}
           />
           <Text
             style={[

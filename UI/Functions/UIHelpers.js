@@ -103,9 +103,7 @@ async function loadFonts() {
     await Font.loadAsync({
       bricolage: require("../../assets/Fonts/BricolageGrotesque.ttf"),
     });
-  } catch (error) {
-    console.error("Error loading fonts", error);
-  }
+  } catch (_) {}
 }
 
 function CalculateTotalFreeSlots(daySchedule, timeslot) {

@@ -2,11 +2,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
   Keyboard,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { useDispatch, useSelector } from "react-redux";
@@ -86,9 +86,7 @@ export default function Timetable() {
       if (!selfCall) {
         await AsyncStorage.setItem("className", JSON.stringify(item));
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (_) {}
   }
 
   function filterDayData(day = "Monday") {
@@ -111,12 +109,7 @@ export default function Timetable() {
               .then(() => {
                 setRefreshing(false);
               })
-              .catch((err) => {
-                console.error(
-                  "Classroom.js: Error fetching data from SQLite:",
-                  err,
-                );
-              });
+              .catch(null);
           }}
         />
       }

@@ -30,7 +30,17 @@
       "favicon": "./assets/Images/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true,
+            "useLegacyPackaging": true
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

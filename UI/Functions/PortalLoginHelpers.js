@@ -8,7 +8,7 @@ const formatInput = (text, previousText, departments) => {
   if (text.length > maxLength) {
     return text.slice(0, maxLength);
   }
-  // Handle text removal
+
   if (text.length < previousText.length) {
     return text.toUpperCase();
   }
@@ -32,6 +32,7 @@ const formatInput = (text, previousText, departments) => {
     return handleYearUnitPlaceDigitInput(
       text,
       yearUnitPlaceDigit,
+      yearTenPlaceDigit,
       isCurrentYearSeptember,
     );
   }
@@ -77,14 +78,19 @@ const handleYearTenPlaceDigitInput = (text, yearTenPlaceDigit) => {
 const handleYearUnitPlaceDigitInput = (
   text,
   yearUnitPlaceDigit,
+  yearTenPlaceDigit,
   isCurrentYearSeptember,
 ) => {
-  const digit = parseInt(text[3], 10);
+  const unitPlace = parseInt(text[3], 10);
+  const tenPlace = parseInt(text[2], 10);
+  if (tenPlace < yearTenPlaceDigit && !isNaN(unitPlace)) {
+    return text;
+  }
   if (
-    isNaN(digit) ||
-    (digit >= yearUnitPlaceDigit && !isCurrentYearSeptember)
+    isNaN(unitPlace) ||
+    (unitPlace >= yearUnitPlaceDigit && !isCurrentYearSeptember)
   ) {
-    if (text.startsWith("SP") && digit === yearUnitPlaceDigit) {
+    if (text.startsWith("SP") && unitPlace === yearUnitPlaceDigit) {
       return text;
     }
     return text.slice(0, 3);

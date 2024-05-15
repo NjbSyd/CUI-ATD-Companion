@@ -7,11 +7,8 @@ import {
   setFreeslots,
   setFreeslotsAvailable,
 } from "../../Redux/FreeslotsSlice";
-import { fakeSleep, RemoveLabData } from "../../UI/Functions/UIHelpers";
-import {
-  clearTimetableTable,
-  insertOrUpdateTimetableDataInBatch,
-} from "../KnexDB";
+import { RemoveLabData } from "../../UI/Functions/UIHelpers";
+import { batchInsertTimetableData, clearTimetableTable } from "../KnexDB";
 
 // Function to check if an update is needed
 async function shouldUpdateDataFromServer() {
@@ -34,13 +31,7 @@ async function shouldUpdateDataFromServer() {
       data.shouldUpdate = res.data.shouldUpdate;
       data.lastScrapDate = res.data.lastScrapDate;
       data.title = res.data.title;
-      if (data?.shouldUpdate) {
-        return await askForDataUpdatePermission(data?.lastScrapDate);
-      }
-      if (data?.title?.toUpperCase().includes("UPDATE")) {
-        return data;
-      }
-      return false;
+      return !!data?.shouldUpdate;
     }
   } catch (error) {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
@@ -57,40 +48,24 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    const updateNeeded = await shouldUpdateDataFromServer();
-    // const updateNeeded = true;
-    if (updateNeeded?.title?.toUpperCase().includes("UPDATE")) {
-      return updateNeeded;
-    }
+    // const updateNeeded = await shouldUpdateDataFromServer();
+    const updateNeeded = true;
     if (updateNeeded) {
-      const isConnected = (await NetInfo.fetch()).isInternetReachable;
-      if (!isConnected) {
-        throw new Error(
-          "Please! Check your internet connection and try again.",
-        );
-      }
       setLoadingText("Fetching Data ...");
       const timetableData = await fetchDataFromMongoDB("timetable");
-      if (
-        timetableData.title &&
-        timetableData?.title.toUpperCase().includes("UPDATE")
-      ) {
-        return timetableData;
-      }
       setLoadingText("Removing Old Data...");
-      await fakeSleep(100);
+      // await fakeSleep(100);
       await clearTimetableTable();
       setLoadingText("Removing Old Data...✅");
-      await fakeSleep(100);
-      await insertOrUpdateTimetableDataInBatch(timetableData);
+      // await fakeSleep(100);
+      await batchInsertTimetableData(timetableData);
       await AsyncStorage.setItem("lastSyncDate", new Date().toJSON());
     } else {
       setLoadingText("Proceeding with existing data...");
     }
-    return "NoError";
   } catch (error) {
     const lastSyncDate = await AsyncStorage.getItem("lastSyncDate");
-    if (error.message.toUpperCase().includes("INTERNET")) {
+    if (error.message.toUpperCase().includes("NETWORK")) {
       throw new Error("Please! Check your internet connection and try again.");
     } else if (
       error.message.toUpperCase().includes("TIMEOUT") &&
@@ -99,7 +74,6 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
       setLoadingText(
         "Server Connection Timeout...⛔\nProceeding with existing data...",
       );
-      return "NoError";
     } else {
       throw new Error("Please! Restart the App or Try Again.");
     }
@@ -123,9 +97,6 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
       return;
     }
     const res = await fetchDataFromMongoDB("freeslots");
-    if (res.title && res.title.toUpperCase().includes("UPDATE")) {
-      return res;
-    }
     const freeslots = RemoveLabData(res);
     StateDispatcher(setFreeslots(freeslots));
     StateDispatcher(setFreeslotsAvailable(true));

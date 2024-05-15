@@ -28,10 +28,6 @@ export default function StudentPortal({ route, navigation }) {
     }
     navigation.setOptions({
       title: url,
-      headerTitleStyle: {
-        fontSize: 14,
-      },
-      headerRight: () => null,
     });
   };
 
@@ -50,13 +46,17 @@ export default function StudentPortal({ route, navigation }) {
   const handleOnMessageEvent = async (event) => {
     try {
       const currentPage = event.nativeEvent.data;
-      if (navigationCounter >= 2) {
+      if (navigationCounter === 2) {
         if (currentPage === "https://sis.cuiatd.edu.pk/login.aspx") {
           await DeleteUserCredentialsFromDB(id.join("-"));
           Alert.alert(
             "Login Failed",
             "Please check your Registration No. and Password!",
-            ["OK"],
+            [
+              {
+                text: "OK",
+              },
+            ],
             { cancelable: true },
           );
           navigation.navigate("Login");
@@ -70,9 +70,7 @@ export default function StudentPortal({ route, navigation }) {
           await DownloadProfileImage(id.join("-"));
         }
       }
-    } catch (error) {
-      console.error("Error occurred:", error);
-    }
+    } catch (_) {}
   };
   return (
     <View

@@ -1,18 +1,17 @@
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { CheckBox } from "@rneui/themed";
-import AnimatedLottieView from "lottie-react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ToastAndroid,
   Alert,
+  Dimensions,
   FlatList,
   Keyboard,
-  Dimensions,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Avatar, Button, IconButton, TextInput } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,9 +54,7 @@ const LoginScreen = ({ navigation }) => {
     useCallback(() => {
       updateUserCredentialsState(StateDispatcher)
         .then(() => {})
-        .catch((error) => {
-          console.error("Error occurred:", error);
-        });
+        .catch(null);
     }, []),
   );
   const users = useSelector((state) => state.StudentCredentialsSlice.users);
@@ -113,13 +110,9 @@ const LoginScreen = ({ navigation }) => {
         .then(() => {
           updateUserCredentialsState(StateDispatcher)
             .then(() => {})
-            .catch((error) => {
-              console.error("Error occurred:", error);
-            });
+            .catch(null);
         })
-        .catch((error) => {
-          console.error("Error occurred:", error);
-        });
+        .catch(null);
     } else {
       GetUserCredentialsByRegistrationNumber(user.label).then((res) => {
         setUsername(res.RegistrationNumber);
@@ -150,6 +143,7 @@ const LoginScreen = ({ navigation }) => {
           onChangeText={handleUsernameChange}
           style={styles.input}
           mode="outlined"
+          activeOutlineColor={Theme.COLORS.MAIN}
         />
         <TextInput
           label="Password"
@@ -164,11 +158,13 @@ const LoginScreen = ({ navigation }) => {
               style={{
                 marginTop: 10,
               }}
+              color={Theme.COLORS.MAIN}
               animated
               onPress={() => setShowPassword(!showPassword)}
               icon={showPassword ? "eye-off" : "eye"}
             />
           }
+          activeOutlineColor={Theme.COLORS.MAIN}
           autoComplete="password"
         />
         <CheckBox
@@ -176,7 +172,7 @@ const LoginScreen = ({ navigation }) => {
           center
           onPress={() => setRememberMe(!rememberMe)}
           title="Remember Me"
-          checkedColor="#674FA3"
+          checkedColor={Theme.COLORS.MAIN}
           style={styles.rememberMe}
         />
         <Button
@@ -184,10 +180,11 @@ const LoginScreen = ({ navigation }) => {
           contentStyle={{ height: 50 }}
           labelStyle={{ fontWeight: "bold", fontSize: 20 }}
           style={{
-            width: "60%",
+            borderRadius: Theme.SIZES.BASE,
           }}
           onPress={handleLogin}
-          width="60%"
+          buttonColor={Theme.COLORS.MAIN}
+          textColor={Theme.COLORS.WHITE}
         >
           Login
         </Button>
@@ -201,7 +198,7 @@ const LoginScreen = ({ navigation }) => {
               flexDirection: "row",
               justifyContent: "space-around",
               alignItems: "center",
-              backgroundColor: "#f0f0f0",
+              backgroundColor: Theme.COLORS.BORDER_COLOR,
               marginBottom: Theme.SIZES.BASE,
               borderRadius: Theme.SIZES.BASE,
               elevation: 1,
@@ -219,25 +216,27 @@ const LoginScreen = ({ navigation }) => {
               size={24}
               onPress={() => setEditSavedUsers(!editSavedUsers)}
               animated
+              iconColor={Theme.COLORS.MAIN}
+              containerColor={Theme.COLORS.WHITE}
             />
           </View>
           <FlatList
             data={users}
             numColumns={4}
             keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <TouchableOpacity
                 style={styles.userContainer}
                 onPress={() => handleSavedUserLogin(item)}
               >
                 {item.image !== "null" ? (
                   <Avatar.Image
-                    size={Theme.SIZES.BASE * 3}
+                    size={Theme.SIZES.BASE * 3.5}
                     source={{ uri: item.image }}
                   />
                 ) : (
                   <Avatar.Text
-                    size={Theme.SIZES.BASE * 3}
+                    size={Theme.SIZES.BASE * 3.5}
                     label={item.label.split("-")[2]}
                     color="white"
                     style={styles.avatarTextStyle}
@@ -247,9 +246,10 @@ const LoginScreen = ({ navigation }) => {
                 {editSavedUsers && (
                   <FontAwesome5
                     name="trash"
-                    size={Theme.SIZES.BASE * 1.2}
+                    size={Theme.SIZES.BASE}
                     color="white"
                     style={styles.deleteSavedUserBtn}
+                    allowFontScaling
                   />
                 )}
               </TouchableOpacity>
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "bold",
     marginBottom: 20,
-    color: "#333",
+    color: Theme.COLORS.MAIN,
     fontVariant: ["small-caps"],
     letterSpacing: 1,
   },
@@ -300,31 +300,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-  slotSelector: {
-    width: "95%",
-    padding: 10,
-    marginTop: 10,
-    borderWidth: 0.3,
-    borderColor: "#000",
-    borderRadius: 5,
-  },
-  slotOptionsContainer: {
-    borderColor: "#000",
-    borderWidth: 0.3,
-    borderRadius: 5,
-  },
-  slotSearch: {
-    backgroundColor: "#000",
-    color: "#fff",
-    letterSpacing: 1,
-    borderRadius: 5,
-    height: 60,
-  },
   savedUsersOuterContainer: {
     flex: 1,
     justifyContent: "center",
@@ -341,7 +316,7 @@ const styles = StyleSheet.create({
   savedUsersLabel: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
+    color: Theme.COLORS.MAIN,
     width: "60%",
   },
   deleteSavedUserBtn: {
@@ -351,8 +326,8 @@ const styles = StyleSheet.create({
     backgroundColor: "red",
     padding: Theme.SIZES.BASE,
     borderRadius: Theme.SIZES.BASE * 2,
-    height: Theme.SIZES.BASE * 3,
-    width: Theme.SIZES.BASE * 3,
+    height: Theme.SIZES.BASE * 3.5,
+    width: Theme.SIZES.BASE * 3.5,
   },
   userContainer: {
     marginRight: Theme.SIZES.BASE,

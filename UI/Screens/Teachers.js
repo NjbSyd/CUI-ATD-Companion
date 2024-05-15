@@ -63,12 +63,7 @@ export function Teachers() {
               .then(() => {
                 setRefreshing(false);
               })
-              .catch((err) => {
-                console.error(
-                  "Teachers.js: Error fetching data from SQLite:",
-                  err,
-                );
-              });
+              .catch(null);
           }}
         />
       }

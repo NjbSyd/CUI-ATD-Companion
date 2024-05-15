@@ -60,7 +60,6 @@ async function fetchDataFromSQLite(StateDispatcher, type) {
     }
     return true;
   } catch (error) {
-    console.error("Error fetching data from SQLite:", error);
     throw error;
   }
 }
@@ -83,7 +82,6 @@ async function updateUserCredentialsState(StateDispatcher) {
     }
     StateDispatcher(setRegistration(usernames));
   } catch (error) {
-    console.error("Error occurred:", error);
     throw error;
   }
 }

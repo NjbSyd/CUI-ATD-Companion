@@ -33,12 +33,7 @@ export function Subjects() {
               .then(() => {
                 setRefreshing(false);
               })
-              .catch((err) => {
-                console.error(
-                  "Subjects.js: Error fetching data from SQLite:",
-                  err,
-                );
-              });
+              .catch(null);
           }}
         />
       }

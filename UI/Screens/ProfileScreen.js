@@ -1,43 +1,24 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import {
-  StyleSheet,
-  ScrollView,
   Image,
   Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
   ToastAndroid,
-  BackHandler,
   TouchableOpacity,
   View,
-  Text,
 } from "react-native";
 
 import Theme from "../Constants/Theme";
 
-const ProfileScreen = ({ navigation }) => {
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => <></>,
-      headerTitleStyle: [styles.title, { color: "#7c47d9" }],
-      headerTitle: "About the App",
-    });
-  }, []);
-  const handleBackPress = () => {
-    navigation.navigate("Home");
-    return true;
-  };
-
-  useCallback(() => {
-    BackHandler.addEventListener("hardwareBackPress", handleBackPress);
-    return () =>
-      BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
-  }, []);
-
+const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <Text style={styles.text}>
+          <Text style={styles.text} textBreakStrategy={"highQuality"}>
             The CUIATD Companion App provides a simple and efficient way to
             manage your class schedules. Built with expertise in React Native
             and Web technologies, it offers a user-friendly interface for
@@ -50,7 +31,7 @@ const ProfileScreen = ({ navigation }) => {
           <Text style={[styles.title, { color: "#00a7ff" }]}>
             Privacy Policy
           </Text>
-          <Text style={styles.text}>
+          <Text style={styles.text} textBreakStrategy={"highQuality"}>
             This app does not collect, store, or share any personal information.
             Any login credentials saved are stored locally on your device for
             your convenience.{" "}
@@ -69,7 +50,7 @@ const ProfileScreen = ({ navigation }) => {
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={[styles.title, { color: "#EA4335" }]}>Data Source</Text>
-          <Text style={styles.text}>
+          <Text style={styles.text} textBreakStrategy={"highQuality"}>
             The data used in this app is sourced from the official CUI
             Administration website . Specifically, it is obtained from the{" "}
             <Text
@@ -225,7 +206,7 @@ const styles = StyleSheet.create({
     padding: Theme.ScreenWidth * 0.05,
   },
   title: {
-    fontFamily: "montserrat-bold",
+    fontFamily: "bricolage",
     fontSize: 26,
     letterSpacing: 2,
     marginBottom: Theme.ScreenWidth * 0.025,

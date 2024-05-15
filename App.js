@@ -27,16 +27,13 @@ export default function App() {
           screenOptions={{
             headerShown: false,
             headerLeft: () => null,
-            animation: "slide_from_bottom",
+            animation: "fade_from_bottom",
           }}
         >
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen
             name="ApplicationEntry"
             component={ApplicationEntry}
-            options={{
-              gestureEnabled: false,
-            }}
             getId={() => "ApplicationEntry"}
           />
           <Stack.Screen name="Error" component={ErrorScreen} />

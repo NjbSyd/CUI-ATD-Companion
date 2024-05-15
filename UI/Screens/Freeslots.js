@@ -123,13 +123,8 @@ export default function Freeslots({ navigation }) {
             onPress={async () => {
               try {
                 setLoading(true);
-                const res = await fetchAndStoreFreeslotsData(StateDispatcher);
+                await fetchAndStoreFreeslotsData(StateDispatcher);
                 setLoading(false);
-                if (typeof res === "object") {
-                  navigation.navigate("Error", {
-                    message: res,
-                  });
-                }
               } catch (e) {
                 Alert.alert("Something Went Wrong!", e.message, [
                   {
@@ -184,7 +179,7 @@ const styles = StyleSheet.create({
     width: "60%",
     height: 50,
     backgroundColor: Theme.COLORS.MAIN,
-    borderRadius: 8,
+    borderRadius: Theme.SIZES.BASE,
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",

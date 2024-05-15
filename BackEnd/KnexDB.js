@@ -12,8 +12,14 @@ export const KnexDB = Knex({
 const createTimetableDataTable = async () => {
   try {
     const hasTable = await KnexDB.schema.hasTable("timetables");
-    if (!hasTable) {
+    const has__vColumn = await KnexDB.schema.hasColumn("timetables", "__v");
+    if (hasTable && !has__vColumn) {
+      await KnexDB.schema.alterTable("timetables", (table) => {
+        table.float("__v");
+      });
+    } else if (!hasTable) {
       await KnexDB.schema.createTable("timetables", (table) => {
+        table.float("__v");
         table.string("_id").primary();
         table.string("class_name");
         table.string("class_room");
@@ -23,41 +29,17 @@ const createTimetableDataTable = async () => {
         table.string("time_slot");
       });
     }
-  } catch (error) {
-    console.error("Error creating table:", error);
-  }
+  } catch (_) {}
 };
 
-const insertOrUpdateTimetableDataInBatch = async (inputDataArray) => {
+const batchInsertTimetableData = async (inputDataArray) => {
   try {
-    for (const inputData of inputDataArray) {
-      const existingRow = await KnexDB("timetables")
-        .where("_id", inputData._id)
-        .first();
-
-      if (!existingRow) {
-        await KnexDB("timetables").insert({
-          _id: inputData._id,
-          class_name: inputData.class_name,
-          class_room: inputData.class_room,
-          day: inputData.day,
-          subject: inputData.subject,
-          teacher: inputData.teacher,
-          time_slot: inputData.time_slot,
-        });
-      } else {
-        await KnexDB("timetables").where("_id", inputData._id).update({
-          class_name: inputData.class_name,
-          class_room: inputData.class_room,
-          day: inputData.day,
-          subject: inputData.subject,
-          teacher: inputData.teacher,
-          time_slot: inputData.time_slot,
-        });
-      }
-    }
-  } catch (error) {
-    console.error("Error occurred:", error);
+    await clearTimetableTable();
+    await KnexDB.batchInsert("timetables", inputDataArray, 500).returning(
+      "_id",
+    );
+  } catch (_) {
+    throw new Error("Error inserting data");
   }
 };
 
@@ -72,51 +54,35 @@ const createUserCredentialsTable = async () => {
         table.string("Image");
       });
     }
-  } catch (error) {
-    console.error("Error creating UserCredentials table:", error);
-  }
+  } catch (_) {}
 };
 
-const insertOrUpdateUserCredentials = async (registrationNumber, password) => {
+async function insertOrUpdateUserCredentials(registrationNumber, password) {
   await createUserCredentialsTable();
-  const nothing = "null";
   try {
-    const existingRow = await KnexDB("UserCredentials")
-      .where("RegistrationNumber", registrationNumber)
-      .first();
-
-    if (!existingRow) {
-      await KnexDB("UserCredentials").insert({
+    await KnexDB("UserCredentials")
+      .insert({
         RegistrationNumber: registrationNumber,
         Password: password,
-        Image: nothing,
-      });
-    } else {
-      await KnexDB("UserCredentials")
-        .where("RegistrationNumber", registrationNumber)
-        .update({ Password: password });
-    }
-  } catch (error) {
-    console.error("Error occurred:", error);
-  }
-};
+        Image: "null",
+      })
+      .onConflict("id")
+      .merge({ Password: password });
+  } catch (_) {}
+}
 
 const updateImagePath = async (registrationNumber, imagePath) => {
   try {
     await KnexDB("UserCredentials")
       .where("RegistrationNumber", registrationNumber)
       .update({ Image: imagePath });
-  } catch (error) {
-    console.error("Error occurred:", error);
-  }
+  } catch (_) {}
 };
 
 const clearTimetableTable = async () => {
   try {
     await KnexDB("timetables").truncate();
-  } catch (error) {
-    console.error("Error clearing data:", error);
-  }
+  } catch (_) {}
 };
 
 async function initializeAllDatabasesAndTables() {
@@ -131,5 +97,5 @@ export {
   insertOrUpdateUserCredentials,
   createUserCredentialsTable,
   updateImagePath,
-  insertOrUpdateTimetableDataInBatch,
+  batchInsertTimetableData,
 };
