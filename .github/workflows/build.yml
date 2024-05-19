@@ -6,8 +6,8 @@ on:
         type: choice
         description: OS to build on. Ubuntu is faster, MacOS supports iOS builds
         options:
-          - macos-latest
           - ubuntu-latest
+          - macos-latest
       platform:
         type: choice
         description: Platform to build for
