@@ -1,6 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import { Alert } from "react-native";
 
 import { DigitalOceanAPI } from "./APIs";
 import {
@@ -48,8 +47,8 @@ async function updateDataFromServerIfNeeded(setLoadingText) {
     setLoadingText = () => {};
   }
   try {
-    // const updateNeeded = await shouldUpdateDataFromServer();
-    const updateNeeded = true;
+    const updateNeeded = await shouldUpdateDataFromServer();
+    // const updateNeeded = true;
     if (updateNeeded) {
       setLoadingText("Fetching Data ...");
       const timetableData = await fetchDataFromMongoDB("timetable");
@@ -108,29 +107,6 @@ async function fetchAndStoreFreeslotsData(StateDispatcher) {
       throw error;
     }
   }
-}
-
-async function askForDataUpdatePermission(date) {
-  return new Promise((resolve) => {
-    Alert.alert(
-      "Data Update Permission",
-      `Data from ${new Date(date)
-        .toString()
-        .split("G")[0]
-        .trim()} has some changes,\nDo you want to update it?`,
-      [
-        {
-          text: "Yes",
-          onPress: () => resolve(true), // User grants permission
-        },
-        {
-          text: "No",
-          onPress: () => resolve(false), // User declines permission
-        },
-      ],
-      { cancelable: false },
-    );
-  });
 }
 
 export {
