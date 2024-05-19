@@ -45,6 +45,14 @@ jobs:
           expo-version: latest
           eas-version: latest
 
+      - name: 🏗 Setup Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+
+      - name: 🏗 Check Java version
+        run: java -version
+
       - name: 📦 Install dependencies
         run: yarn
 
