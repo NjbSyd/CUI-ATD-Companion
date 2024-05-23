@@ -4,7 +4,7 @@
     "version": "0.0.7",
     "slug": "cui_atd_companion",
     "owner": "njbsyd",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/Images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
@@ -17,14 +17,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.companion.cui"
+      "bundleIdentifier": "com.companion.cui.dev"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.companion.cui"
+      "package": "com.companion.cui.dev"
     },
     "web": {
       "favicon": "./assets/Images/favicon.png"
